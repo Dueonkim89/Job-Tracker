@@ -1,0 +1,16 @@
+// Source: https://spin.atomicobject.com/2020/08/17/cra-express-share-code/
+
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "strict": true,
+        "outDir": "../../dist",
+        "noEmit": false,
+        "sourceMap": true,
+        "module": "esnext",
+        "target": "esnext",
+        "moduleResolution": "node"
+    },
+    "exclude": ["../../build", "../client"],
+    "include": ["."]
+}

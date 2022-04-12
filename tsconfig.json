@@ -1,0 +1,29 @@
+// Source: https://www.sitepoint.com/react-with-typescript-best-practices/
+
+{
+    "compilerOptions": {
+        "target": "es5", // Specify ECMAScript target version
+        "strict": true, // Enable all strict type checking options
+        "allowJs": true, // Allow JavaScript files to be compiled
+        "module": "esnext", // Specify module code generation
+        "jsx": "react", // Support JSX in .tsx files
+        "sourceMap": true, // Generate corrresponding .map file
+        "noFallthroughCasesInSwitch": true, // Report errors for fallthrough cases in switch statement
+        "allowSyntheticDefaultImports": true, // Allow default imports from modules with no default export
+        "skipLibCheck": true, // Skip type checking of all declaration files
+        "lib": ["dom", "dom.iterable", "esnext"] // List of library files to be included in the compilation
+        // "noUnusedLocals": true, // Report errors on unused locals
+        // "noUnusedParameters": true, // Report errors on unused parameters
+        // "declaration": true, // Generate corresponding .d.ts file
+        // "moduleResolution": "node", // Resolve modules using Node.js style
+        // "esModuleInterop": true, // Disables namespace imports (import * as fs from "fs") and enables CJS/AMD/UMD style imports (import fs from "fs")
+        // "forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references to the same file.
+        // "isolatedModules": true, // Unconditionally emit imports for unresolved files
+        // "resolveJsonModule": true, // Include modules imported with .json extension
+        // "incremental": true, // Enable incremental compilation by reading/writing information from prior compilations to a file on disk
+    },
+    "include": [
+        "src/**/*" // *** The files TypeScript should type check ***
+    ],
+    "exclude": ["node_modules", "build", "src/server"] // *** The files to not type check ***
+}
