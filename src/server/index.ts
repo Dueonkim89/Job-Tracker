@@ -1,6 +1,8 @@
+import "dotenv/config";
 import express from "express";
 import bodyParser from "body-parser";
 import path from "path";
+import user from "./models/user";
 
 const buildDir = path.join(process.cwd() + "/build");
 const app = express();
@@ -12,7 +14,7 @@ app.use(
 );
 app.use(express.static(buildDir));
 
-app.get("/*", function (req, res) {
+app.get("/", function (req, res) {
     res.sendFile(path.join(buildDir, "index.html"));
 });
 
