@@ -9,7 +9,7 @@ trigger:
 pool:
   name: Job-Tracker
   demands:
-    agent.os -equals Monterey
+    -Agent.Version -equals 2.202.1
 #pool:
   #vmImage: ubuntu-latest
 
