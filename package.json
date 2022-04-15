@@ -10,6 +10,7 @@
         "@types/node": "^17.0.23",
         "@types/react": "^18.0.1",
         "@types/react-dom": "^18.0.0",
+        "bcrypt": "^5.0.1",
         "body-parser": "^1.20.0",
         "cjs": "^0.0.11",
         "concurrently": "^7.1.0",
