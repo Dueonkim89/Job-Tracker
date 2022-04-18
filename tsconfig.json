@@ -23,7 +23,8 @@
         // "incremental": true, // Enable incremental compilation by reading/writing information from prior compilations to a file on disk
     },
     "include": [
-        "src/**/*" // *** The files TypeScript should type check ***
+        "src/**/*", // *** The files TypeScript should type check ***
+        "FLAGS.ts"
     ],
     "exclude": ["node_modules", "build", "src/server"] // *** The files to not type check ***
 }

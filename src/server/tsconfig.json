@@ -12,5 +12,5 @@
         "moduleResolution": "node"
     },
     "exclude": ["../../build", "../client"],
-    "include": ["."]
+    "include": [".", "../../FLAGS.ts"]
 }
