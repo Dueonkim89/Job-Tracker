@@ -1,7 +1,7 @@
 import mysql from "mysql2";
 import fs from "fs";
 import path from "path";
-import { environment, LOCAL, AZURE } from "../FLAGS";
+import { environment, LOCAL, AZURE } from "../../../FLAGS";
 
 // create the connection to database
 const certDir = path.join(process.cwd(), "certs", "BaltimoreCyberTrustRoot.crt.pem");

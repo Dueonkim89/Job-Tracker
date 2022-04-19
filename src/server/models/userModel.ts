@@ -1,17 +1,20 @@
 import db from "./db";
 
-const user = {
-    // TBU - finished this function - add additional parameters
-    async create(params: any) {
-        const { fullName } = params;
-        const sql = "INSERT INTO `user` (full_name) VALUES (?)";
-        const [rows, fields] = await db.query(sql, [fullName]);
-    },
-    async getAll() {
-        const sql = "SELECT * FROM `user`";
-        const [rows, fields] = await db.query(sql);
-        return rows;
-    },
-};
+// TBU - finished this function - add additional parameters
+export async function createUser(params: any) {
+    const { fullName } = params;
+    const sql = "INSERT INTO `user` (full_name) VALUES (?)";
+    const [rows, fields] = await db.query(sql, [fullName]);
+}
 
-export default user;
+export async function getAll() {
+    const sql = "SELECT * FROM `user`";
+    const [rows, fields] = await db.query(sql);
+    return rows;
+}
+
+export async function getUser(userID: string) {
+    const sql = "SELECT * FROM `user` WHERE user_id = ?";
+    const [rows, fields] = await db.query(sql, [userID]);
+    return rows;
+}

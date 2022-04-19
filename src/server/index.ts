@@ -3,6 +3,7 @@ import path from "path";
 import express, { Express, Request, Response, ErrorRequestHandler } from "express";
 import bodyParser from "body-parser";
 import userRouter from "./routes/userRouter";
+import applicationRouter from "./routes/applicationRouter";
 
 const buildDir = path.join(process.cwd(), "/build");
 
@@ -19,7 +20,8 @@ app.get("/", function (req: Request, res: Response) {
     res.sendFile(path.join(buildDir, "index.html"));
 });
 
-app.use("/user", userRouter);
+app.use("/users", userRouter);
+app.use("/applications", applicationRouter);
 
 // Source: https://stackoverflow.com/questions/50218878/typescript-express-error-function
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {

@@ -11,8 +11,8 @@ INSERT INTO `Company`
 (`company_id`, `name`, `industry`, `website_url`) 
 VALUES 
 (1, 'Amazon', 'Technology', 'www.amazon.com'),
-(2, 'Bristol-Myers Squibb', 'Healthcare', 'www.bms.com'),
-(3, 'Coca-Cola', 'Consumer Products', 'www.coca-cola.com');
+(2, 'Blackbaud', 'Technology', 'www.blackbaud.com'),
+(3, 'Cloudera', 'Technology', 'www.cloudera.com');
 
 -- Populate Application table
 INSERT INTO `Application` 
@@ -20,9 +20,9 @@ INSERT INTO `Application`
 VALUES 
 (1, 1, 'https://www.amazon.jobs/en/jobs/996246/senior-software-dev-engineer', 'Seattle, WA', 'Senior Software Dev Engineer'),
 (2, 1, 'https://www.amazon.jobs/en/jobs/981888/chip-design-engineer', 'Tel Aviv, Israel', 'Chip Design Engineer'),
-(3, 2, 'https://careers.bms.com/jobs/R1557110', 'Princeton, NJ', 'Senior Manager, Procurement Operations - Service Desk'),
-(4, 3, 'https://careers.coca-colacompany.com/job/15561927/platform-operations-manager-atlanta-ga/', 'Atlanta, GA', 'Platform Operations Manager'),
-(5, 3, 'https://careers.coca-colacompany.com/job/15331002/people-analytics-data-scientist-atlanta-ga/', 'Atlanta, GA', 'People Analytics Data Scientist');
+(3, 2, 'https://careers.blackbaud.com/us/en/job/R0008354/Software-Engineer-devops', 'Remote', 'Software Engineer, devops'),
+(4, 3, 'https://cloudera.wd5.myworkdayjobs.com/External_Career/job/USA--Texas--Austin/Sr-Site-Reliability-Engineer_220266-1', 'New York, NY', 'Sr. Site Reliability Engineer'),
+(5, 3, 'https://cloudera.wd5.myworkdayjobs.com/External_Career/job/US-California-Santa-Clara-office-1/Senior-Staff-Engineer_220230-1', 'Remote', 'Senior Staff Engineer, Data Hub');
 
 -- Populate Skills table
 INSERT INTO `Skills` 
@@ -32,10 +32,11 @@ VALUES
 (2, 'C++'),
 (3, 'C'),
 (4, 'Verilog'),
-(5, 'Excel'),
-(6, 'PowerPoint'),
-(7, 'Microsoft Power BI'),
-(8, 'R Studio');
+(5, 'Microsoft Azure'),
+(6, 'AWS'),
+(7, 'Python'),
+(8, 'Go'),
+(9, 'Hadoop');
 
 -- Populate Application_Skills table
 INSERT INTO `Application_Skills` 
@@ -46,10 +47,13 @@ VALUES
 (2, 2),
 (2, 3),
 (2, 4),
+(3, 2),
 (3, 5),
-(3, 6),
-(5, 7),
-(5, 8);
+(4, 6),
+(4, 7),
+(4, 8),
+(5, 1),
+(5, 9);
 
 -- Populate User_Skills table
 INSERT INTO `User_Skills` 
