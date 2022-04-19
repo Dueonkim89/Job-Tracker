@@ -16,13 +16,13 @@ code {
   background-color: #0a2a66;
   border-radius: 4px 0 0 4px;
   color: #FFFFFF;
-  min-height:475px;
+  min-height:535px;
   margin-top: 2.75rem;
 }
 
 .registeration-form-field{
-  min-height:475px;
+  min-height:535px;
   margin-top: 2.75rem;
-  background-color: #1E90FF;
+  background-color:#c0c6cc;
   text-align: left;
 }
