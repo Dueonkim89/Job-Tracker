@@ -1,9 +1,11 @@
 import React from "react";
 import "./App.css";
+import AppBar from './components/AppBar';
 
 function App() {
     return (
         <div className="App">
+            <AppBar />
             <header className="App-header">
                 <p>
                     Edit <code>src/App.tsx</code> and save to reload.
