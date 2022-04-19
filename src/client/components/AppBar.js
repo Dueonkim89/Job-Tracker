@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { LinkContainer } from 'react-router-bootstrap';
 import { Navbar, Container, Nav } from 'react-bootstrap';
 
 export default function ProjectAppBar() {
@@ -8,8 +9,10 @@ export default function ProjectAppBar() {
         <Navbar.Brand>Job Tracker</Navbar.Brand>
       </Container>
       <Nav className="me-auto">
-        <Nav.Link href="#home">Login</Nav.Link>
-        <Nav.Link href="#link">Sign Up</Nav.Link>
+        <Nav.Link>Login</Nav.Link>
+        <LinkContainer to="registeration">
+            <Nav.Link>Sign Up</Nav.Link>
+        </LinkContainer>
       </Nav>
     </Navbar>
   );
