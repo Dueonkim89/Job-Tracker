@@ -12,10 +12,10 @@
         "allowSyntheticDefaultImports": true, // Allow default imports from modules with no default export
         "skipLibCheck": true, // Skip type checking of all declaration files
         "lib": ["dom", "dom.iterable", "esnext"], // List of library files to be included in the compilation
+        "moduleResolution": "node" // Resolve modules using Node.js style
         // "noUnusedLocals": true, // Report errors on unused locals
         // "noUnusedParameters": true, // Report errors on unused parameters
         // "declaration": true, // Generate corresponding .d.ts file
-        "moduleResolution": "node" // Resolve modules using Node.js style
         // "esModuleInterop": true, // Disables namespace imports (import * as fs from "fs") and enables CJS/AMD/UMD style imports (import fs from "fs")
         // "forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references to the same file.
         // "isolatedModules": true, // Unconditionally emit imports for unresolved files
@@ -23,7 +23,8 @@
         // "incremental": true, // Enable incremental compilation by reading/writing information from prior compilations to a file on disk
     },
     "include": [
-        "src/**/*" // *** The files TypeScript should type check ***
+        "src/**/*", // *** The files TypeScript should type check ***
+        "FLAGS.ts"
     ],
     "exclude": ["node_modules", "build", "src/server"] // *** The files to not type check ***
 }
