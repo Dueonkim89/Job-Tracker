@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import AppBar from './components/AppBar';
 import Registration from "./components/Registration";
+import Login from "./components/Login";
 import { Routes, Route } from "react-router-dom"; 
 
 
@@ -20,7 +21,8 @@ function setRoutes() {
     // https://reactrouter.com/docs/en/v6/upgrading/v5
     return (
         <Routes>
-            <Route path="registeration" element={<Registration />} />
+            <Route path="login" element={<Login />} />
+            <Route path="registration" element={<Registration />} />
         </Routes>
     );
 }
