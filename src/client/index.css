@@ -16,13 +16,21 @@ code {
   background-color: #0a2a66;
   border-radius: 4px 0 0 4px;
   color: #FFFFFF;
-  min-height:535px;
+  min-height:572px;
   margin-top: 2.75rem;
+  padding-top: 3rem;
+  padding-left: 5rem;
+  padding-right: 5rem;
+  text-align: left;
 }
 
 .registeration-form-field{
   min-height:535px;
   margin-top: 2.75rem;
+  padding-top: 1.75rem;
+  padding-bottom: 1.75rem;
+  padding-left: 5rem;
+  padding-right: 5rem;
   background-color:#c0c6cc;
   text-align: left;
 }
@@ -47,7 +55,6 @@ code {
   padding-right: 5rem;
   background-color:#c0c6cc;
   text-align: left;
-  display: table;
 }
 
 .login-button{
