@@ -6,7 +6,8 @@ USE developmentdb;
 DROP TABLE IF EXISTS User;
 CREATE TABLE `User`(
     `user_id` INT(11) AUTO_INCREMENT NOT NULL PRIMARY KEY,
-    `full_name` VARCHAR(255) NOT NULL,
+    `first_name` VARCHAR(255) NOT NULL,
+    `last_name` VARCHAR(255) NOT NULL,
     `username` VARCHAR(255) NOT NULL,
     `phone_number` VARCHAR(15) NULL,
     `email_address` VARCHAR(50) NOT NULL,

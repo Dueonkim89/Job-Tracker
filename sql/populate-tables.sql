@@ -1,10 +1,10 @@
 -- Populate User table
 INSERT INTO `User` 
-(`user_id`, `full_name`, `username`, `phone_number`, `email_address`, `passwordHash`) 
+(`user_id`, `first_name`, `last_name`, `username`, `phone_number`, `email_address`, `passwordHash`) 
 VALUES 
-(1, 'Ally Alpha', 'ally1', '111-111-1111', 'ally1@email.com', '#111'),
-(2, 'Bryson Beta', 'bryson2', '222-222-2222', 'bryson2@email.com', '#222'),
-(3, 'Carlos Charlie', 'carlos3', '333-333-3333', 'carlos3@email.com', '#333');
+(1, 'Ally', 'Alpha', 'ally1', '111-111-1111', 'ally1@email.com', '#111'),
+(2, 'Bryson', 'Beta', 'bryson2', '222-222-2222', 'bryson2@email.com', '#222'),
+(3, 'Carlos', 'Charlie', 'carlos3', '333-333-3333', 'carlos3@email.com', '#333');
 
 -- Populate Company table
 INSERT INTO `Company` 

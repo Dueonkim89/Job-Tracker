@@ -1,4 +1,4 @@
-import { environment, LOCAL, AZURE } from "../../FLAGS";
+import { environment, LOCAL } from "../../FLAGS";
 import path from "path";
 import dotenv from "dotenv";
 
