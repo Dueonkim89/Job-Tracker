@@ -1,7 +1,7 @@
 import React from "react";
 import "./App.css";
 import AppBar from './components/AppBar';
-import Registeration from "./components/Registeration";
+import Registration from "./components/Registration";
 import { Routes, Route } from "react-router-dom"; 
 
 
@@ -20,7 +20,7 @@ function setRoutes() {
     // https://reactrouter.com/docs/en/v6/upgrading/v5
     return (
         <Routes>
-            <Route path="registeration" element={<Registeration />} />
+            <Route path="registeration" element={<Registration />} />
         </Routes>
     );
 }

@@ -11,7 +11,7 @@ type MyState = {
     password: string
 };
 
-class Registeration extends React.Component<{}, MyState> {
+class Registration extends React.Component<{}, MyState> {
     constructor(props: any) {
         super(props);
         this.state = {
@@ -34,7 +34,7 @@ class Registeration extends React.Component<{}, MyState> {
         this.setState({lastName: event.target.value});
     }
 
-    generateLeftRegisterationPanel(argument: void) : JSX.Element {
+    generateLeftRegistrationPanel(argument: void) : JSX.Element {
         return (                        
         <Container className="registeration-text-box">
             <h2 style={{marginBottom: '1.5rem'}}>Sign Up</h2>
@@ -44,7 +44,7 @@ class Registeration extends React.Component<{}, MyState> {
         );
     }
 
-    generateRightRegisterationPanel(argument: void) : JSX.Element {
+    generateRightRegistrationPanel(argument: void) : JSX.Element {
         return (
             <Container className="registeration-form-field">
                 {this.generateRegisterationForm()}
@@ -96,10 +96,10 @@ class Registeration extends React.Component<{}, MyState> {
             <Container>
                 <Row>
                     <Col>
-                        {this.generateLeftRegisterationPanel()}
+                        {this.generateLeftRegistrationPanel()}
                     </Col>
                     <Col>
-                        {this.generateRightRegisterationPanel()}
+                        {this.generateRightRegistrationPanel()}
                     </Col>
                 </Row>
             </Container>
@@ -107,4 +107,4 @@ class Registeration extends React.Component<{}, MyState> {
     }
 }
 
-export default Registeration;
+export default Registration;
