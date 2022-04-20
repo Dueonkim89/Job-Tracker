@@ -4,7 +4,7 @@ import path from "path";
 import { environment, LOCAL, AZURE } from "../../../FLAGS";
 
 // create the connection to database
-const certDir = path.join(process.cwd(), "certs", "BaltimoreCyberTrustRoot.crt.pem");
+const certDir = path.join(process.cwd(), "certs", "DigiCertGlobalRootCA.crt.pem");
 
 const localDBconfig = {
     host: process.env.DB_HOST,
@@ -32,6 +32,6 @@ const azureDBconfig = {
 };
 
 // Update to azureDBconfig to connect to azure DB
-const db = mysql.createPool(environment == LOCAL ? localDBconfig : azureDBconfig).promise();
+const db = mysql.createPool(environment === LOCAL ? localDBconfig : azureDBconfig).promise();
 
 export default db;
