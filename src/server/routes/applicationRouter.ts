@@ -1,5 +1,5 @@
 import express from "express";
-import { getUser } from "../models/userModel";
+import { getUserByID } from "../models/userModel";
 import * as application from "../models/applicationModel";
 const router = express.Router();
 
@@ -10,8 +10,8 @@ router.get("/", async function (req, res, next) {
             res.status(400).send("Invalid User ID");
             return;
         }
-        const userFields = await getUser(userID);
-        if (Array.isArray(userFields) && userFields.length === 0) {
+        const userFields = await getUserByID(userID);
+        if (!userFields) {
             res.status(404).send("User ID not found.");
             return;
         }
