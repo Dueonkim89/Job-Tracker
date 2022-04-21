@@ -11,7 +11,7 @@ CREATE TABLE `User`(
     `username` VARCHAR(255) NOT NULL,
     `phone_number` VARCHAR(15) NULL,
     `email_address` VARCHAR(50) NOT NULL,
-    `passwordHash` VARCHAR(32) NOT NULL,
+    `passwordHash` VARCHAR(60) NOT NULL,
     UNIQUE INDEX `uq_username` (`username` ASC),
     UNIQUE INDEX `uq_phone_number` (`phone_number` ASC),
     UNIQUE INDEX `uq_email_address` (`email_address` ASC)
