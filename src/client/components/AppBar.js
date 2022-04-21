@@ -9,8 +9,10 @@ export default function ProjectAppBar() {
         <Navbar.Brand>Job Tracker</Navbar.Brand>
       </Container>
       <Nav className="me-auto">
-        <Nav.Link>Login</Nav.Link>
-        <LinkContainer to="registeration">
+        <LinkContainer to="login">
+          <Nav.Link>Login</Nav.Link>
+        </LinkContainer>
+        <LinkContainer to="registration">
             <Nav.Link>Sign Up</Nav.Link>
         </LinkContainer>
       </Nav>
