@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import {validIntData, validStringData, validPassword} from '../utils/formValidation';
+import {formatPhoneNumber} from '../utils/helper';
 
 // declare prop & state types for Registration component
 type MyState = { 
@@ -89,6 +90,9 @@ class Registration extends React.Component<{}, MyState> {
         if (validStringData(this.state.firstName) && validStringData(this.state.lastName) 
             && validStringData(this.state.email) && validStringData(this.state.userName) 
             && validIntData(this.state.phoneNumber) && validPassword(this.state.password)) {
+
+            // console.log(formatPhoneNumber(this.state.phoneNumber));
+
             console.log("To make a POST request");
 
             // CONDITIONAL route to user dashboard, pass in props received from server
