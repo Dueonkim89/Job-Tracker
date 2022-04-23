@@ -60,7 +60,11 @@ router.post("/login", async function (req, res, next) {
         next(err);
     }
 });
-
+/**
+ * This will be the router that will be rendered if the user has passed the login authetication
+ * to test this, run user /users/login and enter user creditials, copy the access token that will
+ * be return, run a GET request on Postman and in the body select Authenticatation, value is the key
+ */
 router.get('/protected', passport.authenticate('jwt', {session : false}), async(req, res) => {
     return res.status(200).json({
         success: true,
