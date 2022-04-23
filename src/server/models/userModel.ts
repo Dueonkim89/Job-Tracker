@@ -2,6 +2,7 @@ import { RowDataPacket } from "mysql2";
 import db from "./db";
 
 interface UserFields {
+    userID?: number;
     firstName: string;
     lastName: string;
     username: string;
@@ -10,7 +11,6 @@ interface UserFields {
     passwordHash: string;
 }
 
-// TBU - finished this function - add additional parameters
 export async function createUser(p: UserFields) {
     const sql = `
     INSERT INTO User
