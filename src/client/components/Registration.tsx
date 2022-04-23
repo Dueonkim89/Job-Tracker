@@ -122,7 +122,7 @@ class Registration extends React.Component<{}, MyState> {
     }
 
     generateRegistrationForm(argument: void) : JSX.Element {
-        const invalidStyle = '3px solid red';
+        const invalidStyle: string = '3px solid red';
         return (
             <Form onSubmit={this.handleSubmit}>
                 <Row className="mb-3">
