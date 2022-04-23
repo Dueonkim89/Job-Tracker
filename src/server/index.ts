@@ -4,10 +4,36 @@ import express, { Express, Request, Response, ErrorRequestHandler } from "expres
 import bodyParser from "body-parser";
 import userRouter from "./routes/userRouter";
 import applicationRouter from "./routes/applicationRouter";
+import session from "express-session";
+import passport from "passport";
+require('./models/passport');
+const MySqlStore = require('express-mysql-session')(session);
+
 
 const buildDir = path.join(process.cwd(), "/build");
 
+// Middleware
 const app: Express = express();
+app.use(session({
+    key: 'session_cokie_name',
+    secret: "session_cokie_secret",
+    store: new MySqlStore({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASS,
+        database: process.env.DB_DATABASE,
+        port: 3306,
+    }),
+    resave: false,
+    saveUninitialized: false,
+    cookie:{
+        maxAge:1000*60*60*24
+    }
+})
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(bodyParser.json());
 app.use(
     bodyParser.urlencoded({
