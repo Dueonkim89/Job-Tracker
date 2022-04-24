@@ -6,15 +6,10 @@ import userRouter from "./routes/userRouter";
 import applicationRouter from "./routes/applicationRouter";
 import session from "express-session";
 import passport from "passport";
-<<<<<<< HEAD
 require('./models/passport');
 const cors = require("cors");
 const MySqlStore = require('express-mysql-session')(session);
 
-=======
-require("./models/passport");
-const MySqlStore = require("express-mysql-session")(session);
->>>>>>> main
 
 const buildDir = path.join(process.cwd(), "/build");
 
