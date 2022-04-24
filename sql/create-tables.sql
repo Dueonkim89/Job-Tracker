@@ -8,13 +8,11 @@ CREATE TABLE `User`(
     `userID` INT(11) AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `firstName` VARCHAR(255) NOT NULL,
     `lastName` VARCHAR(255) NOT NULL,
-    `username` VARCHAR(255) NOT NULL,
+    `username` VARCHAR(255) NOT NULL UNIQUE,
     `phoneNumber` VARCHAR(15) NULL,
     `emailAddress` VARCHAR(50) NOT NULL,
     `passwordHash` VARCHAR(60) NOT NULL,
-    UNIQUE INDEX `uq_username` (`username` ASC),
-    UNIQUE INDEX `uq_phoneNumber` (`phoneNumber` ASC),
-    UNIQUE INDEX `uq_emailAddress` (`emailAddress` ASC)
+    UNIQUE INDEX `uq_username` (`username` ASC)
 );
 -- Creating Company Table
 DROP TABLE IF EXISTS Company;
@@ -35,9 +33,7 @@ CREATE TABLE `CompanyContacts`(
     `role` VARCHAR(255),
     `notes` TINYTEXT,
     FOREIGN KEY(`userID`) REFERENCES `User`(`userID`),
-    FOREIGN KEY(`companyID`) REFERENCES `Company`(`companyID`),
-    UNIQUE INDEX `uq_phoneNumber` (`phoneNumber` ASC),
-    UNIQUE INDEX `uq_emailAddress` (`emailAddress` ASC)
+    FOREIGN KEY(`companyID`) REFERENCES `Company`(`companyID`)
 );
 -- Creating Company Comments Table
 DROP TABLE IF EXISTS CompanyComments;

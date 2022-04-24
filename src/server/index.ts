@@ -6,7 +6,6 @@ import userRouter from "./routes/userRouter";
 import applicationRouter from "./routes/applicationRouter";
 import session from "express-session";
 import passport from "passport";
-import * as bcrypt from "bcrypt";
 require("./models/passport");
 const MySqlStore = require("express-mysql-session")(session);
 
@@ -53,7 +52,7 @@ app.use("/api/applications", applicationRouter);
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     const statusCode = err.statusCode || 500;
     console.error(err.message, err.stack);
-    res.status(statusCode).json({ message: err.message });
+    res.status(statusCode).json({ success: false, message: err.message });
     return;
 };
 

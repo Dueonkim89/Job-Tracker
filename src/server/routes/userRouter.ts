@@ -1,4 +1,5 @@
 import express from "express";
+import { QueryError } from "mysql2";
 import * as bcrypt from "bcrypt";
 import * as userModel from "../models/userModel";
 import * as jwt from "jsonwebtoken";
@@ -17,8 +18,11 @@ router.post("/", async function (req, res, next) {
     try {
         const passwordHash = await bcrypt.hash(password, saltRounds);
         await userModel.createUser({ firstName, lastName, username, phoneNumber, emailAddress, passwordHash });
-        res.status(201).send("Successfully created user.");
-    } catch (err) {
+        return res.status(201).json({ success: true });
+    } catch (err: any) {
+        if (err?.code === "ER_DUP_ENTRY" && err?.sqlMessage?.includes("username")) {
+            return res.status(400).json({ success: false, reason: "duplicate", field: "username" });
+        }
         console.error(`Error in creating user: ${err}`);
         next(err);
     }
