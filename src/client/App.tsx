@@ -4,6 +4,7 @@ import AppBar from './components/AppBar';
 import Registration from "./components/Registration";
 import Login from "./components/Login";
 import NewJobApplication from "./components/NewJobApplication";
+import AddCompany from "./components/AddCompany";
 import { Routes, Route } from "react-router-dom"; 
 
 
@@ -25,6 +26,7 @@ function setRoutes() {
             <Route path="login" element={<Login />} />
             <Route path="registration" element={<Registration />} />
             <Route path="application" element={<NewJobApplication />} />
+            <Route path="add_company" element={<AddCompany />} />
         </Routes>
     );
 }
