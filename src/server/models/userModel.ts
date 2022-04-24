@@ -14,7 +14,7 @@ interface UserFields {
 export async function createUser(p: UserFields) {
     const sql = `
     INSERT INTO User
-    (first_name, last_name, username, phone_number, email_address, passwordHash)
+    (firstName, lastName, username, phoneNumber, emailAddress, passwordHash)
     VALUES (?, ?, ?, ?, ?, ?);
     `;
     const vals = [p.firstName, p.lastName, p.username, p.phoneNumber, p.emailAddress, p.passwordHash];

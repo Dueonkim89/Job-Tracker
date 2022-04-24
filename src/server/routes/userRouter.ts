@@ -42,7 +42,7 @@ router.post("/login", async function (req, res, next) {
         if (isValidPassword) {
             // TODO - probably need some sort of session token logic here
             const accessToken = jwt.sign({ id: userFields.userID }, 'd5bb8b56620cc82ee7d0ebda543f26414e8547051469fe642a64100b918767c5ef5494efe3659742853f83d425562098ca450abbc8d38f3f5dfcc2aceb22b78a', {
-                expiresIn: "1h"
+                expiresIn: "15s"
             })
             res.status(200).json({
                 success: true,
