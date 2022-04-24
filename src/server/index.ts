@@ -7,6 +7,7 @@ import applicationRouter from "./routes/applicationRouter";
 import session from "express-session";
 import passport from "passport";
 require('./models/passport');
+const cors = require("cors");
 const MySqlStore = require('express-mysql-session')(session);
 
 
@@ -31,6 +32,13 @@ app.use(session({
     }
 })
 );
+
+const corsOption = {
+    origin: '*',
+    credentials: true,
+    optionSuccessStatus: 200,
+};
+app.use(cors(corsOption));
 app.use(passport.initialize());
 app.use(passport.session());
 

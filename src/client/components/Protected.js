@@ -6,14 +6,14 @@ function Protected() {
     let navigate = useNavigate()
     useEffect(() => {
         const token = localStorage.getItem('token')
-        axios.get("http://localhost:3001/protected", {headers : {
+        axios.get("http://localhost:3001/users/protected", {headers : {
             Authorization : token,
         }}).then(res => {
             console.log(res)
         }).catch(err => {
             console.log(err);
             // if user not authenticated, redirect to login page
-            navigate('/users/login')
+            navigate('/login')
 
         })
     }, [])

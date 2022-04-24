@@ -37,7 +37,7 @@ function userOrNull(rows: RowDataPacket[]) {
 }
 
 export async function getUserByID(userID: string) {
-    const sql = "SELECT * FROM `user` WHERE user_id = ?";
+    const sql = "SELECT * FROM `user` WHERE userID = ?";
     const [rows, fields] = await db.query(sql, [userID]);
     return userOrNull(rows as RowDataPacket[]);
 }
