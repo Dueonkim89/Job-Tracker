@@ -10,15 +10,25 @@ const saltRounds = 10;
 /**
  * @description: Creates (registers) a new user
  * @method: POST /api/users
- * @param: JSON object of {firstName, lastName, username, phoneNumber, emailAddress, password}
- * @returns: HTTP 201 upon success
+ * @param: JSON of {firstName, lastName, username, phoneNumber, emailAddress, password}
+ * @returns: HTTP 201 upon success with JSON of {success: true, userID, firstName, lastName, username, phoneNumber, emailAddress}
+ * or HTTP 400 and JSON of {success: false, reason: "duplicate", field: "username"}
+ * or HTTP 400 and JSON of {success: false, message: "other reason for error"}
  */
 router.post("/", async function (req, res, next) {
     const { firstName, lastName, username, phoneNumber, emailAddress, password } = req.body;
     try {
         const passwordHash = await bcrypt.hash(password, saltRounds);
-        await userModel.createUser({ firstName, lastName, username, phoneNumber, emailAddress, passwordHash });
-        return res.status(201).json({ success: true });
+        const userID = await userModel.createUser({
+            firstName,
+            lastName,
+            username,
+            phoneNumber,
+            emailAddress,
+            passwordHash,
+        });
+        const response = { success: true, userID, firstName, lastName, username, phoneNumber, emailAddress };
+        return res.status(201).json(response);
     } catch (err: any) {
         if (err?.code === "ER_DUP_ENTRY" && err?.sqlMessage?.includes("username")) {
             return res.status(400).json({ success: false, reason: "duplicate", field: "username" });
@@ -32,7 +42,7 @@ router.post("/", async function (req, res, next) {
  * @description: Logs in an existing user
  * @method: POST /api/users/login
  * @param: JSON object of {username, password}
- * @returns: HTTP 200 upon success and JSON object of {token: thisWillBeAnAcessToken}
+ * @returns: HTTP 200 upon success and JSON object of {success: true, userID, message, token}
  */
 router.post("/login", async function (req, res, next) {
     const { username, password } = req.body;
