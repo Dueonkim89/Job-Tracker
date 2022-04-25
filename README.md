@@ -1,19 +1,24 @@
 # Building and Test
 
-### Installation
+### Installation & Set-up
 
 -   To install the necessary dependencies use: `npm install`
--   If running a local mysql, create a `.dev.env` file and add the following:
+-   Create a `.env` file and add the following:
 
 ```
-DB_HOST="localhost"
-DB_USER="root"
-DB_PASS={put_password_here_if_any}
-DB_DATABASE={put_password_here_if_any}
+LOCAL_DB_HOST="localhost"
+LOCAL_DB_USER="root"
+LOCAL_DB_PASS="{password_here}"
+LOCAL_DB_DATABASE="developmentdb"
+AZURE_DB_HOST="jobtracker-mysql-server1.mysql.database.azure.com"
+AZURE_DB_USER="osu467"
+AZURE_DB_PASS="{password_here - get from Stanely}"
+AZURE_DB_DATABASE="developmentdb"
+JWT_SECRET="{secret_here}"
+SESSION_SECRET="{secret_here}"
 ```
 
--   If connecting to the Azure mysql, create a `.azure.env` file with the same four keys but the appropriate Azure connection settings (ask Stanley for these - should be kept secrete), and update `server/FLAGS.ts` to be `environment = AZURE`
-
+-   To swtich between localhost mysql and Azure, update `FLAGS.ts` to be `environment = AZURE` or `environment = LOCAL`
 -   TODO: create script to set-up local copy of database with dummy data
 
 ### Running the Development Environment
