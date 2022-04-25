@@ -1,7 +1,7 @@
-import { RowDataPacket } from "mysql2";
+import { FieldPacket, ResultSetHeader, RowDataPacket } from "mysql2";
 import db from "./db";
 
-interface CompanyFields {
+export interface CompanyFields {
     companyID?: number;
     name: string;
     industry: string;
@@ -29,22 +29,19 @@ export async function getCompanyByName(companyName: string) {
 }
 
 export async function searchCompaniesByName(companyName: string) {
-    const sql = "SELECT * FROM `Companies` WHERE name LIKE '%?%'";
+    companyName = `${companyName}%`;
+    const sql = "SELECT * FROM `Companies` WHERE name LIKE ?";
     const [rows, fields] = await db.query(sql, [companyName]);
-    if (Array.isArray(rows) && rows.length > 0) {
-        return rows as CompanyFields[];
-    } else {
-        return null;
-    }
+    return rows as CompanyFields[];
 }
 
 export async function createCompany(p: CompanyFields) {
     const sql = `
     INSERT INTO Companies
     (name, industry, websiteURL)
-    VALUES (?, ?, ?)
+    VALUES (?, ?, ?);
     `;
     const vals = [p.name, p.industry, p.websiteURL];
-    await db.query(sql, vals);
-    return true;
+    const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.query(sql, vals);
+    return result.insertId;
 }
