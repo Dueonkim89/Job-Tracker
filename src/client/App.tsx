@@ -28,6 +28,7 @@ function setRoutes() {
             <Route path="registration" element={<Registration />} />
             <Route path="application" element={<NewJobApplication />} />
             <Route path="add_company" element={<AddCompany />} />
+            <Route path="protected" element={<Protected />} />
         </Routes>
     );
 }
