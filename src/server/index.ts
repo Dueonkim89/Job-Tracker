@@ -8,6 +8,8 @@ import session from "express-session";
 import passport from "passport";
 import jobsRouter from "./routes/jobRouter";
 import companyRouter from "./routes/companyRouter";
+require('./models/passport');
+const cors = require("cors");
 require("./models/passport");
 const MySqlStore = require("express-mysql-session")(session);
 
@@ -32,6 +34,13 @@ app.use(
         },
     })
 );
+
+const corsOption = {
+    origin: '*',
+    credentials: true,
+    optionSuccessStatus: 200,
+};
+app.use(cors(corsOption));
 app.use(passport.initialize());
 app.use(passport.session());
 

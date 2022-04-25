@@ -6,6 +6,7 @@ import Login from "./components/Login";
 import NewJobApplication from "./components/NewJobApplication";
 import AddCompany from "./components/AddCompany";
 import { Routes, Route } from "react-router-dom"; 
+import Protected from "./components/Protected";
 
 
 function App() {
@@ -27,6 +28,7 @@ function setRoutes() {
             <Route path="registration" element={<Registration />} />
             <Route path="application" element={<NewJobApplication />} />
             <Route path="add_company" element={<AddCompany />} />
+            <Route path="protected" element={<Protected />} />
         </Routes>
     );
 }
