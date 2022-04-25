@@ -30,8 +30,8 @@ router.post("/", async function (req, res, next) {
 router.get("/", async function (req, res, next) {
     try {
         const { jobPostingURL } = req.query;
-        if (typeof jobPostingURL !== "string") {
-            return res.status(400).json({ success: false, error: "Invalid url" });
+        if (typeof jobPostingURL !== "string" || jobPostingURL.length === 0) {
+            return res.status(400).json({ success: false, message: "Invalid url" });
         }
         const fields = await jobModel.getJobByURL(jobPostingURL);
         if (!fields) {

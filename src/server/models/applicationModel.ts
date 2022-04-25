@@ -50,7 +50,7 @@ export async function createApp(p: AppFields) {
     (userID, jobID, status, location, datetime)
     VALUES (?, ?, ?, ?, ?);
     `;
-    const vals = [p.userID, p.jobID, p.status, p.location, convertDateTime(p.datetime)];
+    const vals = [p.userID, p.jobID, p.status, p.location, p.datetime];
     const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.query(sql, vals);
     return result.insertId;
 }

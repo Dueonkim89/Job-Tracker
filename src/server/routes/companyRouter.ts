@@ -21,15 +21,17 @@ router.post("/", async function (req, res, next) {
 });
 
 /**
- * @description: Adds a company to the database
+ * @description: Searches and returns an array of companies with given name prefix
+ * for example if the name prefix is "Go" it would match "Google", "Goodyear", etc.
+ * if name prefix is empty, it will return ALL companies
  * @method: GET /api/companies/search?name={name}
- * @returns: HTTP 200 and JSON of CompanyFields[]
+ * @returns: HTTP 200 and JSON of CompanyFields[] (see companyModel for CompanyFields interface)
  */
 router.get("/search", async function (req, res, next) {
     try {
         const { name } = req.query;
         if (typeof name !== "string") {
-            return res.status(400).json({ success: false, error: "Invalid name" });
+            return res.status(400).json({ success: false, message: "Invalid name" });
         }
         const companies = await companyModel.searchCompaniesByName(name);
         return res.status(200).json(companies);
