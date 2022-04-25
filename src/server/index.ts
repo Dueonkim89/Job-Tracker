@@ -6,6 +6,8 @@ import userRouter from "./routes/userRouter";
 import applicationRouter from "./routes/applicationRouter";
 import session from "express-session";
 import passport from "passport";
+import jobsRouter from "./routes/jobRouter";
+import companyRouter from "./routes/companyRouter";
 require("./models/passport");
 const MySqlStore = require("express-mysql-session")(session);
 
@@ -47,6 +49,8 @@ app.get("/", function (req: Request, res: Response) {
 
 app.use("/api/users", userRouter);
 app.use("/api/applications", applicationRouter);
+app.use("/api/jobs", jobsRouter);
+app.use("/api/companies", companyRouter);
 
 // Source: https://stackoverflow.com/questions/50218878/typescript-express-error-function
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
