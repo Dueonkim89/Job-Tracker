@@ -1,6 +1,6 @@
 import * as appModel from "../applicationModel";
 
-test("testing #1", async () => {
+test("Get user 1 apps", async () => {
     const result = await appModel.getUserApps(1);
     const expected = [
         {
@@ -29,8 +29,29 @@ test("testing #1", async () => {
     expect(result).toStrictEqual(expected);
 });
 
-// const sum = (a: number, b: number) => a + b;
+test("Get non-existant user apps", async () => {
+    const result = await appModel.getUserApps(100);
+    expect(result).toStrictEqual([]);
+});
 
-// test("adds 1 + 2 to equal 3", () => {
-//     expect(sum(1, 2)).toBe(3);
-// });
+test("Create new user app", async () => {
+    const payload = {
+        userID: 2,
+        jobID: 3,
+        status: "pending",
+        location: "remote",
+        datetime: new Date(),
+    };
+    const result = await appModel.createApp(payload);
+    expect(result).toBeGreaterThan(5); // returns insert ID
+});
+
+test("Update valid user app status", async () => {
+    const result = await appModel.updateAppStatus(4, "Interview");
+    expect(result).toBe(true);
+});
+
+test("Update non-existant user app status", async () => {
+    const result = await appModel.updateAppStatus(100, "Interview");
+    expect(result).toBe(false);
+});
