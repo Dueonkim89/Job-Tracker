@@ -1,4 +1,4 @@
-import { FieldPacket, RowDataPacket } from "mysql2";
+import { FieldPacket, OkPacket, ResultSetHeader, RowDataPacket } from "mysql2";
 import db from "./db";
 import { JobFields } from "./jobModel";
 
@@ -49,11 +49,10 @@ export async function createApp(p: AppFields) {
     INSERT INTO Applications
     (userID, jobID, status, location, datetime)
     VALUES (?, ?, ?, ?, ?);
-    SELECT last_insert_id();
     `;
     const vals = [p.userID, p.jobID, p.status, p.location, convertDateTime(p.datetime)];
-    const [rows, fields] = <[RowDataPacket[], FieldPacket[]]>await db.query(sql, vals);
-    return rows[0].last_insert_id as number;
+    const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.query(sql, vals);
+    return result.insertId;
 }
 
 /**
@@ -66,6 +65,6 @@ export async function updateAppStatus(applicationID: number, status: string) {
     WHERE applicationID = ?;
     `;
     const vals = [status, applicationID];
-    await db.query(sql, vals);
-    return true;
+    const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.query(sql, vals);
+    return result.affectedRows > 0;
 }
