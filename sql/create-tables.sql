@@ -3,22 +3,21 @@ DROP DATABASE IF EXISTS developmentdb;
 CREATE DATABASE developmentdb;
 USE developmentdb;
 -- Creating User Table
-DROP TABLE IF EXISTS User;
-CREATE TABLE `User`(
-    `userID` INT(11) AUTO_INCREMENT NOT NULL PRIMARY KEY,
+DROP TABLE IF EXISTS Users;
+CREATE TABLE `Users`(
+    `userID` INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `firstName` VARCHAR(255) NOT NULL,
     `lastName` VARCHAR(255) NOT NULL,
     `username` VARCHAR(255) NOT NULL UNIQUE,
     `phoneNumber` VARCHAR(15) NULL,
     `emailAddress` VARCHAR(50) NOT NULL,
-    `passwordHash` VARCHAR(60) NOT NULL,
-    UNIQUE INDEX `uq_username` (`username` ASC)
+    `passwordHash` VARCHAR(60) NOT NULL
 );
 -- Creating Company Table
-DROP TABLE IF EXISTS Company;
-CREATE TABLE `Company`(
-    `companyID` INT(20) AUTO_INCREMENT NOT NULL PRIMARY KEY,
-    `name` VARCHAR(255) NOT NULL,
+DROP TABLE IF EXISTS Companies;
+CREATE TABLE `Companies`(
+    `companyID` INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    `name` VARCHAR(255) NOT NULL UNIQUE,
     `industry` VARCHAR(255),
     `websiteURL` VARCHAR(255)
 );
@@ -32,8 +31,8 @@ CREATE TABLE `CompanyContacts`(
     `companyID` INT NOT NULL,
     `role` VARCHAR(255),
     `notes` TINYTEXT,
-    FOREIGN KEY(`userID`) REFERENCES `User`(`userID`),
-    FOREIGN KEY(`companyID`) REFERENCES `Company`(`companyID`)
+    FOREIGN KEY(`userID`) REFERENCES `Users`(`userID`),
+    FOREIGN KEY(`companyID`) REFERENCES `Companies`(`companyID`)
 );
 -- Creating Company Comments Table
 DROP TABLE IF EXISTS CompanyComments;
@@ -43,34 +42,35 @@ CREATE TABLE `CompanyComments`(
     `companyID` INT NOT NULL,
     `title` VARCHAR(255),
     `text` TINYTEXT,
-    FOREIGN KEY(`userID`) REFERENCES `User`(`userID`),
-    FOREIGN KEY(`companyID`) REFERENCES `Company`(`companyID`)
+    FOREIGN KEY(`userID`) REFERENCES `Users`(`userID`),
+    FOREIGN KEY(`companyID`) REFERENCES `Companies`(`companyID`)
 );
--- Creating Application Table
-DROP TABLE IF EXISTS Application;
-CREATE TABLE `Application`(
-    `applicationID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+-- Creating Jobs Table
+DROP TABLE IF EXISTS Jobs;
+CREATE TABLE `Jobs`(
+    `jobID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `companyID` INT NOT NULL,
-    `jobPostingURL` VARCHAR(300),
-    `location` VARCHAR(255),
-    `position` VARCHAR(255),
-    FOREIGN KEY(`companyID`) REFERENCES `Company`(`companyID`)
+    `jobPostingURL` VARCHAR(300) NOT NULL UNIQUE,
+    `position` VARCHAR(255) NOT NULL,
+    FOREIGN KEY(`companyID`) REFERENCES `Companies`(`companyID`)
 );
--- Creating UserApplications Table
-DROP TABLE IF EXISTS UserApplications;
-CREATE TABLE `UserApplications`(
+-- Creating Applications Table
+DROP TABLE IF EXISTS Applications;
+CREATE TABLE `Applications`(
+    `applicationID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `userID` INT NOT NULL,
-    `applicationID` INT NOT NULL,
+    `jobID` INT NOT NULL,
     `status` VARCHAR(255),
-    PRIMARY KEY (`userID`, `applicationID`),
-    FOREIGN KEY(`userID`) REFERENCES `User`(`userID`),
-    FOREIGN KEY(`applicationID`) REFERENCES `Application`(`applicationID`)
+    `location` VARCHAR(255),
+    `datetime` DATETIME,
+    FOREIGN KEY(`userID`) REFERENCES `Users`(`userID`),
+    FOREIGN KEY(`jobID`) REFERENCES `Jobs`(`jobID`)
 );
 -- Creating Skills Table
 DROP TABLE IF EXISTS Skills;
 CREATE TABLE `Skills`(
     `skillID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `skillName` VARCHAR(50) NOT NULL
+    `name` VARCHAR(50) NOT NULL
 );
 -- Creating User Skills Table
 DROP TABLE IF EXISTS UserSkills;
@@ -79,15 +79,15 @@ CREATE TABLE `UserSkills`(
     `skillID` INT,
     `rating` INT,
     PRIMARY KEY (`userID`, `skillID`),
-    FOREIGN KEY(`userID`) REFERENCES `User`(`userID`),
+    FOREIGN KEY(`userID`) REFERENCES `Users`(`userID`),
     FOREIGN KEY(`skillID`) REFERENCES `Skills`(`skillID`)
 );
--- Creating Applications Skills Table
-DROP TABLE IF EXISTS ApplicationSkills;
-CREATE TABLE `ApplicationSkills`(
-    `applicationID` INT,
+-- Creating JobSkills Table
+DROP TABLE IF EXISTS JobSkills;
+CREATE TABLE `JobSkills`(
+    `jobID` INT,
     `skillID` INT,
-    PRIMARY KEY (`applicationID`, `skillID`),
-    FOREIGN KEY(`applicationID`) REFERENCES `Application`(`applicationID`),
+    PRIMARY KEY (`jobID`, `skillID`),
+    FOREIGN KEY(`jobID`) REFERENCES `Jobs`(`jobID`),
     FOREIGN KEY(`skillID`) REFERENCES `Skills`(`skillID`)
 );
