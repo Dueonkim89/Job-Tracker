@@ -33,11 +33,7 @@ export async function getUserApps(userID: number) {
     WHERE apps.userID = ?
     `;
     const [rows, fields] = <[RowDataPacket[], FieldPacket[]]>await db.query(sql, [userID]);
-    if (Array.isArray(rows) && rows.length > 0) {
-        return rows as AppJobFields[];
-    } else {
-        return null;
-    }
+    return rows as AppJobFields[];
 }
 
 /**
