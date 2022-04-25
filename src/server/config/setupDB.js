@@ -10,6 +10,7 @@ async function setUpDB() {
     const connection = mysql.createConnection({ ...db.chosenDBConfig, multipleStatements: true });
     await connection.promise().query(createTableSQL, []);
     await connection.promise().query(populateTableSQL, []);
+    connection.destroy();
 }
 
 module.exports = setUpDB;
