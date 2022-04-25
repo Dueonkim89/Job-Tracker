@@ -8,7 +8,7 @@ const router = express.Router();
 const saltRounds = 10;
 
 /**
- * @description: Creates / registers a new user
+ * @description: Creates (registers) a new user
  * @method: POST /api/users
  * @param: JSON object of {firstName, lastName, username, phoneNumber, emailAddress, password}
  * @returns: HTTP 201 upon success
