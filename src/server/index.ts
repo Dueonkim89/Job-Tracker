@@ -1,4 +1,4 @@
-import "./env";
+import "dotenv/config";
 import path from "path";
 import express, { Express, Request, Response, ErrorRequestHandler } from "express";
 import bodyParser from "body-parser";
@@ -8,7 +8,8 @@ import session from "express-session";
 import passport from "passport";
 import jobsRouter from "./routes/jobRouter";
 import companyRouter from "./routes/companyRouter";
-require('./models/passport');
+import { chosenDBConfig } from "./models/db";
+require("./models/passport");
 const cors = require("cors");
 require("./models/passport");
 const MySqlStore = require("express-mysql-session")(session);
@@ -19,14 +20,8 @@ const buildDir = path.join(process.cwd(), "/build");
 const app: Express = express();
 app.use(
     session({
-        secret: "session_cokie_secret",
-        store: new MySqlStore({
-            host: process.env.DB_HOST,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASS,
-            database: process.env.DB_DATABASE,
-            port: 3306,
-        }),
+        secret: process.env.SESSION_SECRET as string,
+        store: new MySqlStore(chosenDBConfig), // TBU Stanely - ensure this part is correct
         resave: false,
         saveUninitialized: false,
         cookie: {
@@ -36,7 +31,7 @@ app.use(
 );
 
 const corsOption = {
-    origin: '*',
+    origin: "*",
     credentials: true,
     optionSuccessStatus: 200,
 };
