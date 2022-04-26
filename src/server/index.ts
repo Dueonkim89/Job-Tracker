@@ -7,6 +7,7 @@ import applicationRouter from "./routes/applicationRouter";
 import session from "express-session";
 import passport from "passport";
 import companyRouter from "./routes/companyRouter";
+import skillRouter from "./routes/skillRouter";
 import { chosenDBConfig } from "./models/db";
 require("./models/passport");
 const cors = require("cors");
@@ -53,6 +54,7 @@ app.get("/", function (req: Request, res: Response) {
 app.use("/api/users", userRouter);
 app.use("/api/applications", applicationRouter);
 app.use("/api/companies", companyRouter);
+app.use("/api/skills", skillRouter);
 
 // Source: https://stackoverflow.com/questions/50218878/typescript-express-error-function
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {

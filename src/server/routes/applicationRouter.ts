@@ -9,8 +9,8 @@ const router = express.Router();
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.get("/", async function (req, res, next) {
+    const { userID } = req.query;
     try {
-        const { userID } = req.query;
         if (typeof userID !== "string") {
             return res.status(400).json({ success: false, message: "Invalid User ID" });
         }
@@ -19,9 +19,10 @@ router.get("/", async function (req, res, next) {
             return res.status(400).json({ success: false, message: "Invalid User ID" });
         }
         const rows = await appModel.getUserApps(parsedUserID);
-        res.status(200).send(rows);
+        res.status(200).json(rows);
     } catch (err) {
-        console.error(`Error in getting user applications: ${err}`);
+        console.error(`Error in getting user applications:`);
+        console.error({ userID });
         next(err);
     }
 });
@@ -34,9 +35,9 @@ router.get("/", async function (req, res, next) {
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.post("/", async function (req, res, next) {
+    const { companyID, jobPostingURL, position, userID, status, location } = req.body;
+    const datetime = new Date();
     try {
-        const { companyID, jobPostingURL, position, userID, status, location } = req.body;
-        const datetime = new Date();
         const applicationID = await appModel.createApp({
             companyID,
             jobPostingURL,
@@ -59,7 +60,8 @@ router.post("/", async function (req, res, next) {
         };
         return res.status(200).json(response);
     } catch (err) {
-        console.error(`Error in creating new application: ${err}`);
+        console.error(`Error in creating new application:`);
+        console.error({ companyID, jobPostingURL, position, userID, status, location, datetime });
         next(err);
     }
 });
@@ -72,8 +74,8 @@ router.post("/", async function (req, res, next) {
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.post("/status", async function (req, res, next) {
+    const { applicationID, status } = req.body;
     try {
-        const { applicationID, status } = req.body;
         if (typeof applicationID !== "number") {
             return res.status(400).json({ success: false, message: "Application ID is not a number" });
         }
@@ -84,7 +86,8 @@ router.post("/status", async function (req, res, next) {
             return res.status(400).json({ success: false, message: "Invalid Application ID." });
         }
     } catch (err) {
-        console.error(`Error in creating updating application: ${err}`);
+        console.error(`Error in updating application status:`);
+        console.error({ applicationID, status });
         next(err);
     }
 });

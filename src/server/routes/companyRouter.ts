@@ -9,13 +9,14 @@ const router = express.Router();
  * @returns: HTTP 201 and JSON of {success: true, companyID, name, industry, websiteURL}
  */
 router.post("/", async function (req, res, next) {
+    const { name, industry, websiteURL } = req.body;
     try {
-        const { name, industry, websiteURL } = req.body;
         const companyID = await companyModel.createCompany({ name, industry, websiteURL });
         const response = { success: true, companyID, name, industry, websiteURL };
         return res.status(201).json(response);
     } catch (err) {
-        console.error(`Error in creating new company: ${err}`);
+        console.error(`Error in creating new company:`);
+        console.error({ name, industry, websiteURL });
         next(err);
     }
 });
@@ -28,15 +29,16 @@ router.post("/", async function (req, res, next) {
  * @returns: HTTP 200 and JSON of CompanyFields[] (see companyModel for CompanyFields interface)
  */
 router.get("/search", async function (req, res, next) {
+    const { name } = req.query;
     try {
-        const { name } = req.query;
         if (typeof name !== "string") {
             return res.status(400).json({ success: false, message: "Invalid name" });
         }
         const companies = await companyModel.searchCompaniesByName(name);
         return res.status(200).json(companies);
     } catch (err) {
-        console.error(`Error in searching for company: ${err}`);
+        console.error(`Error in searching for company:`);
+        console.error({ name });
         next(err);
     }
 });

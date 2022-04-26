@@ -1,5 +1,4 @@
 import express from "express";
-import { QueryError } from "mysql2";
 import * as bcrypt from "bcrypt";
 import * as userModel from "../models/userModel";
 import * as jwt from "jsonwebtoken";
@@ -33,7 +32,8 @@ router.post("/", async function (req, res, next) {
         if (err?.code === "ER_DUP_ENTRY" && err?.sqlMessage?.includes("username")) {
             return res.status(400).json({ success: false, reason: "duplicate", field: "username" });
         }
-        console.error(`Error in creating user: ${err}`);
+        console.error(`Error in creating user:`);
+        console.error({ firstName, lastName, username, phoneNumber, emailAddress }); // purposely excluding password
         next(err);
     }
 });
@@ -69,7 +69,8 @@ router.post("/login", async function (req, res, next) {
             return;
         }
     } catch (err) {
-        console.error(`Error in logging in user: ${err}`);
+        console.error(`Error in logging in user:`);
+        console.error({ username }); // purposely excluding password
         next(err);
     }
 });
@@ -85,4 +86,5 @@ router.get("/protected", passport.authenticate("jwt", { session: false }), async
         message: "User has been authenticated and is authorized",
     });
 });
+
 export default router;
