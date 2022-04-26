@@ -3,6 +3,22 @@ import * as skillModel from "../models/skillModel";
 const router = express.Router();
 
 /**
+ * @description: Returns all skill names in the database
+ * @method: GET /api/skills
+ * @returns: HTTP 200 and all rows of data, which is an array of {skillID, name}
+ * or HTTP 400 and JSON of {success: false, message: "reason for error"}
+ */
+router.get("/", async function (req, res, next) {
+    try {
+        const rows = await skillModel.getAllSkills();
+        res.status(200).send(rows);
+    } catch (err) {
+        console.error(`Error in getting all skills: ${err}`);
+        next(err);
+    }
+});
+
+/**
  * @description: Returns all of a user's skills
  * @method: GET /api/skills/user?userID={userID}
  * @returns: HTTP 200 and all rows of data
@@ -32,7 +48,7 @@ router.get("/user", async function (req, res, next) {
  * @returns: HTTP 200 and all rows of data
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
-router.get("/user", async function (req, res, next) {
+router.get("/application", async function (req, res, next) {
     try {
         const { applicationID } = req.query;
         if (typeof applicationID !== "string") {
@@ -46,6 +62,84 @@ router.get("/user", async function (req, res, next) {
         res.status(200).send(rows);
     } catch (err) {
         console.error(`Error in getting application skills: ${err}`);
+        next(err);
+    }
+});
+
+/**
+ * @description: Add a new skill name to the database
+ * @method: POST /api/skills
+ * @param: JSON of {name}
+ * @returns: HTTP 200 and JSON of {success: true, skillID, name}
+ * or HTTP 400 and JSON of {success: false, message: "reason for error"}
+ */
+router.post("/", async function (req, res, next) {
+    try {
+        const { name } = req.body;
+        if (typeof name !== "string") {
+            return res.status(400).json({ success: false, message: "Invalid name: not a string" });
+        }
+        const skillID = await skillModel.createSkill({ name });
+        res.status(200).send({ success: true, skillID, name });
+    } catch (err) {
+        console.error(`Error in creating new skill: ${err}`);
+        next(err);
+    }
+});
+
+/**
+ * @description: Adds a skill to a user
+ * @method: POST /api/skills/user
+ * @param: JSON of {userID, skillID, name, rating}
+ * @returns: HTTP 200 and JSON of {success: true, userID, skillID, name, rating}
+ * or HTTP 400 and JSON of {success: false, message: "reason for error"}
+ */
+router.post("/user", async function (req, res, next) {
+    try {
+        const { userID, skillID, name, rating } = req.body;
+        if (typeof userID !== "number") {
+            return res.status(400).json({ success: false, message: "Invalid userID: not a number" });
+        }
+        if (typeof skillID !== "number") {
+            return res.status(400).json({ success: false, message: "Invalid skillID: not a number" });
+        }
+        if (typeof name !== "string") {
+            return res.status(400).json({ success: false, message: "Invalid name: not a string" });
+        }
+        if (typeof rating !== "number") {
+            return res.status(400).json({ success: false, message: "Invalid rating: not a number" });
+        }
+        await skillModel.createUserSkill({ userID, skillID, name, rating });
+        res.status(200).send({ success: true, userID, skillID, name, rating });
+    } catch (err) {
+        console.error(`Error in creating new skill: ${err}`);
+        next(err);
+    }
+});
+
+/**
+ * @description: Adds a skill to an application
+ * @method: POST /api/skills/application
+ * @param: JSON of {applicationID, skillID, name}
+ * @returns: HTTP 200 and JSON of {success: true, applicationID, skillID, name}
+ * or HTTP 400 and JSON of {success: false, message: "reason for error"}
+ */
+router.post("/application", async function (req, res, next) {
+    try {
+        const { applicationID, skillID, name } = req.body;
+        if (typeof applicationID !== "number") {
+            return res.status(400).json({ success: false, message: "Invalid userID: not a number" });
+        }
+        if (typeof skillID !== "number") {
+            return res.status(400).json({ success: false, message: "Invalid skillID: not a number" });
+        }
+        if (typeof name !== "string") {
+            return res.status(400).json({ success: false, message: "Invalid name: not a string" });
+        }
+        await skillModel.createApplicationSkill({ applicationID, skillID, name });
+        res.status(200).send({ success: true, applicationID, skillID, name });
+    } catch (err) {
+        console.error(`Error in creating new skill: ${err}`);
         next(err);
     }
 });

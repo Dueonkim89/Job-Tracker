@@ -18,12 +18,6 @@ test("Get application 1 skills", async () => {
     expect(result).toStrictEqual(expected);
 });
 
-test("Create new skill", async () => {
-    const payload = { name: "Scala" };
-    const result = await skillModel.createSkill(payload);
-    expect(result).toStrictEqual(10);
-});
-
 test("Get all skills", async () => {
     const result = await skillModel.getAllSkills();
     result.sort((a, b) => (a.skillID as number) - (b.skillID as number));
@@ -64,10 +58,24 @@ test("Get all skills", async () => {
             name: "Hadoop",
             skillID: 9,
         },
-        {
-            name: "Scala",
-            skillID: 10,
-        },
     ];
     expect(result).toStrictEqual(expected);
+});
+
+test("Create new skill", async () => {
+    const payload = { name: "Scala" };
+    const result = await skillModel.createSkill(payload);
+    expect(result).toStrictEqual(10);
+});
+
+test("Create new user skill", async () => {
+    const payload = { userID: 1, skillID: 9, name: "Hadoop", rating: 5 };
+    const result = await skillModel.createUserSkill(payload);
+    expect(result).toStrictEqual(true);
+});
+
+test("Create new application skill", async () => {
+    const payload = { applicationID: 1, skillID: 9, name: "Hadoop" };
+    const result = await skillModel.createApplicationSkill(payload);
+    expect(result).toStrictEqual(true);
 });

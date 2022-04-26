@@ -28,6 +28,28 @@ export async function createSkill(p: SkillFields) {
     return result.insertId;
 }
 
+export async function createUserSkill(p: UserSkillFields) {
+    const sql = `
+    INSERT INTO UserSkills
+    (userID, skillID, rating)
+    VALUES (?, ?, ?);
+    `;
+    const vals = [p.userID, p.skillID, p.rating];
+    const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.query(sql, vals);
+    return true;
+}
+
+export async function createApplicationSkill(p: ApplicationSkillFields) {
+    const sql = `
+    INSERT INTO ApplicationSkills
+    (applicationID, skillID)
+    VALUES (?, ?);
+    `;
+    const vals = [p.applicationID, p.skillID];
+    const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.query(sql, vals);
+    return true;
+}
+
 export async function getAllSkills() {
     const sql = "SELECT * FROM `Skills` ORDER BY name ASC";
     const [rows, fields] = await db.query(sql);
