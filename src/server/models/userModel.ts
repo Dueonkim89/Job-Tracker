@@ -1,4 +1,4 @@
-import { RowDataPacket } from "mysql2";
+import { FieldPacket, ResultSetHeader, RowDataPacket } from "mysql2";
 import db from "./db";
 
 interface UserFields {
@@ -26,8 +26,8 @@ export async function createUser(p: UserFields) {
     VALUES (?, ?, ?, ?, ?, ?);
     `;
     const vals = [p.firstName, p.lastName, p.username, p.phoneNumber, p.emailAddress, p.passwordHash];
-    await db.query(sql, vals);
-    return true;
+    const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.query(sql, vals);
+    return result.insertId;
 }
 
 export async function getAll() {

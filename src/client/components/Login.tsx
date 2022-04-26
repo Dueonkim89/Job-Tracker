@@ -11,30 +11,42 @@ function Login() {
     const [usernameValid, setUsernameValid] = useState(true);
     const [passwordValid, setPasswordValid] = useState(true);
     // auth token
-    const [loggedIn, setLoggedIn] = useState(localStorage.getItem("token"));
+    const [token, setToken] = useState(localStorage.getItem('token'));
+    // logged in status
+    const [loggedIn, setLoggedIn] = useState(localStorage.getItem('loggedIn'));
+    // user information
 
     // checks if the token in the local storage matches the one created when the user logged in. 
     // if it is the user is directed to protected page
     useEffect(() => {
-        if (loggedIn) {
-            axios.get("http://localhost:3001/users/login", {
+        checkToken();
+        if (loggedIn === 'true') {
+            console.log("user is logged in");
+            navigate('/protected');
+        } else {
+            console.log("user is not logged in");
+            navigate('/login')
+        }
+    }, [])
+
+    // the get request to get user information and navigate to protected page
+    const checkToken = () => {
+        if (token) {
+            axios.get("http://localhost:3001/api/users/login", {
             headers: {
-                Authorization: loggedIn,
+                Authorization: token,
             }
             }).then(res => {
                 console.log(res);
+                setLoggedIn(localStorage.getItem('loggedIn'));
                 navigate('/protected');
             }).catch(err => {
                 console.log(err);
             })
         } else {
             navigate('/login')
-        }
-
-        const token = localStorage.getItem('token');
-        
-        
-    }, [])
+        }  
+    }
 
     const generateLeftLoginPanel = (argument: void) : JSX.Element => {
         return (                        
@@ -51,18 +63,23 @@ function Login() {
     // the user will be redirected to the protected page
     const handleSubmit = (event: any) => {
         event.preventDefault();
+
+        console.log("attempting POST request");
         
         // See if all the form field has data and a valid strong password
         setUsernameValid(validStringData(username));
         //setPasswordValid(validPassword(password));
         
         // only make GET request when all the form field is valid
-        if (validStringData(username) && validPassword(password)) {
-            console.log("To make a GET request");
+        if (usernameValid && passwordValid) {
+            console.log("Starting POST request...");
             console.log(username, password);
-            axios.post("http://localhost:3001/users/login", { username, password }).then(user => {
+            axios.post("http://localhost:3001/api/users/login", { username, password }).then(user => {
                 console.log(user);
                 localStorage.setItem('token', user.data.token);
+                setToken(localStorage.getItem("token"));
+                localStorage.setItem('loggedIn', 'true');
+                setLoggedIn(localStorage.getItem("loggedIn"));
                 navigate('/protected');
             }).catch(err => {
                 console.log(err);

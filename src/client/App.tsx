@@ -24,6 +24,7 @@ function setRoutes() {
     // https://reactrouter.com/docs/en/v6/upgrading/v5
     return (
         <Routes>
+            <Route path="" element={<Login />} />
             <Route path="login" element={<Login />} />
             <Route path="registration" element={<Registration />} />
             <Route path="application" element={<NewJobApplication />} />
