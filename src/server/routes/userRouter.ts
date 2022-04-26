@@ -56,7 +56,7 @@ router.post("/login", async function (req, res, next) {
         if (isValidPassword) {
             const accessToken = jwt.sign(
                 { id: user.userID },
-                "d5bb8b56620cc82ee7d0ebda543f26414e8547051469fe642a64100b918767c5ef5494efe3659742853f83d425562098ca450abbc8d38f3f5dfcc2aceb22b78a",
+                process.env.JWT_SECRET,
                 {
                     expiresIn: "1h",
                 }

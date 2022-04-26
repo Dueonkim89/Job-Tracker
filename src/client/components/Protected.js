@@ -6,7 +6,7 @@ function Protected() {
     let navigate = useNavigate()
     useEffect(() => {
         const token = localStorage.getItem('token')
-        axios.get("http://localhost:3001/users/protected", {headers : {
+        axios.get("http://localhost:3001/api/users/protected", {headers : {
             Authorization : token,
         }}).then(res => {
             console.log(res)
