@@ -1,5 +1,4 @@
 import express from "express";
-import { QueryError } from "mysql2";
 import * as bcrypt from "bcrypt";
 import * as userModel from "../models/userModel";
 import * as jwt from "jsonwebtoken";

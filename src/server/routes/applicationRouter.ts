@@ -19,7 +19,7 @@ router.get("/", async function (req, res, next) {
             return res.status(400).json({ success: false, message: "Invalid User ID" });
         }
         const rows = await appModel.getUserApps(parsedUserID);
-        res.status(200).send(rows);
+        res.status(200).json(rows);
     } catch (err) {
         console.error(`Error in getting user applications: ${err}`);
         next(err);
@@ -84,7 +84,7 @@ router.post("/status", async function (req, res, next) {
             return res.status(400).json({ success: false, message: "Invalid Application ID." });
         }
     } catch (err) {
-        console.error(`Error in creating updating application: ${err}`);
+        console.error(`Error in updating application status: ${err}`);
         next(err);
     }
 });

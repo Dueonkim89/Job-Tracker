@@ -1,7 +1,7 @@
 import { FieldPacket, ResultSetHeader, RowDataPacket } from "mysql2";
 import db from "./db";
 
-interface UserFields {
+export interface UserFields {
     userID?: number;
     firstName: string;
     lastName: string;
@@ -30,7 +30,7 @@ export async function createUser(p: UserFields) {
     return result.insertId;
 }
 
-export async function getAll() {
+export async function getAllUsers() {
     const sql = "SELECT * FROM `Users`";
     const [rows, fields] = await db.query(sql);
     return rows;
