@@ -26,6 +26,7 @@ test("Get company by name: invalid name", async () => {
 
 test("Search companies by name: many results", async () => {
     const result = await companyModel.searchCompaniesByName("");
+    result.sort((a, b) => (a.companyID as number) - (b.companyID as number));
     const expected = [
         { companyID: 1, industry: "Technology", name: "Amazon", websiteURL: "www.amazon.com" },
         { companyID: 2, industry: "Technology", name: "Blackbaud", websiteURL: "www.blackbaud.com" },
