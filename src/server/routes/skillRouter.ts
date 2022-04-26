@@ -13,7 +13,7 @@ router.get("/", async function (req, res, next) {
         const rows = await skillModel.getAllSkills();
         res.status(200).send(rows);
     } catch (err) {
-        console.error(`Error in getting all skills: ${err}`);
+        console.error(`Error in getting all skills:`);
         next(err);
     }
 });
@@ -25,8 +25,8 @@ router.get("/", async function (req, res, next) {
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.get("/user", async function (req, res, next) {
+    const { userID } = req.query;
     try {
-        const { userID } = req.query;
         if (typeof userID !== "string") {
             return res.status(400).json({ success: false, message: "Invalid User ID" });
         }
@@ -37,7 +37,8 @@ router.get("/user", async function (req, res, next) {
         const rows = await skillModel.getUserSkills(parsedUserID);
         res.status(200).send(rows);
     } catch (err) {
-        console.error(`Error in getting user skills: ${err}`);
+        console.error(`Error in getting user skills:`);
+        console.error({ userID });
         next(err);
     }
 });
@@ -49,8 +50,8 @@ router.get("/user", async function (req, res, next) {
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.get("/application", async function (req, res, next) {
+    const { applicationID } = req.query;
     try {
-        const { applicationID } = req.query;
         if (typeof applicationID !== "string") {
             return res.status(400).json({ success: false, message: "Invalid Application ID" });
         }
@@ -61,7 +62,8 @@ router.get("/application", async function (req, res, next) {
         const rows = await skillModel.getApplicationSkills(parsedApplicationID);
         res.status(200).send(rows);
     } catch (err) {
-        console.error(`Error in getting application skills: ${err}`);
+        console.error(`Error in getting application skills:`);
+        console.error({ applicationID });
         next(err);
     }
 });
@@ -70,19 +72,20 @@ router.get("/application", async function (req, res, next) {
  * @description: Add a new skill name to the database
  * @method: POST /api/skills
  * @param: JSON of {name}
- * @returns: HTTP 200 and JSON of {success: true, skillID, name}
+ * @returns: HTTP 201 and JSON of {success: true, skillID, name}
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.post("/", async function (req, res, next) {
+    const { name } = req.body;
     try {
-        const { name } = req.body;
         if (typeof name !== "string") {
             return res.status(400).json({ success: false, message: "Invalid name: not a string" });
         }
         const skillID = await skillModel.createSkill({ name });
-        res.status(200).send({ success: true, skillID, name });
+        res.status(201).send({ success: true, skillID, name });
     } catch (err) {
-        console.error(`Error in creating new skill: ${err}`);
+        console.error(`Error in creating new skill:`);
+        console.error({ name });
         next(err);
     }
 });
@@ -91,12 +94,12 @@ router.post("/", async function (req, res, next) {
  * @description: Adds a skill to a user
  * @method: POST /api/skills/user
  * @param: JSON of {userID, skillID, name, rating}
- * @returns: HTTP 200 and JSON of {success: true, userID, skillID, name, rating}
+ * @returns: HTTP 201 and JSON of {success: true, userID, skillID, name, rating}
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.post("/user", async function (req, res, next) {
+    const { userID, skillID, name, rating } = req.body;
     try {
-        const { userID, skillID, name, rating } = req.body;
         if (typeof userID !== "number") {
             return res.status(400).json({ success: false, message: "Invalid userID: not a number" });
         }
@@ -110,9 +113,10 @@ router.post("/user", async function (req, res, next) {
             return res.status(400).json({ success: false, message: "Invalid rating: not a number" });
         }
         await skillModel.createUserSkill({ userID, skillID, name, rating });
-        res.status(200).send({ success: true, userID, skillID, name, rating });
+        res.status(201).send({ success: true, userID, skillID, name, rating });
     } catch (err) {
-        console.error(`Error in creating new skill: ${err}`);
+        console.error(`Error in creating new skill:`);
+        console.error({ userID, skillID, name, rating });
         next(err);
     }
 });
@@ -121,12 +125,12 @@ router.post("/user", async function (req, res, next) {
  * @description: Adds a skill to an application
  * @method: POST /api/skills/application
  * @param: JSON of {applicationID, skillID, name}
- * @returns: HTTP 200 and JSON of {success: true, applicationID, skillID, name}
+ * @returns: HTTP 201 and JSON of {success: true, applicationID, skillID, name}
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.post("/application", async function (req, res, next) {
+    const { applicationID, skillID, name } = req.body;
     try {
-        const { applicationID, skillID, name } = req.body;
         if (typeof applicationID !== "number") {
             return res.status(400).json({ success: false, message: "Invalid userID: not a number" });
         }
@@ -137,9 +141,10 @@ router.post("/application", async function (req, res, next) {
             return res.status(400).json({ success: false, message: "Invalid name: not a string" });
         }
         await skillModel.createApplicationSkill({ applicationID, skillID, name });
-        res.status(200).send({ success: true, applicationID, skillID, name });
+        res.status(201).send({ success: true, applicationID, skillID, name });
     } catch (err) {
-        console.error(`Error in creating new skill: ${err}`);
+        console.error(`Error in creating new skill:`);
+        console.error({ applicationID, skillID, name });
         next(err);
     }
 });
