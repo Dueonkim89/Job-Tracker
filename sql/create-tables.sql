@@ -45,26 +45,19 @@ CREATE TABLE `CompanyComments`(
     FOREIGN KEY(`userID`) REFERENCES `Users`(`userID`),
     FOREIGN KEY(`companyID`) REFERENCES `Companies`(`companyID`)
 );
--- Creating Jobs Table
-DROP TABLE IF EXISTS Jobs;
-CREATE TABLE `Jobs`(
-    `jobID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `companyID` INT NOT NULL,
-    `jobPostingURL` VARCHAR(300) NOT NULL UNIQUE,
-    `position` VARCHAR(255) NOT NULL,
-    FOREIGN KEY(`companyID`) REFERENCES `Companies`(`companyID`)
-);
 -- Creating Applications Table
 DROP TABLE IF EXISTS Applications;
 CREATE TABLE `Applications`(
     `applicationID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `companyID` INT NOT NULL,
+    `jobPostingURL` VARCHAR(300) NOT NULL,
+    `position` VARCHAR(255) NOT NULL,
     `userID` INT NOT NULL,
-    `jobID` INT NOT NULL,
     `status` VARCHAR(255),
     `location` VARCHAR(255),
     `datetime` DATETIME,
     FOREIGN KEY(`userID`) REFERENCES `Users`(`userID`),
-    FOREIGN KEY(`jobID`) REFERENCES `Jobs`(`jobID`)
+    FOREIGN KEY(`companyID`) REFERENCES `Companies`(`companyID`)
 );
 -- Creating Skills Table
 DROP TABLE IF EXISTS Skills;
@@ -82,12 +75,12 @@ CREATE TABLE `UserSkills`(
     FOREIGN KEY(`userID`) REFERENCES `Users`(`userID`),
     FOREIGN KEY(`skillID`) REFERENCES `Skills`(`skillID`)
 );
--- Creating JobSkills Table
-DROP TABLE IF EXISTS JobSkills;
-CREATE TABLE `JobSkills`(
-    `jobID` INT,
+-- Creating ApplicationSkills Table
+DROP TABLE IF EXISTS ApplicationSkills;
+CREATE TABLE `ApplicationSkills`(
+    `applicationID` INT,
     `skillID` INT,
-    PRIMARY KEY (`jobID`, `skillID`),
-    FOREIGN KEY(`jobID`) REFERENCES `Jobs`(`jobID`),
+    PRIMARY KEY (`applicationID`, `skillID`),
+    FOREIGN KEY(`applicationID`) REFERENCES `Applications`(`applicationID`),
     FOREIGN KEY(`skillID`) REFERENCES `Skills`(`skillID`)
 );

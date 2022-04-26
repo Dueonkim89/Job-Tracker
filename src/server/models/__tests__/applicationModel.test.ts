@@ -6,24 +6,22 @@ test("Get user 1 apps", async () => {
         {
             applicationID: 1,
             companyID: 1,
-            datetime: new Date("2022-01-01T05:00:00.000Z"),
-            jobID: 1,
             jobPostingURL: "https://www.amazon.jobs/en/jobs/996246/senior-software-dev-engineer",
-            location: "Seattle, WA",
             position: "Senior Software Dev Engineer",
-            status: "Phone Screen",
             userID: 1,
+            status: "Phone Screen",
+            location: "Seattle, WA",
+            datetime: new Date("2022-01-01T05:00:00.000Z"),
         },
         {
             applicationID: 2,
             companyID: 1,
-            datetime: new Date("2022-01-02T05:00:00.000Z"),
-            jobID: 2,
             jobPostingURL: "https://www.amazon.jobs/en/jobs/981888/chip-design-engineer",
-            location: "Tel Aviv, Israel",
             position: "Chip Design Engineer",
-            status: "Applied",
             userID: 1,
+            status: "Applied",
+            location: "Tel Aviv, Israel",
+            datetime: new Date("2022-01-02T05:00:00.000Z"),
         },
     ];
     expect(result).toStrictEqual(expected);
@@ -36,8 +34,10 @@ test("Get non-existant user apps", async () => {
 
 test("Create new user app", async () => {
     const payload = {
+        companyID: 1,
+        jobPostingURL: "https://www.test.com",
+        position: "Test Position",
         userID: 2,
-        jobID: 3,
         status: "pending",
         location: "remote",
         datetime: new Date(),

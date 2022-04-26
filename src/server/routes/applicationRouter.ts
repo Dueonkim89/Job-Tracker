@@ -5,7 +5,7 @@ const router = express.Router();
 /**
  * @description: Returns all of a user's job applications
  * @method: GET /api/applications?userID={userID}
- * @returns: HTTP 200 and all fields from the Jobs & Applications tables
+ * @returns: HTTP 200 and all fields from Applications tables
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.get("/", async function (req, res, next) {
@@ -29,16 +29,34 @@ router.get("/", async function (req, res, next) {
 /**
  * @description: Adds a user's job application to the database
  * @method: POST /api/applications
- * @param: JSON of {userID, jobID, status, location}
+ * @param: JSON of {companyID, jobPostingURL, position, userID, status, location}
  * @returns: HTTP 201 and JSON of {success: true, applicationID, userID, jobID, status, location, datetime}
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.post("/", async function (req, res, next) {
     try {
-        const { userID, jobID, status, location } = req.body;
+        const { companyID, jobPostingURL, position, userID, status, location } = req.body;
         const datetime = new Date();
-        const applicationID = await appModel.createApp({ userID, jobID, status, location, datetime });
-        const response = { success: true, applicationID, userID, jobID, status, location, datetime };
+        const applicationID = await appModel.createApp({
+            companyID,
+            jobPostingURL,
+            position,
+            userID,
+            status,
+            location,
+            datetime,
+        });
+        const response = {
+            success: true,
+            applicationID,
+            companyID,
+            jobPostingURL,
+            position,
+            userID,
+            status,
+            location,
+            datetime,
+        };
         return res.status(200).json(response);
     } catch (err) {
         console.error(`Error in creating new application: ${err}`);

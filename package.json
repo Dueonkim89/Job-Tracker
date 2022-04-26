@@ -51,6 +51,8 @@
         "webpack-node-externals": "^3.0.0"
     },
     "scripts": {
+        "database:local": "node ./config/setupScript.mjs LOCAL",
+        "database:azure": "node ./config/setupScript.mjs AZURE",
         "test:frontend": "react-scripts test",
         "test:backend": "jest --selectProjects backend --detectOpenHandles",
         "eject": "react-scripts eject",
