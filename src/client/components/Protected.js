@@ -5,14 +5,16 @@ import { useNavigate } from "react-router-dom";
 function Protected() {
     let navigate = useNavigate()
     useEffect(() => {
-        const token = localStorage.getItem('token')
+        const token = localStorage.getItem('token');
+        const loggedIn = localStorage.getItem('loggedIn');
         axios.get("http://localhost:3001/api/users/protected", {headers : {
             Authorization : token,
         }}).then(res => {
-            console.log(res)
+            console.log(res);
         }).catch(err => {
             console.log(err);
             // if user not authenticated, redirect to login page
+            localStorage.setItem('loggedIn', '');
             navigate('/login')
 
         })
