@@ -10,7 +10,7 @@ function Login() {
 // checks if the token in the local storage matches the one created when the user logged in. if it is the user is directed to protected page
     useEffect(() => {
         const token = localStorage.getItem('token');
-        axios.get("http://localhost:3001/users/login", {
+        axios.get("http://localhost:3001/api/users/login", {
             headers: {
                 Authorization: token,
             }
@@ -25,7 +25,7 @@ function Login() {
 // Once the user clicks submit and the login username and password have been authenticated the user will be redirected to the protected page
     const submit = () => {
         console.log(username, password)
-        axios.post("http://localhost:3001/users/login", { username, password }).then(user => {
+        axios.post("http://localhost:3001/api/users/login", { username, password }).then(user => {
             console.log(user);
             localStorage.setItem('token', user.data.token)
             navigate('/protected')
