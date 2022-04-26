@@ -50,7 +50,7 @@ DROP TABLE IF EXISTS Applications;
 CREATE TABLE `Applications`(
     `applicationID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `companyID` INT NOT NULL,
-    `jobPostingURL` VARCHAR(300) NOT NULL UNIQUE,
+    `jobPostingURL` VARCHAR(300) NOT NULL,
     `position` VARCHAR(255) NOT NULL,
     `userID` INT NOT NULL,
     `status` VARCHAR(255),
