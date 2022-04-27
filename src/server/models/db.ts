@@ -34,6 +34,6 @@ const azureDBconfig = {
 export const chosenDBConfig = environment === LOCAL ? localDBconfig : azureDBconfig;
 
 // Update to azureDBconfig to connect to azure DB
-export const pool = mysql.createPool(chosenDBConfig);
+export default mysql.createPool(chosenDBConfig);
 
-export default pool.promise();
+// export default pool.promise();

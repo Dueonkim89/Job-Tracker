@@ -16,9 +16,7 @@ module.exports = {
             displayName: "backend",
             testMatch: ["<rootDir>/src/server/**/__tests__/*"],
             preset: "ts-jest/presets/default-esm",
-            globalSetup: "<rootDir>/src/server/config/jestGlobalSetup.js",
-            globalTeardown: "<rootDir>/src/server/config/jestGlobalTeardown.js",
-            setupFilesAfterEnv: ["<rootDir>/src/server/config/jestSetupFile.js"],
+            testEnvironment: "<rootDir>/src/server/config/testEnvironment.js",
         },
     ],
 };

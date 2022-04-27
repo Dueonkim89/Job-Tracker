@@ -17,7 +17,7 @@ const MySqlStore = require("express-mysql-session")(session);
 const buildDir = path.join(process.cwd(), "/build");
 
 // Middleware
-const app: Express = express();
+export const app: Express = express();
 app.use(
     session({
         secret: process.env.SESSION_SECRET as string,
@@ -66,8 +66,10 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 
 app.use(errorHandler);
 
-const port = 3001;
-console.log("checking port", port);
-app.listen(port, () => {
-    console.log(`Server now listening on port: ${port}`);
-});
+if (process.env.NODE_ENV !== "test") {
+    const port = 3001;
+    console.log("checking port", port);
+    app.listen(port, () => {
+        console.log(`Server now listening on port: ${port}`);
+    });
+}

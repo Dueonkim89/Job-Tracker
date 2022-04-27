@@ -47,31 +47,31 @@ class Registration extends React.Component<{}, MyState> {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    enterFirstName(event: any) {
+    enterFirstName(event: any) : void {
         this.setState({firstName: event.target.value});
     }
 
-    enterLastName(event: any) {
+    enterLastName(event: any) : void {
         this.setState({lastName: event.target.value});
     }
 
-    enterEmail(event: any) {
+    enterEmail(event: any) : void {
         this.setState({email: event.target.value});
     }
 
-    enterUserName(event: any) {
+    enterUserName(event: any) : void {
         this.setState({userName: event.target.value});
     }
 
-    enterPhoneNumber(event: any) {
+    enterPhoneNumber(event: any) : void {
         this.setState({phoneNumber: parseInt(event.target.value)});
     }
 
-    enterPassword(event: any) {
+    enterPassword(event: any) : void {
         this.setState({password: event.target.value});
     }
 
-    handleSubmit(event: any) {
+    handleSubmit(event: any) : void {
         event.preventDefault();
         
         // See if all the form field has data and a valid strong password
@@ -84,21 +84,21 @@ class Registration extends React.Component<{}, MyState> {
             passwordValid: validPassword(this.state.password)
         });
 
-        // MAKE GET REQUEST: check if username is taken and update state
-
-        // only make POST request when all the form field is valid AND username is not taken
+        // only make POST request when all the form field is valid
         if (validStringData(this.state.firstName) && validStringData(this.state.lastName) 
             && validStringData(this.state.email) && validStringData(this.state.userName) 
             && validIntData(this.state.phoneNumber) && validPassword(this.state.password)) {
 
-            // console.log(formatPhoneNumber(this.state.phoneNumber));
+            // send POST request
+                // format phone number
+                // make sure data has same property name as server
 
-            console.log("To make a POST request");
+            // if username is taken, update state, send warning to user
 
-            // CONDITIONAL route to user dashboard, pass in props received from server
+            // else, CONDITIONAL route to user dashboard, pass in props received from server
             // https://stackoverflow.com/questions/45805930/react-router-redirect-conditional
 
-                // update redux store before routing, so appbar is updated. 
+            // update redux store before routing, so appbar is updated. 
         }
             
     }

@@ -59,7 +59,7 @@ router.post("/", passport.authenticate("jwt", {session: false}), async function 
             location,
             datetime,
         };
-        return res.status(200).json(response);
+        return res.status(201).json(response);
     } catch (err) {
         console.error(`Error in creating new application:`);
         console.error({ companyID, jobPostingURL, position, userID, status, location, datetime });
@@ -82,7 +82,7 @@ router.post("/status",passport.authenticate("jwt", {session: false}), async func
         }
         const didUpdate = await appModel.updateAppStatus(applicationID, status);
         if (didUpdate) {
-            return res.status(200).json({ success: true, applicationID, status });
+            return res.status(201).json({ success: true, applicationID, status });
         } else {
             return res.status(400).json({ success: false, message: "Invalid Application ID." });
         }
