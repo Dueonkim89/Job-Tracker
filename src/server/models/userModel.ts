@@ -1,4 +1,4 @@
-import { FieldPacket, ResultSetHeader, RowDataPacket } from "mysql2";
+import { FieldPacket, OkPacket, ResultSetHeader, RowDataPacket } from "mysql2";
 import db from "./db";
 
 export interface UserFields {
@@ -26,24 +26,24 @@ export async function createUser(p: UserFields) {
     VALUES (?, ?, ?, ?, ?, ?);
     `;
     const vals = [p.firstName, p.lastName, p.username, p.phoneNumber, p.emailAddress, p.passwordHash];
-    const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.query(sql, vals);
+    const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.promise().query(sql, vals);
     return result.insertId;
 }
 
 export async function getAllUsers() {
     const sql = "SELECT * FROM `Users`";
-    const [rows, fields] = await db.query(sql);
+    const [rows, fields] = await db.promise().query(sql);
     return rows;
 }
 
 export async function getUserByID(userID: number) {
     const sql = "SELECT * FROM `Users` WHERE userID = ?";
-    const [rows, fields] = await db.query(sql, [userID]);
+    const [rows, fields] = await db.promise().query(sql, [userID]);
     return userOrNull(rows as RowDataPacket[]);
 }
 
 export async function getUserByUsername(username: string) {
     const sql = "SELECT * FROM `Users` WHERE username = ?";
-    const [rows, fields] = await db.query(sql, [username]);
+    const [rows, fields] = await db.promise().query(sql, [username]);
     return userOrNull(rows as RowDataPacket[]);
 }
