@@ -76,6 +76,18 @@ router.post("/login", async function (req, res, next) {
 });
 
 /**
+ * haven't tested this feature, will test once the logout tab has been created on the client side.
+ */
+router.get("/logout", async function (req, res){
+    req.logout();
+    localStorage.clear();
+    res.json({
+        message: "user successfully logged out",
+        status: "success"
+    })
+    res.redirect('/login')
+}) 
+/**
  * This will be the router that will be rendered if the user has passed the login authetication
  * to test this, run user /users/login and enter user creditials, copy the access token that will
  * be return, run a GET request on Postman and in the body select Authenticatation, value is the key

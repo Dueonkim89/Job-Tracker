@@ -1,4 +1,5 @@
 import express from "express";
+import passport from "passport";
 import * as skillModel from "../models/skillModel";
 const router = express.Router();
 
@@ -24,7 +25,7 @@ router.get("/", async function (req, res, next) {
  * @returns: HTTP 200 and all rows of data
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
-router.get("/user", async function (req, res, next) {
+router.get("/user", passport.authenticate("jwt", {session: false}), async function (req, res, next) {
     const { userID } = req.query;
     try {
         if (typeof userID !== "string") {
@@ -49,7 +50,7 @@ router.get("/user", async function (req, res, next) {
  * @returns: HTTP 200 and all rows of data
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
-router.get("/application", async function (req, res, next) {
+router.get("/application", passport.authenticate("jwt", {session: false}),async function (req, res, next) {
     const { applicationID } = req.query;
     try {
         if (typeof applicationID !== "string") {
@@ -97,7 +98,7 @@ router.post("/", async function (req, res, next) {
  * @returns: HTTP 201 and JSON of {success: true, userID, skillID, name, rating}
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
-router.post("/user", async function (req, res, next) {
+router.post("/user", passport.authenticate("jwt", {session: false}), async function (req, res, next) {
     const { userID, skillID, name, rating } = req.body;
     try {
         if (typeof userID !== "number") {
@@ -128,7 +129,7 @@ router.post("/user", async function (req, res, next) {
  * @returns: HTTP 201 and JSON of {success: true, applicationID, skillID, name}
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
-router.post("/application", async function (req, res, next) {
+router.post("/application", passport.authenticate("jwt", {session: false}), async function (req, res, next) {
     const { applicationID, skillID, name } = req.body;
     try {
         if (typeof applicationID !== "number") {
