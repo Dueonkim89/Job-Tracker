@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Container, Row, Form, Button, Col } from 'react-bootstrap';
+import { Container, Row, Form, Button } from 'react-bootstrap';
 
 const formPadding: string = ".75rem";
 const labelFontSize: string = "1.2rem";
