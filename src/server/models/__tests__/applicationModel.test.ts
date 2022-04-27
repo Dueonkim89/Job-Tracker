@@ -2,6 +2,7 @@ import * as appModel from "../applicationModel";
 
 test("Get user 1 apps", async () => {
     const result = await appModel.getUserApps(1);
+    result.sort((a, b) => (a.applicationID as number) - (b.applicationID as number));
     const expected = [
         {
             applicationID: 1,
