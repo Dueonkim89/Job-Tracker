@@ -1,6 +1,7 @@
 import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createElement, createRef, forwardRef } from 'react';
 import { Container, Row, Col, Form, Button, Nav } from 'react-bootstrap';
+import { findDOMNode } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import {validStringData, validPassword} from '../utils/formValidation';
 
@@ -15,6 +16,10 @@ function Login() {
     // logged in status
     const [loggedIn, setLoggedIn] = useState(localStorage.getItem('loggedIn'));
     // user information
+
+    // invalid input text
+    const [showInvalid, setShowInvalid] = useState(false);
+    const InvalidText = () => <Form.Text style={{color: 'red'}} id="requiredAsterick">Your username or password is incorrect.</Form.Text>;
 
     // checks if the token in the local storage matches the one created when the user logged in. 
     // if it is the user is directed to protected page
@@ -73,6 +78,7 @@ function Login() {
         
         // only make GET request when all the form field is valid
         if (usernameValid && passwordValid) {
+            setShowInvalid(false);
             console.log("Starting POST request...");
             console.log(username, password);
             axios.post("http://localhost:3001/api/users/login", { username, password }).then(user => {
@@ -85,6 +91,8 @@ function Login() {
             }).catch(err => {
                 console.log(err);
             })
+        } else {
+            setShowInvalid(true);
         }
             
     }
@@ -104,7 +112,7 @@ function Login() {
     const generateLoginForm = (argument: void) : JSX.Element => {
         const invalidStyle = '3px solid red';
         return (
-            <Form onSubmit={handleSubmit}>
+            <Form>
                 <br />
                 <Form.Group className="mb-3">
                     <Form.Text style={{color: 'red'}} id="requiredAsterick">* </Form.Text>
@@ -112,13 +120,14 @@ function Login() {
                         Indicates a required field
                     </Form.Text>
                 </Form.Group>
-                <Form.Group>
-                    {renderInvalidInput()}
+                <Form.Group id='invalidInput'>
+                    {showInvalid ? <InvalidText /> : null}
                 </Form.Group>
                 <Form.Group className="mb-3">
                     <Form.Label htmlFor="username" style={{fontWeight: 'bold'}}>username</Form.Label>
                     <Form.Text style={{color: 'red'}} id="requiredAsterick"> *</Form.Text>
-                    <Form.Control style={{ border: !usernameValid ? invalidStyle: ''}} id="username" type="text" value={username} onChange={event => setUsername(event.target.value)} placeholder="Enter username" />
+                    {/* re-add style={{ border: !usernameValid ? invalidStyle: ''}}  */}
+                    <Form.Control id="username" type="text" value={username} onChange={event => setUsername(event.target.value)} placeholder="Enter username" />
                 </Form.Group>
                 <Form.Group className="mb-3">
                     <Form.Label htmlFor="password" style={{fontWeight: 'bold'}}>Password</Form.Label>
@@ -130,7 +139,7 @@ function Login() {
                     <Link to="../registration">Forgot password?</Link>
                 </Form.Group>
                 <br />
-                <Button type="submit" className='login-button'>Log In</Button>
+                <Button className='login-button' onClick={handleSubmit}>Log In</Button>
                 
             </Form>
         );  
@@ -138,8 +147,10 @@ function Login() {
 
     const renderInvalidInput = (argument: void) => {
         if (!usernameValid || !passwordValid) {
-            return <Form.Text style={{color: 'red'}} id="requiredAsterick">Your username or password is incorrect.</Form.Text>
-        };
+            return;
+        } else {
+        }
+        
     }
 
     const generateCreateAnAccount = (argument: void) : JSX.Element => {
