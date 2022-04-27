@@ -49,7 +49,7 @@ router.post("/login", async function (req, res, next) {
     try {
         const user = await userModel.getUserByUsername(username);
         if (!user) {
-            res.status(400).json({ error: "Didn't find a user matching that username." });
+            res.status(400).json({ success: false, message: "Didn't find a user matching that username." });
             return;
         }
         const isValidPassword = await bcrypt.compare(password, user.passwordHash);
@@ -65,7 +65,7 @@ router.post("/login", async function (req, res, next) {
             });
             return;
         } else {
-            res.status(400).json({ error: "Invalid Password or Username" });
+            res.status(400).json({ success: false, message: "Invalid Password or Username" });
             return;
         }
     } catch (err) {

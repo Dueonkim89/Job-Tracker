@@ -11,12 +11,12 @@ test("Get user by ID", async () => {
         userID: 1,
         username: "ally1",
     };
-    expect(result).toStrictEqual(expected);
+    expect(result).toEqual(expected);
 });
 
 test("Get user by ID: no entry", async () => {
     const result = await userModel.getUserByID(100);
-    expect(result).toStrictEqual(null);
+    expect(result).toEqual(null);
 });
 
 test("Get user by username", async () => {
@@ -30,12 +30,12 @@ test("Get user by username", async () => {
         userID: 1,
         username: "ally1",
     };
-    expect(result).toStrictEqual(expected);
+    expect(result).toEqual(expected);
 });
 
 test("Get user by username: no entry", async () => {
     const result = await userModel.getUserByUsername("svsafsd");
-    expect(result).toStrictEqual(null);
+    expect(result).toEqual(null);
 });
 
 test("Create user", async () => {
@@ -48,5 +48,5 @@ test("Create user", async () => {
         username: "test1",
     };
     const result = await userModel.createUser(payload);
-    expect(result).toStrictEqual(4);
+    expect(result).toEqual(4);
 });

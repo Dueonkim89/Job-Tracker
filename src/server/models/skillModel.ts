@@ -1,4 +1,4 @@
-import { FieldPacket, ResultSetHeader, RowDataPacket } from "mysql2";
+import { FieldPacket, OkPacket, ResultSetHeader, RowDataPacket } from "mysql2";
 import db from "./db";
 
 export interface SkillFields {
@@ -24,7 +24,7 @@ export async function createSkill(p: SkillFields) {
     VALUES (?);
     `;
     const vals = [p.name];
-    const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.query(sql, vals);
+    const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.promise().query(sql, vals);
     return result.insertId;
 }
 
@@ -35,7 +35,7 @@ export async function createUserSkill(p: UserSkillFields) {
     VALUES (?, ?, ?);
     `;
     const vals = [p.userID, p.skillID, p.rating];
-    const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.query(sql, vals);
+    const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.promise().query(sql, vals);
     return true;
 }
 
@@ -46,13 +46,13 @@ export async function createApplicationSkill(p: ApplicationSkillFields) {
     VALUES (?, ?);
     `;
     const vals = [p.applicationID, p.skillID];
-    const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.query(sql, vals);
+    const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.promise().query(sql, vals);
     return true;
 }
 
 export async function getAllSkills() {
     const sql = "SELECT * FROM `Skills` ORDER BY name ASC";
-    const [rows, fields] = await db.query(sql);
+    const [rows, fields] = await db.promise().query(sql);
     return rows as SkillFields[];
 }
 
@@ -63,7 +63,7 @@ export async function getUserSkills(userID: number) {
     WHERE us.userID = ?
     `;
     const vals = [userID];
-    const [rows, fields] = await db.query(sql, vals);
+    const [rows, fields] = await db.promise().query(sql, vals);
     return rows as UserSkillFields[];
 }
 
@@ -74,6 +74,6 @@ export async function getApplicationSkills(applicationID: number) {
     WHERE appS.applicationID = ?
     `;
     const vals = [applicationID];
-    const [rows, fields] = await db.query(sql, vals);
+    const [rows, fields] = await db.promise().query(sql, vals);
     return rows as ApplicationSkillFields[];
 }
