@@ -44,7 +44,7 @@ test("Create new user app", async () => {
         datetime: new Date(),
     };
     const result = await appModel.createApp(payload);
-    expect(result).toEqual(6);
+    expect(result).toBeGreaterThan(5);
 });
 
 test("Update valid user app status", async () => {

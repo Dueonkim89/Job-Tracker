@@ -1,7 +1,32 @@
+import http from "http";
 import request from "supertest";
-import "../../config/global";
 
-const server = global.__SERVER__;
+let server: http.Server;
+let token: string;
+
+const logInGetToken = async () => {
+    const body = {
+        username: "ally1",
+        password: "ally1",
+    };
+    const result = await request(server).post("/api/users/login").send(body);
+    if (!result.body.success) {
+        throw Error("Log In / Get Token failed");
+    }
+    return result.body.token;
+};
+
+beforeAll((done) => {
+    const { app } = require("../../index");
+    server = app.listen(async () => {
+        token = await logInGetToken();
+        return done();
+    });
+});
+
+afterAll((done) => {
+    server.close(() => done());
+});
 
 test("[Valid] user login", async () => {
     const expected = {
@@ -59,12 +84,7 @@ test("[Valid] user registration", async () => {
         phoneNumber: "123-456-9999",
         emailAddress: "test@test.com",
     };
-    const expected = {
-        success: true,
-        userID: 4,
-        ...body,
-    };
-    delete expected.password;
     const result = await request(server).post("/api/users").send(body);
-    expect(result.body).toStrictEqual(expected);
+    expect(result.statusCode).toEqual(201);
+    expect(result.body.userID).toBeGreaterThan(3);
 });

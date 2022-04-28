@@ -65,7 +65,7 @@ test("Get all skills", async () => {
 test("Create new skill", async () => {
     const payload = { name: "Scala" };
     const result = await skillModel.createSkill(payload);
-    expect(result).toEqual(10);
+    expect(result).toBeGreaterThan(9);
 });
 
 test("Create new user skill", async () => {
