@@ -49,5 +49,5 @@ test("Search companies by name: no results", async () => {
 test("Create company", async () => {
     const payload = { industry: "Technology", name: "Test", websiteURL: "www.test.com" };
     const result = await companyModel.createCompany(payload);
-    expect(result).toEqual(4);
+    expect(result).toBeGreaterThan(3);
 });
