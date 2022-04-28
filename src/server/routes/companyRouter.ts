@@ -29,7 +29,7 @@ router.post("/", async function (req, res, next) {
  * @method: GET /api/companies/search?name={name}
  * @returns: HTTP 200 and JSON of CompanyFields[] (see companyModel for CompanyFields interface)
  */
-router.get("/search", passport.authenticate("jwt", {session: false}), async function (req, res, next) {
+router.get("/search", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { name } = req.query;
     try {
         if (typeof name !== "string") {
