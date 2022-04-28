@@ -1,7 +1,8 @@
+import axios from 'axios';
 import * as React from 'react';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import {validIntData, validStringData, validPassword} from '../utils/formValidation';
-import {formatPhoneNumber} from '../utils/helper';
+import {formatPhoneNumber, getServerURL, newUserInfo, registerNewUser} from '../utils/helper';
 
 // declare prop & state types for Registration component
 type MyState = { 
@@ -73,25 +74,38 @@ class Registration extends React.Component<{}, MyState> {
 
     handleSubmit(event: any) : void {
         event.preventDefault();
+        const {firstName, lastName, email, userName, phoneNumber, password} = this.state;
         
         // See if all the form field has data and a valid strong password
         this.setState({ 
-            firstNameValid: validStringData(this.state.firstName),
-            lastNameValid: validStringData(this.state.lastName),
-            emailValid: validStringData(this.state.email),
-            userNameValid: validStringData(this.state.userName),
-            phoneNumberValid: validIntData(this.state.phoneNumber),
-            passwordValid: validPassword(this.state.password)
+            firstNameValid: validStringData(firstName),
+            lastNameValid: validStringData(lastName),
+            emailValid: validStringData(email),
+            userNameValid: validStringData(userName),
+            phoneNumberValid: validIntData(phoneNumber),
+            passwordValid: validPassword(password)
         });
 
         // only make POST request when all the form field is valid
-        if (validStringData(this.state.firstName) && validStringData(this.state.lastName) 
-            && validStringData(this.state.email) && validStringData(this.state.userName) 
-            && validIntData(this.state.phoneNumber) && validPassword(this.state.password)) {
+        if (validStringData(firstName) && validStringData(lastName) 
+            && validStringData(email) && validStringData(userName) 
+            && validIntData(phoneNumber) && validPassword(password)) {
 
+            const serverURL: string  = getServerURL(process.env.NODE_ENV);
+
+            // make sure data has same property name as server
+            let newUser: newUserInfo = {
+                firstName: firstName,
+                lastName: lastName,
+                username: userName,
+                phoneNumber: formatPhoneNumber(phoneNumber),  // format phone number
+                emailAddress: email,
+                password: password
+            };
+            
             // send POST request
-                // format phone number
-                // make sure data has same property name as server
+            registerNewUser(serverURL, newUser);
+                
 
             // if username is taken, update state, send warning to user
 
