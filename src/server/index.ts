@@ -67,7 +67,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 app.use(errorHandler);
 
 if (process.env.NODE_ENV !== "test") {
-    const port = 3001;
+    const port = process.env.PORT ? parseInt(process.env.PORT) : 3001;
     console.log("checking port", port);
     app.listen(port, () => {
         console.log(`Server now listening on port: ${port}`);
