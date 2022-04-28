@@ -30,6 +30,45 @@ afterAll((done) => {
 });
 
 // Tests start here
+
+// TODO - test that a user cannot update skills other than their own?
+
+test("[Valid] Getting all skills", async () => {
+    const expected = [
+        { name: "Java", skillID: 1 },
+        { name: "Go", skillID: 8 },
+    ];
+    const result = await request(server).get("/api/skills").send();
+    expect(result.statusCode).toEqual(200);
+    expect(result.body).toContainEqual(expected[0]);
+    expect(result.body).toContainEqual(expected[1]);
+});
+
+test("[Valid] Getting all user skills", async () => {
+    const expected = [
+        { userID: 1, name: "Java", skillID: 1, rating: 5 },
+        { userID: 1, name: "C++", skillID: 2, rating: 3 },
+    ];
+    const result = await request(server).get("/api/skills/user?userID=1").set("Authorization", token).send();
+    expect(result.statusCode).toEqual(200);
+    expect(result.body).toContainEqual(expected[0]);
+    expect(result.body).toContainEqual(expected[1]);
+});
+
+test("[Valid] Getting all application skills", async () => {
+    const expected = [
+        { applicationID: 1, name: "Java", skillID: 1 },
+        { applicationID: 1, name: "C++", skillID: 2 },
+    ];
+    const result = await request(server)
+        .get("/api/skills/application?applicationID=1")
+        .set("Authorization", token)
+        .send();
+    expect(result.statusCode).toEqual(200);
+    expect(result.body).toContainEqual(expected[0]);
+    expect(result.body).toContainEqual(expected[1]);
+});
+
 test("[Valid] Adding a new skill", async () => {
     const payload = { name: "NEW SKILL" };
     const result = await request(server).post("/api/skills").send(payload);
@@ -38,7 +77,6 @@ test("[Valid] Adding a new skill", async () => {
     expect(result.body.success).toEqual(true);
 });
 
-// TODO - test that a user cannot update skills other than their own?
 test("[Valid] Adding a new skill to a user", async () => {
     const payload = { userID: 1, skillID: 7, name: "Python", rating: 5 };
     const result = await request(server).post("/api/skills/user").set("Authorization", token).send(payload);
@@ -46,7 +84,6 @@ test("[Valid] Adding a new skill to a user", async () => {
     expect(result.body.success).toEqual(true);
 });
 
-// TODO - test that a user cannot update skills other than their own?
 test("[Valid] Adding a new skill to an application", async () => {
     const payload = { applicationID: 1, skillID: 7, name: "Python" };
     const result = await request(server).post("/api/skills/application").set("Authorization", token).send(payload);
