@@ -47,10 +47,6 @@ app.use(
 );
 app.use(express.static(buildDir));
 
-app.get("/", function (req: Request, res: Response) {
-    res.sendFile(path.join(buildDir, "index.html"));
-});
-
 app.use("/api/users", userRouter);
 app.use("/api/applications", applicationRouter);
 app.use("/api/companies", companyRouter);
@@ -65,6 +61,10 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 };
 
 app.use(errorHandler);
+
+app.get("/*", function (req: Request, res: Response) {
+    res.sendFile(path.join(buildDir, "index.html"));
+});
 
 if (process.env.NODE_ENV !== "test") {
     const port = process.env.PORT ? parseInt(process.env.PORT) : 3001;
