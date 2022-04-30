@@ -1,8 +1,9 @@
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Form, Button, Nav } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { validStringData, validPassword } from "../utils/formValidation";
+import { UserLoggedInContext } from "../context/UserLoggedInStatus";
 
 function Login() {
     let navigate = useNavigate();
@@ -14,14 +15,16 @@ function Login() {
     // auth token
     const [token, setToken] = useState(localStorage.getItem("token"));
     // logged in status
-    const [loggedIn, setLoggedIn] = useState(localStorage.getItem("loggedIn"));
+    const {loggedInStatus, setLoggedInStatus} = useContext(UserLoggedInContext);
+
     // user information
 
     // checks if the token in the local storage matches the one created when the user logged in.
     // if it is the user is directed to protected page
     useEffect(() => {
+        console.log(loggedInStatus);
         checkToken();
-        if (loggedIn == "true") {
+        if (loggedInStatus) {
             console.log("user is logged in");
             navigate("/protected");
         } else {
@@ -41,7 +44,7 @@ function Login() {
                 })
                 .then((res) => {
                     console.log(res);
-                    setLoggedIn(localStorage.getItem("loggedIn"));
+                    setLoggedInStatus(true);
                     setUserID(localStorage.getItem('userID'));
                     navigate("/protected");
                 })
@@ -49,7 +52,7 @@ function Login() {
                     console.log(err);
                 });
         } else {
-            setLoggedIn("");
+            setLoggedInStatus(false);
             setUserID('');
             navigate("/login");
         }
@@ -85,10 +88,9 @@ function Login() {
                 .post("/api/users/login", { username, password })
                 .then((user) => {
                     console.log(user);
+                    setLoggedInStatus(true);
                     localStorage.setItem("token", user.data.token);
                     setToken(localStorage.getItem("token"));
-                    localStorage.setItem("loggedIn", "true");
-                    setLoggedIn(localStorage.getItem("loggedIn"));
                     localStorage.setItem("userID", user.data.userID);
                     setUserID(localStorage.getItem("userID"));
                     navigate("/protected");

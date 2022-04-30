@@ -1,7 +1,8 @@
-import { Container, Row, Col, Form, Button, Nav } from 'react-bootstrap';
-import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Form, Button, Nav, Table } from 'react-bootstrap';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { UserLoggedInContext } from "../context/UserLoggedInStatus";
 
 
 export default function Dashboard() {
@@ -11,12 +12,12 @@ export default function Dashboard() {
     // auth token
     const [token, setToken] = useState(localStorage.getItem('token'));
     // logged in status
-    const [loggedIn, setLoggedIn] = useState(localStorage.getItem('loggedIn'));
+    const {loggedInStatus, setLoggedInStatus} = useContext(UserLoggedInContext);
     // user hashmap with hashmaps as data points
     const [userInfo, setUserInfo] = useState(localStorage.getItem('userInfo'));
 
     useEffect(() => {
-        if (loggedIn == 'true') {
+        if (loggedInStatus) {
             getApps();
             getSkills();
         }
@@ -25,7 +26,7 @@ export default function Dashboard() {
     // function to get all of user applications
     // GET /api/applications?userID={userID}
     const getApps = (argument : void) => {
-        if (token) {
+        if (loggedInStatus && token) {
             axios.get("/api/applications?userID=" + userID, {
                 headers: {
                     Authorization: token,
@@ -39,7 +40,6 @@ export default function Dashboard() {
                 }
             })
         } else {
-            setLoggedIn('');
             setUserID('');
             navigate('/login');
         }
@@ -65,7 +65,7 @@ export default function Dashboard() {
 
     // GET request for all user skills
     const getSkills = () => {
-        if (token) {
+        if (loggedInStatus && token) {
             console.log('GET request for skills sent')
             axios.get("/api/skills/user?userID=" + userID, {
                 headers: {
@@ -81,7 +81,6 @@ export default function Dashboard() {
                 }
             })
         } else {
-            setLoggedIn('');
             setUserID('');
             navigate('/login');
         }
@@ -93,9 +92,45 @@ export default function Dashboard() {
     const generateMainTable = (argument: void) : JSX.Element => {
         return (
             <Container className="main-table">
-
+                <br />
+                {setUpTable()}
             </Container>
         );
+    }
+
+    // table
+    const setUpTable = () => {
+        return (
+            <Table striped bordered hover size="sm">
+                <thead>
+                    <tr>
+                    <th>#</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Username</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    <td>1</td>
+                    <td>Mark</td>
+                    <td>Otto</td>
+                    <td>@mdo</td>
+                    </tr>
+                    <tr>
+                    <td>2</td>
+                    <td>Jacob</td>
+                    <td>Thornton</td>
+                    <td>@fat</td>
+                    </tr>
+                    <tr>
+                    <td>3</td>
+                    <td colSpan={2}>Larry the Bird</td>
+                    <td>@twitter</td>
+                    </tr>
+                </tbody>
+            </Table>
+        )
     }
 
     return (
