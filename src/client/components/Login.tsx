@@ -10,6 +10,7 @@ function Login() {
     const [password, setPassword] = useState("");
     const [usernameValid, setUsernameValid] = useState(true);
     const [passwordValid, setPasswordValid] = useState(true);
+    const [userID, setUserID] = useState(localStorage.getItem('userID'));
     // auth token
     const [token, setToken] = useState(localStorage.getItem("token"));
     // logged in status
@@ -33,7 +34,7 @@ function Login() {
     const checkToken = () => {
         if (token) {
             axios
-                .get("/api/users/login", {
+                .get("http://localhost:3001/api/users/login", {
                     headers: {
                         Authorization: token,
                     },
@@ -41,6 +42,7 @@ function Login() {
                 .then((res) => {
                     console.log(res);
                     setLoggedIn(localStorage.getItem("loggedIn"));
+                    setUserID(localStorage.getItem('userID'));
                     navigate("/protected");
                 })
                 .catch((err) => {
@@ -48,6 +50,7 @@ function Login() {
                 });
         } else {
             setLoggedIn("");
+            setUserID('');
             navigate("/login");
         }
     };
@@ -79,13 +82,15 @@ function Login() {
             console.log("Starting POST request...");
             console.log(username, password);
             axios
-                .post("/api/users/login", { username, password })
+                .post("http://localhost:3001/api/users/login", { username, password })
                 .then((user) => {
                     console.log(user);
                     localStorage.setItem("token", user.data.token);
                     setToken(localStorage.getItem("token"));
                     localStorage.setItem("loggedIn", "true");
                     setLoggedIn(localStorage.getItem("loggedIn"));
+                    localStorage.setItem("userID", user.data.userID);
+                    setUserID(localStorage.getItem("userID"));
                     navigate("/protected");
                 })
                 .catch((err) => {

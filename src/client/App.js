@@ -3,6 +3,7 @@ import "./App.css";
 import AppBar from './components/AppBar';
 import Registration from "./components/Registration";
 import Login from "./components/Login";
+import Dashboard from "./components/MainDashboard";
 import NewJobApplication from "./components/NewJobApplication";
 import AddCompany from "./components/AddCompany";
 import AppliedCompany from "./components/AppliedCompany";
@@ -34,6 +35,7 @@ function setRoutes() {
         <Routes>
             <Route path="" element={<Login />} />
             <Route path="login" element={<Login />} />
+            <Route path="main" element={<Dashboard />} />
             <Route path="registration" element={<Registration />} />
             <Route path="application" element={<NewJobApplication />} />
             <Route path="add_company" element={<AddCompany />} />
