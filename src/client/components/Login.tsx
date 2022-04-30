@@ -34,7 +34,7 @@ function Login() {
     const checkToken = () => {
         if (token) {
             axios
-                .get("http://localhost:3001/api/users/login", {
+                .get("/api/users/login", {
                     headers: {
                         Authorization: token,
                     },
@@ -82,7 +82,7 @@ function Login() {
             console.log("Starting POST request...");
             console.log(username, password);
             axios
-                .post("http://localhost:3001/api/users/login", { username, password })
+                .post("/api/users/login", { username, password })
                 .then((user) => {
                     console.log(user);
                     localStorage.setItem("token", user.data.token);

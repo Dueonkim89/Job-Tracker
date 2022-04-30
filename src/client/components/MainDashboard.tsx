@@ -12,6 +12,8 @@ export default function Dashboard() {
     const [token, setToken] = useState(localStorage.getItem('token'));
     // logged in status
     const [loggedIn, setLoggedIn] = useState(localStorage.getItem('loggedIn'));
+    // user hashmap with hashmaps as data points
+    const [userInfo, setUserInfo] = useState(localStorage.getItem('userInfo'));
 
     useEffect(() => {
         if (loggedIn == 'true') {
@@ -24,7 +26,7 @@ export default function Dashboard() {
     // GET /api/applications?userID={userID}
     const getApps = (argument : void) => {
         if (token) {
-            axios.get("http://localhost:3001/api/applications?userID=" + userID, {
+            axios.get("/api/applications?userID=" + userID, {
                 headers: {
                     Authorization: token,
                 }
@@ -47,7 +49,7 @@ export default function Dashboard() {
     // GET request to get Company information based on companyID
     const getCompany = (companyID : any) => {
         if (token) {
-            axios.get("http://localhost:3001/api/companies?companyID=" + companyID.toString(), {
+            axios.get("/api/companies?companyID=" + companyID.toString(), {
                 headers: {
                     Authorization: token
                 }
@@ -65,7 +67,7 @@ export default function Dashboard() {
     const getSkills = () => {
         if (token) {
             console.log('GET request for skills sent')
-            axios.get("http://localhost:3001/api/skills/user?userID=" + userID, {
+            axios.get("/api/skills/user?userID=" + userID, {
                 headers: {
                     Authorization: token
                 }
