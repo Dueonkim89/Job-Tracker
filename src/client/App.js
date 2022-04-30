@@ -14,8 +14,8 @@ import {UserLoggedInContext} from "./context/UserLoggedInStatus";
 
 function App() {
     // use hooks to implement context
-    const [loggedInStatus, setLoggedInStatus] = useState(false);
-    const value = {loggedInStatus, setLoggedInStatus};
+    const [loggedIn, setLoggedIn] = useState(localStorage.getItem('loggedIn'));
+    const value = {loggedIn, setLoggedIn};
     // console.log("i am in app.js", loggedInStatus, value)
     return (
         <UserLoggedInContext.Provider value={value}>

@@ -92,6 +92,7 @@ function Login() {
                     localStorage.setItem("userID", user.data.userID);
                     setUserID(localStorage.getItem("userID"));
                     navigate("/protected");
+                    window.location.reload();
                 })
                 .catch((err) => {
                     console.log(err);

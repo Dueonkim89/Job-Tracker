@@ -1,13 +1,17 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Navbar, Container, Nav } from 'react-bootstrap';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
+import { Navigate, useNavigate } from 'react-router-dom';
 
 export default function ProjectAppBar() {
-  // get loggedInstatus from context
-  const {loggedInStatus} = React.useContext(UserLoggedInContext);
+  // get loggedInstatus from localStorage
+  const [loggedIn, setLoggedIn] = useState(localStorage.getItem('loggedIn'));
+  // authentication token
+  const [token, setToken] = useState(localStorage.getItem('token'));
   // return appbar for not logged in users
-  if (!loggedInStatus) {
+  if (!token && !loggedIn) {
     return notLoggedInUserAppBar();
   }
   // return appbar for logged in users
@@ -24,8 +28,8 @@ function loggedInUserAppBar() {
         <LinkContainer to="login">
           <Nav.Link>My contacts</Nav.Link>
         </LinkContainer>
-        <LinkContainer to="registration">
-          <Nav.Link>Log out</Nav.Link>
+        <LinkContainer to="login">
+          <Nav.Link onClick={removeTokenFromLS}>Log out</Nav.Link>
         </LinkContainer>
       </Nav>
     </Navbar>
@@ -48,5 +52,10 @@ function notLoggedInUserAppBar() {
       </Nav>
     </Navbar>
   );
+}
+
+function removeTokenFromLS(event : any) {
+  localStorage.removeItem('token');
+  window.location.reload();
 }
 
