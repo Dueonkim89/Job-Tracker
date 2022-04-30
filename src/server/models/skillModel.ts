@@ -77,3 +77,18 @@ export async function getApplicationSkills(applicationID: number) {
     const [rows, fields] = await db.promise().query(sql, vals);
     return rows as ApplicationSkillFields[];
 }
+
+export async function updateUserSkillRating(userID: number, skillID: number, rating: number) {
+    const sql = `
+    UPDATE UserSkills
+    SET rating = ?
+    WHERE userID = ? AND skillID = ?
+    `;
+    const vals = [rating, userID, skillID];
+    const [rows, fields] = <[ResultSetHeader, FieldPacket[]]>await db.promise().query(sql, vals);
+    if (rows.affectedRows > 1) {
+        console.error("User skill rating update: multiple rows matched");
+        throw Error("Error in User skill rating update");
+    }
+    return rows.affectedRows === 1;
+}

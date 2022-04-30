@@ -46,3 +46,8 @@ test("Create new application skill", async () => {
     const result = await skillModel.createApplicationSkill(payload);
     expect(result).toEqual(true);
 });
+
+test("Update user skill rating", async () => {
+    const result = await skillModel.updateUserSkillRating(2, 6, 5);
+    expect(result).toEqual(true);
+});
