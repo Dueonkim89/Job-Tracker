@@ -38,8 +38,8 @@ interface registerStatus {
 
 // Promise<registerStatus>
 
-function registerNewUser(url: string, userField: newUserInfo) : void {
-    const endPoint: string = url + "/api/users";
+function registerNewUser(userField: newUserInfo) : void {
+    const endPoint: string = "/api/users";
     axios.post(endPoint, userField).then(function (response) {
         console.log(response);
     }).catch(function (error) {

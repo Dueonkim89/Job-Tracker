@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState }  from "react";
 import "./App.css";
 import AppBar from './components/AppBar';
 import Registration from "./components/Registration";
@@ -8,15 +8,22 @@ import AddCompany from "./components/AddCompany";
 import AppliedCompany from "./components/AppliedCompany";
 import { Routes, Route } from "react-router-dom"; 
 import Protected from "./components/Protected";
+import {UserLoggedInContext} from "./context/UserLoggedInStatus";
 
 
 function App() {
+    // use hooks to implement context
+    const [loggedInStatus, setLoggedInStatus] = useState(false);
+    const value = {loggedInStatus, setLoggedInStatus};
+    // console.log("i am in app.js", loggedInStatus, value)
     return (
-        <div className="App">
-            <AppBar />
-            {/*anything in this main App page shows up by default in any other page that is routed to*/}
-            {setRoutes()}
-        </div>
+        <UserLoggedInContext.Provider value={value}>
+            <div className="App">
+                <AppBar />
+                {/*anything in this main App page shows up by default in any other page that is routed to*/}
+                {setRoutes()}
+            </div>
+        </UserLoggedInContext.Provider>
     );
 }
 
