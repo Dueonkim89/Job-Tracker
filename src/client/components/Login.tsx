@@ -21,7 +21,7 @@ function Login() {
     // if it is the user is directed to protected page
     useEffect(() => {
         checkToken();
-        if (loggedIn == "true") {
+        if (loggedIn === "true") {
             console.log("user is logged in");
             navigate("/protected");
         } else {
