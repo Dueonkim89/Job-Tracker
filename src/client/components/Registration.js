@@ -1,27 +1,11 @@
 import * as React from 'react';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import {validIntData, validStringData, validPassword} from '../utils/formValidation';
-import {formatPhoneNumber} from '../utils/helper';
+import {formatPhoneNumber, newUserInfo, registerNewUser} from '../utils/helper';
+import {UserLoggedInContext} from "../context/UserLoggedInStatus";
 
-// declare prop & state types for Registration component
-type MyState = { 
-    firstName: string,
-    lastName: string,
-    email: string,
-    userName: string,
-    phoneNumber: number,
-    password: string,
-    firstNameValid: boolean,
-    lastNameValid: boolean,
-    emailValid: boolean,
-    userNameValid: boolean,
-    phoneNumberValid: boolean,
-    passwordValid: boolean,
-    userNameAvailable: boolean
-};
-
-class Registration extends React.Component<{}, MyState> {
-    constructor(props: any) {
+class Registration extends React.Component {
+    constructor(props) {
         super(props);
         this.state = {
             firstName: '',
@@ -47,63 +31,81 @@ class Registration extends React.Component<{}, MyState> {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    enterFirstName(event: any) {
+    enterFirstName(event)  {
         this.setState({firstName: event.target.value});
     }
 
-    enterLastName(event: any) {
+    enterLastName(event) {
         this.setState({lastName: event.target.value});
     }
 
-    enterEmail(event: any) {
+    enterEmail(event) {
         this.setState({email: event.target.value});
     }
 
-    enterUserName(event: any) {
+    enterUserName(event) {
         this.setState({userName: event.target.value});
     }
 
-    enterPhoneNumber(event: any) {
+    enterPhoneNumber(event) {
         this.setState({phoneNumber: parseInt(event.target.value)});
     }
 
-    enterPassword(event: any) {
+    enterPassword(event) {
         this.setState({password: event.target.value});
     }
 
-    handleSubmit(event: any) {
+    handleSubmit(event) {
         event.preventDefault();
+        const {firstName, lastName, email, userName, phoneNumber, password} = this.state;
         
         // See if all the form field has data and a valid strong password
         this.setState({ 
-            firstNameValid: validStringData(this.state.firstName),
-            lastNameValid: validStringData(this.state.lastName),
-            emailValid: validStringData(this.state.email),
-            userNameValid: validStringData(this.state.userName),
-            phoneNumberValid: validIntData(this.state.phoneNumber),
-            passwordValid: validPassword(this.state.password)
+            firstNameValid: validStringData(firstName),
+            lastNameValid: validStringData(lastName),
+            emailValid: validStringData(email),
+            userNameValid: validStringData(userName),
+            phoneNumberValid: validIntData(phoneNumber),
+            passwordValid: validPassword(password)
         });
 
-        // MAKE GET REQUEST: check if username is taken and update state
+        // TEST:: SEE IF GLOBAL CAN BE TOGGLED
+        const {LoggedInStatus, setLoggedInStatus} = this.context;
+        console.log(this.context);
+        console.log(LoggedInStatus);
 
-        // only make POST request when all the form field is valid AND username is not taken
-        if (validStringData(this.state.firstName) && validStringData(this.state.lastName) 
-            && validStringData(this.state.email) && validStringData(this.state.userName) 
-            && validIntData(this.state.phoneNumber) && validPassword(this.state.password)) {
+   
+        // only make POST request when all the form field is valid
+        if (validStringData(firstName) && validStringData(lastName) 
+            && validStringData(email) && validStringData(userName) 
+            && validIntData(phoneNumber) && validPassword(password)) {
 
-            // console.log(formatPhoneNumber(this.state.phoneNumber));
+            // const serverURL: string  = getServerURL(process.env.NODE_ENV);
 
-            console.log("To make a POST request");
+            // make sure data has same property name as server
+            let newUser = {
+                firstName: firstName,
+                lastName: lastName,
+                username: userName,
+                phoneNumber: formatPhoneNumber(phoneNumber),  // format phone number
+                emailAddress: email,
+                password: password
+            };
+            
+            // send POST request
+            registerNewUser(newUser);
+                
+            // if username is taken, update state, send warning to user
 
-            // CONDITIONAL route to user dashboard, pass in props received from server
+            // else, CONDITIONAL route to user dashboard, pass in props received from server
             // https://stackoverflow.com/questions/45805930/react-router-redirect-conditional
 
-                // update redux store before routing, so appbar is updated. 
+            // update redux store before routing, so appbar is updated. 
         }
             
     }
 
-    generateLeftRegistrationPanel(argument: void) : JSX.Element {
+    generateLeftRegistrationPanel() {
         return (                        
         <Container className="registeration-text-box">
             <h2 style={{marginBottom: '1.5rem'}}>Sign Up</h2>
@@ -113,7 +115,7 @@ class Registration extends React.Component<{}, MyState> {
         );
     }
 
-    generateRightRegistrationPanel(argument: void) : JSX.Element {
+    generateRightRegistrationPanel() {
         return (
             <Container className="registeration-form-field">
                 {this.generateRegistrationForm()}
@@ -121,8 +123,8 @@ class Registration extends React.Component<{}, MyState> {
         );
     }
 
-    generateRegistrationForm(argument: void) : JSX.Element {
-        const invalidStyle: string = '3px solid red';
+    generateRegistrationForm() {
+        const invalidStyle = '3px solid red';
         return (
             <Form onSubmit={this.handleSubmit}>
                 <Row className="mb-3">
@@ -163,6 +165,7 @@ class Registration extends React.Component<{}, MyState> {
     render() {
         //const {firstNameValid, lastNameValid, emailValid, userNameValid, phoneNumberValid, passwordValid, userNameAvailable} = this.state;
         //console.log(firstNameValid, lastNameValid, emailValid, userNameValid, phoneNumberValid, passwordValid, userNameAvailable);
+        //console.log(this.context);
         return (
             <Container>
                 <Row>
@@ -178,4 +181,6 @@ class Registration extends React.Component<{}, MyState> {
     }
 }
 
+// add context to class
+Registration.contextType = UserLoggedInContext;
 export default Registration;

@@ -18,7 +18,6 @@ module.exports = {
             preset: "ts-jest/presets/default-esm",
             globalSetup: "<rootDir>/src/server/config/jestGlobalSetup.js",
             globalTeardown: "<rootDir>/src/server/config/jestGlobalTeardown.js",
-            setupFilesAfterEnv: ["<rootDir>/src/server/config/jestSetupFile.js"],
         },
     ],
 };

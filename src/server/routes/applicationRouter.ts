@@ -1,4 +1,5 @@
 import express from "express";
+import passport from "passport";
 import * as appModel from "../models/applicationModel";
 const router = express.Router();
 
@@ -8,7 +9,7 @@ const router = express.Router();
  * @returns: HTTP 200 and all fields from Applications tables
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
-router.get("/", async function (req, res, next) {
+router.get("/", passport.authenticate("jwt", {session: false}), async function (req, res, next) {
     const { userID } = req.query;
     try {
         if (typeof userID !== "string") {
@@ -34,7 +35,7 @@ router.get("/", async function (req, res, next) {
  * @returns: HTTP 201 and JSON of {success: true, applicationID, userID, jobID, status, location, datetime}
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
-router.post("/", async function (req, res, next) {
+router.post("/", passport.authenticate("jwt", {session: false}), async function (req, res, next) {
     const { companyID, jobPostingURL, position, userID, status, location } = req.body;
     const datetime = new Date();
     try {
@@ -58,7 +59,7 @@ router.post("/", async function (req, res, next) {
             location,
             datetime,
         };
-        return res.status(200).json(response);
+        return res.status(201).json(response);
     } catch (err) {
         console.error(`Error in creating new application:`);
         console.error({ companyID, jobPostingURL, position, userID, status, location, datetime });
@@ -73,7 +74,7 @@ router.post("/", async function (req, res, next) {
  * @returns: HTTP 201 and JSON of {success: true, applicationID, status}
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
-router.post("/status", async function (req, res, next) {
+router.post("/status",passport.authenticate("jwt", {session: false}), async function (req, res, next) {
     const { applicationID, status } = req.body;
     try {
         if (typeof applicationID !== "number") {
@@ -81,7 +82,7 @@ router.post("/status", async function (req, res, next) {
         }
         const didUpdate = await appModel.updateAppStatus(applicationID, status);
         if (didUpdate) {
-            return res.status(200).json({ success: true, applicationID, status });
+            return res.status(201).json({ success: true, applicationID, status });
         } else {
             return res.status(400).json({ success: false, message: "Invalid Application ID." });
         }

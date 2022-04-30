@@ -1,5 +1,5 @@
-module.exports = async function (globalConfig, projectConfig) {
+module.exports = async (globalConfig, projectConfig) => {
     require("dotenv").config();
-    const setUpDB = require("./setupDB");
-    await setUpDB();
+    const setupDB = require("./setupDB");
+    await setupDB();
 };

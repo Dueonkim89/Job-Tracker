@@ -49,7 +49,7 @@ router.post("/login", async function (req, res, next) {
     try {
         const user = await userModel.getUserByUsername(username);
         if (!user) {
-            res.status(400).json({ error: "Didn't find a user matching that username." });
+            res.status(400).json({ success: false, message: "Didn't find a user matching that username." });
             return;
         }
         const isValidPassword = await bcrypt.compare(password, user.passwordHash);
@@ -65,7 +65,7 @@ router.post("/login", async function (req, res, next) {
             });
             return;
         } else {
-            res.status(400).json({ error: "Invalid Password or Username" });
+            res.status(400).json({ success: false, message: "Invalid Password or Username" });
             return;
         }
     } catch (err) {
@@ -75,6 +75,18 @@ router.post("/login", async function (req, res, next) {
     }
 });
 
+/**
+ * haven't tested this feature, will test once the logout tab has been created on the client side.
+ */
+router.get("/logout", async function (req, res){
+    req.logout();
+    localStorage.clear();
+    res.json({
+        message: "user successfully logged out",
+        status: "success"
+    })
+    res.redirect('/login')
+}) 
 /**
  * This will be the router that will be rendered if the user has passed the login authetication
  * to test this, run user /users/login and enter user creditials, copy the access token that will

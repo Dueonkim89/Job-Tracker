@@ -1,4 +1,6 @@
-module.exports = async function (globalConfig, projectConfig) {
-    const setUpDB = require("./setupDB");
-    await setUpDB();
+module.exports = async (globalConfig, projectConfig) => {
+    const pool = require("../models/db");
+    pool.default.end();
+    const setupDB = require("./setupDB");
+    await setupDB();
 };
