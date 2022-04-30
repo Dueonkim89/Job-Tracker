@@ -1,7 +1,33 @@
 import express from "express";
 import passport from "passport";
 import * as companyModel from "../models/companyModel";
+import { parseStringID } from "./utils";
 const router = express.Router();
+
+/**
+ * @description: Get a company by ID
+ * @method: GET /api/companies?companyID={companyID}
+ * @returns: HTTP 200 and JSON of {success: true, companyID, name, industry, websiteURL}
+ */
+router.get("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
+    const { companyID } = req.query;
+    try {
+        const parsedID = parseStringID(companyID);
+        if (parsedID === null) {
+            return res.status(400).json({ success: false, message: "Invalid Company ID" });
+        }
+        const data = await companyModel.getCompanyByID(parsedID);
+        if (data === null) {
+            return res.status(400).json({ success: false, message: "No company found" });
+        }
+        const response = { success: true, ...data };
+        return res.status(200).json(response);
+    } catch (err) {
+        console.error(`Error in gett company by id:`);
+        console.error({ companyID });
+        next(err);
+    }
+});
 
 /**
  * @description: Adds a company to the database

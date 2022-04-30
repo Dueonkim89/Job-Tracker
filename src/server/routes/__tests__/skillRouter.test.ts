@@ -90,3 +90,10 @@ test("[Valid] Adding a new skill to an application", async () => {
     expect(result.statusCode).toEqual(201);
     expect(result.body.success).toEqual(true);
 });
+
+test("[Valid] Updating a user's skill rating", async () => {
+    const payload = { userID: 2, skillID: 5, rating: 4 };
+    const result = await request(server).patch("/api/skills/user").set("Authorization", token).send(payload);
+    expect(result.statusCode).toEqual(200);
+    expect(result.body.success).toEqual(true);
+});

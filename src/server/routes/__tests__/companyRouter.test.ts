@@ -45,6 +45,26 @@ test("[Valid] Adding a new company", async () => {
 test("[Valid] Searching for a company", async () => {
     const expected = [{ companyID: 1, industry: "Technology", name: "Amazon", websiteURL: "www.amazon.com" }];
     const result = await request(server).get("/api/companies/search?name=Amaz").set("Authorization", token).send();
-    expect(result.statusCode).toEqual(200);
     expect(result.body).toEqual(expected);
+    expect(result.statusCode).toEqual(200);
+});
+
+test("[Valid] Getting a company by ID", async () => {
+    const expected = {
+        success: true,
+        companyID: 1,
+        industry: "Technology",
+        name: "Amazon",
+        websiteURL: "www.amazon.com",
+    };
+    const result = await request(server).get("/api/companies?companyID=1").set("Authorization", token).send();
+    expect(result.body).toEqual(expected);
+    expect(result.statusCode).toEqual(200);
+});
+
+test("[Invalid] Getting a company by ID: no match", async () => {
+    const expected = { success: false, message: "No company found" };
+    const result = await request(server).get("/api/companies?companyID=100").set("Authorization", token).send();
+    expect(result.body).toEqual(expected);
+    expect(result.statusCode).toEqual(400);
 });
