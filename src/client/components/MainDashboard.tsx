@@ -23,18 +23,16 @@ export default function Dashboard() {
     // function to get all of user applications
     // GET /api/applications?userID={userID}
     const getApps = (argument : void) => {
-        console.log("Starting GET request for applications");
         if (token) {
             axios.get("http://localhost:3001/api/applications?userID=" + userID, {
                 headers: {
                     Authorization: token,
                 }
             }).then(data => {
-                console.log('GET request success');
+                console.log('GET request for applications success');
                 for (let i=0; i<data.data.length; i++) {
-                    console.log()
                     // Another GET call to get the company name from companyID
-                    //getCompany(data.data[i].companyID);
+                    getCompany(data.data[i].companyID);
                     console.log(data.data[i])
                 }
             })
@@ -47,23 +45,21 @@ export default function Dashboard() {
     }
 
     // GET request to get Company information based on companyID
-    /*
     const getCompany = (companyID : any) => {
-        console.log(companyID);
         if (token) {
-            axios.get("" + companyID.toString(), {
+            axios.get("http://localhost:3001/api/companies?companyID=" + companyID.toString(), {
                 headers: {
                     Authorization: token
                 }
             }).then(data => {
                 console.log('GET request for Company info success');
                 // return company info from data
+                console.log(data.data);
             })
         } else {
-            return null
+            return false
         }
     }
-    */
 
     // GET request for all user skills
     const getSkills = () => {
