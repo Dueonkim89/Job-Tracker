@@ -12,17 +12,25 @@ export interface AppFields {
     datetime: Date;
 }
 
+interface AppReturnedFields extends AppFields {
+    applicationID: number;
+    companyName: string;
+}
+
 /**
  * @returns all applications for the given userID
  */
 export async function getUserApps(userID: number) {
     const sql = `
-    SELECT applicationID, companyID, jobPostingURL, position, userID, status, location,
-    convert_tz(\`datetime\`, '+00:00', @@session.time_zone) AS datetime
-    FROM Applications WHERE Applications.userID = ?
+    SELECT app.applicationID, app.companyID, app.jobPostingURL, app.position, 
+    app.userID, app.status, app.location, comp.name AS companyName,
+    convert_tz(app.\`datetime\`, '+00:00', @@session.time_zone) AS datetime
+    FROM Applications AS app
+    JOIN Companies AS comp ON app.companyID = comp.companyID
+    WHERE app.userID = ?
     `;
     const [rows, fields] = <[RowDataPacket[], FieldPacket[]]>await db.promise().query(sql, [userID]);
-    return rows as AppFields[];
+    return rows as AppReturnedFields[];
 }
 
 /**
