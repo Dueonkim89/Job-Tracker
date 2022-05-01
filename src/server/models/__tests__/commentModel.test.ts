@@ -10,6 +10,7 @@ test("Get company 1 comments", async () => {
             userID: 1,
             title: "Great Company",
             text: "Really loved my chat with the hiring manager!",
+            datetime: new Date("2022-01-01T00:00:00.000Z"),
         },
     ];
     expect(result).toEqual(expected);
@@ -27,6 +28,7 @@ test("Create a new comment", async () => {
         userID: 3,
         title: "Not a great company",
         text: "Did not like my chat!",
+        datetime: new Date("2022-01-04T00:00:00.000Z"),
     };
     const result = await commentModel.createComment(payload);
     expect(result).toBeGreaterThan(3);

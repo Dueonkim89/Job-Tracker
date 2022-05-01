@@ -34,19 +34,20 @@ router.get("/", passport.authenticate("jwt", { session: false }), async function
  * @description: Adds a user's company comment to the database
  * @method: POST /api/comments
  * @param: JSON of {userID, companyID, title, text}
- * @returns: HTTP 201 and JSON of {success: true, applicationID, userID, jobID, status, location, datetime}
+ * @returns: HTTP 201 and JSON of {success: true, commentID, userID, companyID, title, text, datetime}
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.post("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { userID, companyID, title, text } = req.body;
+    const datetime = new Date();
     try {
-        const payload = { userID, companyID, title, text };
+        const payload = { userID, companyID, title, text, datetime };
         const commentID = await commentModel.createComment(payload);
         const response = { success: true, commentID, ...payload };
         return res.status(201).json(response);
     } catch (err) {
         console.error(`Error in creating new company comment:`);
-        console.error({ userID, companyID, title, text });
+        console.error({ userID, companyID, title, text, datetime });
         next(err);
     }
 });

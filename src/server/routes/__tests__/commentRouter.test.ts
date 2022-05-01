@@ -39,6 +39,7 @@ test("[Valid] Getting company comments", async () => {
             userID: 1,
             title: "Great Company",
             text: "Really loved my chat with the hiring manager!",
+            datetime: "2022-01-01T00:00:00.000Z",
         },
     ];
     expect(result.statusCode).toEqual(200);
