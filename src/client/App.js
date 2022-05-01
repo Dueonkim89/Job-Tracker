@@ -1,4 +1,4 @@
-import React, { useState }  from "react";
+import React, { useState, useMemo }  from "react";
 import "./App.css";
 import AppBar from './components/AppBar';
 import Registration from "./components/Registration";
@@ -8,14 +8,13 @@ import NewJobApplication from "./components/NewJobApplication";
 import AddCompany from "./components/AddCompany";
 import AppliedCompany from "./components/AppliedCompany";
 import { Routes, Route } from "react-router-dom"; 
-import Protected from "./components/Protected";
 import {UserLoggedInContext} from "./context/UserLoggedInStatus";
 
 
 function App() {
     // use hooks to implement context
-    const [loggedInStatus, setLoggedInStatus] = useState(UserLoggedInContext);
-    const value = {loggedInStatus, setLoggedInStatus};
+    const [loggedInStatus, setLoggedInStatus] = useState(true);
+    const value = useMemo(() => ({loggedInStatus, setLoggedInStatus}), [loggedInStatus, setLoggedInStatus]);
     // console.log("i am in app.js", loggedInStatus, value)
     return (
         <UserLoggedInContext.Provider value={value}>
@@ -40,7 +39,6 @@ function setRoutes() {
             <Route path="application" element={<NewJobApplication />} />
             <Route path="add_company" element={<AddCompany />} />
             <Route path="applied_company/:company_name" element={<AppliedCompany />} />
-            <Route path="protected" element={<Protected />} />
         </Routes>
     );
 }

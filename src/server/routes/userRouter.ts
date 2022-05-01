@@ -27,6 +27,20 @@ router.post("/", async function (req, res, next) {
             passwordHash,
         });
         const response = { success: true, userID, firstName, lastName, username, phoneNumber, emailAddress };
+        if (response.success === true) {
+            const user = await userModel.getUserByUsername(username);
+            const accessToken = jwt.sign({ id: user?.userID }, process.env.JWT_SECRET as jwt.Secret, {
+                expiresIn: "1h",
+            });
+            res.status(200).json({
+                success: true,
+                userID: user?.userID,
+                message: "user sucessfully created and login sucessfully",
+                token: "Bearer " + accessToken,
+            });
+            return;
+        }
+
         return res.status(201).json(response);
     } catch (err: any) {
         if (err?.code === "ER_DUP_ENTRY" && err?.sqlMessage?.includes("username")) {

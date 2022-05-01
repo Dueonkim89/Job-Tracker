@@ -1,15 +1,28 @@
-import * as React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Navbar, Container, Nav } from 'react-bootstrap';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
+import { useNavigate } from 'react-router-dom';
 
 export default function ProjectAppBar() {
+  // user
+  const userData = localStorage.getItem("user");
   // get loggedInstatus from context
-  const {loggedInStatus, setLoggedInStatus} = React.useContext(UserLoggedInContext);
+  const {loggedInStatus, setLoggedInStatus} = useContext(UserLoggedInContext);
+  console.log("APPBAR Login Status");
+  console.log(loggedInStatus);
 
   const logout = () => {
-    localStorage.removeItem('token');
+    console.log("logging out!");
+    localStorage.removeItem('user');
     setLoggedInStatus(false);
+  }
+
+  if (userData) {
+    setLoggedInStatus(true);
+    return loggedInUserAppBar()
+  } else {
+    return notLoggedInUserAppBar();
   }
 
   function loggedInUserAppBar() {
@@ -48,11 +61,5 @@ export default function ProjectAppBar() {
     );
   }
 
-  // return appbar for not logged in users
-  if (!loggedInStatus) {
-    return notLoggedInUserAppBar();
-  }
-  // return appbar for logged in users
-  return loggedInUserAppBar();
 }
 

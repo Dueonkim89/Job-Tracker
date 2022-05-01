@@ -11,52 +11,24 @@ function Login() {
     const [password, setPassword] = useState("");
     const [usernameValid, setUsernameValid] = useState(true);
     const [passwordValid, setPasswordValid] = useState(true);
-    const [userID, setUserID] = useState(localStorage.getItem('userID'));
-    // auth token
-    const [token, setToken] = useState(localStorage.getItem("token"));
     // logged in status
     const {loggedInStatus, setLoggedInStatus} = useContext(UserLoggedInContext);
 
-    // user information
+    const userData = localStorage.getItem("user");
+    let user = new Map();
 
     // checks if the token in the local storage matches the one created when the user logged in.
-    // if it is the user is directed to protected page
+    // if it is the user is directed to main dashboard page
     useEffect(() => {
         console.log(loggedInStatus);
-        checkToken();
-        if (loggedInStatus) {
-            console.log("user is logged in");
-            navigate("/protected");
+        if (userData) {
+            user = JSON.parse(userData);
+            setLoggedInStatus(true);
+            navigate('/main');
         } else {
-            console.log("user is not logged in");
-            navigate("/login");
+            
         }
     }, []);
-
-    // the get request to get user information and navigate to protected page
-    const checkToken = () => {
-        if (token) {
-            axios
-                .get("/api/users/login", {
-                    headers: {
-                        Authorization: token,
-                    },
-                })
-                .then((res) => {
-                    console.log(res);
-                    setLoggedInStatus(true);
-                    setUserID(localStorage.getItem('userID'));
-                    navigate("/protected");
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        } else {
-            setLoggedInStatus(false);
-            setUserID('');
-            navigate("/login");
-        }
-    };
 
     const generateLeftLoginPanel = (argument: void): JSX.Element => {
         return (
@@ -70,12 +42,9 @@ function Login() {
     };
 
     // Once the user clicks submit and the login username and password have been authenticated
-    // the user will be redirected to the protected page
-    const handleSubmit = (event: any) => {
+    // the user will be redirected to the main dashboard page
+    const handleSubmit = async (event: any) => {
         event.preventDefault();
-
-        console.log("attempting POST request");
-
         // See if all the form field has data and a valid strong password
         setUsernameValid(validStringData(username));
         //setPasswordValid(validPassword(password));
@@ -83,18 +52,16 @@ function Login() {
         // only make GET request when all the form field is valid
         if (usernameValid && passwordValid) {
             console.log("Starting POST request...");
-            console.log(username, password);
             axios
                 .post("/api/users/login", { username, password })
-                .then((user) => {
-                    console.log(user);
+                .then((res) => {
                     setLoggedInStatus(true);
-                    localStorage.setItem("token", user.data.token);
-                    setToken(localStorage.getItem("token"));
-                    localStorage.setItem("userID", user.data.userID);
-                    setUserID(localStorage.getItem("userID"));
-                    navigate("/protected");
-                    window.location.reload();
+                    // create user
+                    user.set('token' , res.data.token);
+                    user.set('userID', res.data.userID);
+                    const jsonObject = Object.fromEntries(user);
+                    localStorage.setItem("user", JSON.stringify(jsonObject));
+                    navigate('/main');
                 })
                 .catch((err) => {
                     console.log(err);
