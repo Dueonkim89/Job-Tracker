@@ -1,8 +1,9 @@
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Form, Button, Nav } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { validStringData, validPassword } from "../utils/formValidation";
+import { UserLoggedInContext } from "../context/UserLoggedInStatus";
 
 function Login() {
     let navigate = useNavigate();
@@ -10,50 +11,24 @@ function Login() {
     const [password, setPassword] = useState("");
     const [usernameValid, setUsernameValid] = useState(true);
     const [passwordValid, setPasswordValid] = useState(true);
-    const [userID, setUserID] = useState(localStorage.getItem('userID'));
-    // auth token
-    const [token, setToken] = useState(localStorage.getItem("token"));
     // logged in status
-    const [loggedIn, setLoggedIn] = useState(localStorage.getItem("loggedIn"));
-    // user information
+    const {loggedInStatus, setLoggedInStatus} = useContext(UserLoggedInContext);
+
+    const userData = localStorage.getItem("user");
+    let user = new Map();
 
     // checks if the token in the local storage matches the one created when the user logged in.
-    // if it is the user is directed to protected page
+    // if it is the user is directed to main dashboard page
     useEffect(() => {
-        checkToken();
-        if (loggedIn === "true") {
-            console.log("user is logged in");
-            navigate("/protected");
+        console.log(loggedInStatus);
+        if (userData) {
+            user = JSON.parse(userData);
+            setLoggedInStatus(true);
+            navigate('/main');
         } else {
-            console.log("user is not logged in");
-            navigate("/login");
+            
         }
     }, []);
-
-    // the get request to get user information and navigate to protected page
-    const checkToken = () => {
-        if (token) {
-            axios
-                .get("/api/users/login", {
-                    headers: {
-                        Authorization: token,
-                    },
-                })
-                .then((res) => {
-                    console.log(res);
-                    setLoggedIn(localStorage.getItem("loggedIn"));
-                    setUserID(localStorage.getItem('userID'));
-                    navigate("/protected");
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        } else {
-            setLoggedIn("");
-            setUserID('');
-            navigate("/login");
-        }
-    };
 
     const generateLeftLoginPanel = (argument: void): JSX.Element => {
         return (
@@ -67,12 +42,9 @@ function Login() {
     };
 
     // Once the user clicks submit and the login username and password have been authenticated
-    // the user will be redirected to the protected page
-    const handleSubmit = (event: any) => {
+    // the user will be redirected to the main dashboard page
+    const handleSubmit = async (event: any) => {
         event.preventDefault();
-
-        console.log("attempting POST request");
-
         // See if all the form field has data and a valid strong password
         setUsernameValid(validStringData(username));
         //setPasswordValid(validPassword(password));
@@ -80,19 +52,16 @@ function Login() {
         // only make GET request when all the form field is valid
         if (usernameValid && passwordValid) {
             console.log("Starting POST request...");
-            console.log(username, password);
             axios
                 .post("/api/users/login", { username, password })
-                .then((user) => {
-                    console.log(user);
-                    localStorage.setItem("token", user.data.token);
-                    setToken(localStorage.getItem("token"));
-                    localStorage.setItem("loggedIn", "true");
-                    setLoggedIn(localStorage.getItem("loggedIn"));
-                    localStorage.setItem("userID", user.data.userID);
-                    setUserID(localStorage.getItem("userID"));
-                    navigate("/protected");
-                    window.location.reload();
+                .then((res) => {
+                    setLoggedInStatus(true);
+                    // create user
+                    user.set('token' , res.data.token);
+                    user.set('userID', res.data.userID);
+                    const jsonObject = Object.fromEntries(user);
+                    localStorage.setItem("user", JSON.stringify(jsonObject));
+                    navigate('/main');
                 })
                 .catch((err) => {
                     console.log(err);
