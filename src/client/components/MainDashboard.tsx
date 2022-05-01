@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { UserLoggedInContext } from "../context/UserLoggedInStatus";
 import { User } from './User';
+import { Application } from './Application';
 
 
 export default function Dashboard() {
@@ -56,10 +57,21 @@ export default function Dashboard() {
                 }
             }).then(data => {
                 console.log('GET request for applications success');
+                // Go through all applications and create a new map
                 for (let i=0; i<data.data.length; i++) {
+                    console.log(i);
+                    let current = data.data[i]
+                    // create application object
+                    let application : Application = {"applicationID" : current.applicationID,
+                                                     "companyID" : current.companyID,
+                                                     "datetime" : new Date(current.datetime),
+                                                     "jobPostingURL" : current.jobPostingURL,
+                                                     "location" : current.location,
+                                                     "position" : current.position,
+                                                     "status" : current.status}
                     // Another GET call to get the company name from companyID
-                    getCompany(data.data[i].companyID);
-                    console.log(data.data[i])
+                    //getCompany(data.data[i].companyID, application);
+                    console.log(application);
                 }
             })
         } else {
@@ -69,7 +81,7 @@ export default function Dashboard() {
     }
 
     // GET request to get Company information based on companyID
-    const getCompany = (companyID : any) => {
+    const getCompany = (companyID : any, application: Application) => {
         if (user.token) {
             axios.get("/api/companies?companyID=" + companyID.toString(), {
                 headers: {
@@ -77,11 +89,12 @@ export default function Dashboard() {
                 }
             }).then(data => {
                 console.log('GET request for Company info success');
+                application = data.data.name;
                 // return company info from data
-                console.log(data.data);
+                return(data.data.name);
             })
         } else {
-            return false
+            return ''
         }
     }
 
