@@ -41,6 +41,7 @@ test("[Valid] Getting user applications", async () => {
             status: "Phone Screen",
             location: "Seattle, WA",
             datetime: "2022-01-01T00:00:00.000Z",
+            companyName: "Amazon",
         },
         {
             applicationID: 2,
@@ -51,6 +52,7 @@ test("[Valid] Getting user applications", async () => {
             status: "Applied",
             location: "Tel Aviv, Israel",
             datetime: "2022-01-02T00:00:00.000Z",
+            companyName: "Amazon",
         },
     ];
     const result = await request(server).get("/api/applications?userID=1").set("Authorization", token).send();
