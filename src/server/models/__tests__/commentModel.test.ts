@@ -15,10 +15,16 @@ test("Get company 1 comments", async () => {
     expect(result).toEqual(expected);
 });
 
+test("Get non-existant company comments", async () => {
+    const result = await commentModel.getCompanyComments(100);
+    result.sort((a, b) => a.commentID - b.commentID);
+    expect(result).toEqual([]);
+});
+
 test("Create a new comment", async () => {
     const payload = {
-        companyID: 1,
-        userID: 1,
+        companyID: 3,
+        userID: 3,
         title: "Not a great company",
         text: "Did not like my chat!",
     };
