@@ -1,34 +1,58 @@
-import { Container, Row, Col, Form, Button, Nav } from 'react-bootstrap';
-import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Form, Button, Nav, Table } from 'react-bootstrap';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { UserLoggedInContext } from "../context/UserLoggedInStatus";
+import { User } from './User';
 
 
 export default function Dashboard() {
     let navigate = useNavigate();
-    // userID for get request for specific user
-    const [userID, setUserID] = useState(localStorage.getItem('userID'));
-    // auth token
-    const [token, setToken] = useState(localStorage.getItem('token'));
     // logged in status
-    const [loggedIn, setLoggedIn] = useState(localStorage.getItem('loggedIn'));
+    const {loggedInStatus, setLoggedInStatus} = useContext(UserLoggedInContext);
     // user hashmap with hashmaps as data points
-    const [userInfo, setUserInfo] = useState(localStorage.getItem('userInfo'));
+    const userData = localStorage.getItem('user');
+    let user : User = userData ? JSON.parse(userData) : null;
 
     useEffect(() => {
-        if (loggedIn == 'true') {
+        if (user) {
+            console.log("USER DATA");
+            console.log(user);
             getApps();
             getSkills();
+        } else {
+            navigate('/login');
         }
     }, [])
+
+    // the get request to get user information and navigate to main dashboard page
+    const checkToken = () => {
+        if (userData) {
+            axios
+                .get("/api/users/login", {
+                    headers: {
+                        Authorization: user.token,
+                    },
+                })
+                .then((res) => {
+                    console.log('user is logged in')
+                })
+                .catch((err) => {
+                    localStorage.removeItem('user');
+                    console.log(err);
+                });
+        } else {
+            navigate("/login");
+        }
+    };
 
     // function to get all of user applications
     // GET /api/applications?userID={userID}
     const getApps = (argument : void) => {
-        if (token) {
-            axios.get("/api/applications?userID=" + userID, {
+        if (loggedInStatus && user.token) {
+            axios.get("/api/applications?userID=" + user.userID, {
                 headers: {
-                    Authorization: token,
+                    Authorization: user.token,
                 }
             }).then(data => {
                 console.log('GET request for applications success');
@@ -39,19 +63,17 @@ export default function Dashboard() {
                 }
             })
         } else {
-            setLoggedIn('');
-            setUserID('');
-            navigate('/login');
+            //navigate('/login');
         }
         
     }
 
     // GET request to get Company information based on companyID
     const getCompany = (companyID : any) => {
-        if (token) {
+        if (user.token) {
             axios.get("/api/companies?companyID=" + companyID.toString(), {
                 headers: {
-                    Authorization: token
+                    Authorization: user.token
                 }
             }).then(data => {
                 console.log('GET request for Company info success');
@@ -65,14 +87,12 @@ export default function Dashboard() {
 
     // GET request for all user skills
     const getSkills = () => {
-        if (token) {
-            console.log('GET request for skills sent')
-            axios.get("/api/skills/user?userID=" + userID, {
+        if (loggedInStatus && user.token) {
+            axios.get("/api/skills/user?userID=" + user.userID, {
                 headers: {
-                    Authorization: token
+                    Authorization: user.token
                 }
             }).then(data => {
-                console.log('GET request for all skills success');
                 console.log("\nALL SKILLS");
                 for (let i=0; i<data.data.length; i++) {
                     console.log(data.data[i]);
@@ -81,9 +101,7 @@ export default function Dashboard() {
                 }
             })
         } else {
-            setLoggedIn('');
-            setUserID('');
-            navigate('/login');
+            //navigate('/login');
         }
     }
 
@@ -93,9 +111,45 @@ export default function Dashboard() {
     const generateMainTable = (argument: void) : JSX.Element => {
         return (
             <Container className="main-table">
-
+                <br />
+                {setUpTable()}
             </Container>
         );
+    }
+
+    // table
+    const setUpTable = () => {
+        return (
+            <Table striped bordered hover size="sm">
+                <thead>
+                    <tr>
+                    <th>#</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Username</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    <td>1</td>
+                    <td>Mark</td>
+                    <td>Otto</td>
+                    <td>@mdo</td>
+                    </tr>
+                    <tr>
+                    <td>2</td>
+                    <td>Jacob</td>
+                    <td>Thornton</td>
+                    <td>@fat</td>
+                    </tr>
+                    <tr>
+                    <td>3</td>
+                    <td colSpan={2}>Larry the Bird</td>
+                    <td>@twitter</td>
+                    </tr>
+                </tbody>
+            </Table>
+        )
     }
 
     return (
