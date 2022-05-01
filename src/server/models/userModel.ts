@@ -11,9 +11,13 @@ export interface UserFields {
     passwordHash: string;
 }
 
+interface AllUserFields extends UserFields {
+    userID: number;
+}
+
 function userOrNull(rows: RowDataPacket[]) {
     if (Array.isArray(rows) && rows.length > 0) {
-        return rows[0] as UserFields;
+        return rows[0] as AllUserFields;
     } else {
         return null;
     }
@@ -33,7 +37,7 @@ export async function createUser(p: UserFields) {
 export async function getAllUsers() {
     const sql = "SELECT * FROM `Users`";
     const [rows, fields] = await db.promise().query(sql);
-    return rows;
+    return rows as AllUserFields[];
 }
 
 export async function getUserByID(userID: number) {

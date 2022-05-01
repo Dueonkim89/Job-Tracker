@@ -41,7 +41,8 @@ CREATE TABLE `CompanyComments`(
     `userID` INT NOT NULL,
     `companyID` INT NOT NULL,
     `title` VARCHAR(255),
-    `text` TINYTEXT,
+    `text` TEXT,
+    `datetime` DATETIME,
     FOREIGN KEY(`userID`) REFERENCES `Users`(`userID`),
     FOREIGN KEY(`companyID`) REFERENCES `Companies`(`companyID`)
 );

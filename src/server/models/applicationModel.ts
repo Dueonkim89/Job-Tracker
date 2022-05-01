@@ -16,7 +16,11 @@ export interface AppFields {
  * @returns all applications for the given userID
  */
 export async function getUserApps(userID: number) {
-    const sql = `SELECT * FROM Applications WHERE Applications.userID = ?`;
+    const sql = `
+    SELECT applicationID, companyID, jobPostingURL, position, userID, status, location,
+    convert_tz(\`datetime\`, '+00:00', @@session.time_zone) AS datetime
+    FROM Applications WHERE Applications.userID = ?
+    `;
     const [rows, fields] = <[RowDataPacket[], FieldPacket[]]>await db.promise().query(sql, [userID]);
     return rows as AppFields[];
 }

@@ -12,7 +12,7 @@ test("Get user 1 apps", async () => {
             userID: 1,
             status: "Phone Screen",
             location: "Seattle, WA",
-            datetime: new Date("2022-01-01T05:00:00.000Z"),
+            datetime: new Date("2022-01-01T00:00:00.000Z"),
         },
         {
             applicationID: 2,
@@ -22,7 +22,7 @@ test("Get user 1 apps", async () => {
             userID: 1,
             status: "Applied",
             location: "Tel Aviv, Israel",
-            datetime: new Date("2022-01-02T05:00:00.000Z"),
+            datetime: new Date("2022-01-02T00:00:00.000Z"),
         },
     ];
     expect(result).toEqual(expected);

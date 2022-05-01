@@ -10,7 +10,7 @@ const saltRounds = 10;
  * @description: Creates (registers) a new user
  * @method: POST /api/users
  * @param: JSON of {firstName, lastName, username, phoneNumber, emailAddress, password}
- * @returns: HTTP 201 upon success with JSON of {success: true, userID, firstName, lastName, username, phoneNumber, emailAddress}
+ * @returns: HTTP 201 upon success and JSON of {success: true, userID, message, token}
  * or HTTP 400 and JSON of {success: false, reason: "duplicate", field: "username"}
  * or HTTP 400 and JSON of {success: false, message: "other reason for error"}
  */
@@ -26,21 +26,18 @@ router.post("/", async function (req, res, next) {
             emailAddress,
             passwordHash,
         });
-        const response = { success: true, userID, firstName, lastName, username, phoneNumber, emailAddress };
-        if (response.success === true) {
-            const user = await userModel.getUserByUsername(username);
-            const accessToken = jwt.sign({ id: user?.userID }, process.env.JWT_SECRET as jwt.Secret, {
-                expiresIn: "1h",
-            });
-            res.status(200).json({
-                success: true,
-                userID: user?.userID,
-                message: "user sucessfully created and login sucessfully",
-                token: "Bearer " + accessToken,
-            });
-            return;
+        if (!userID || typeof userID !== "number") {
+            throw Error("Invalid user creation: create user did not return userID");
         }
-
+        const accessToken = jwt.sign({ id: userID }, process.env.JWT_SECRET as jwt.Secret, {
+            expiresIn: "1h",
+        });
+        const response = {
+            success: true,
+            userID: userID,
+            message: "user sucessfully created and login sucessfully",
+            token: "Bearer " + accessToken,
+        };
         return res.status(201).json(response);
     } catch (err: any) {
         if (err?.code === "ER_DUP_ENTRY" && err?.sqlMessage?.includes("username")) {
@@ -56,7 +53,7 @@ router.post("/", async function (req, res, next) {
  * @description: Logs in an existing user
  * @method: POST /api/users/login
  * @param: JSON object of {username, password}
- * @returns: HTTP 200 upon success and JSON object of {success: true, userID, message, token}
+ * @returns: HTTP 200 upon success and JSON of {success: true, userID, message, token}
  */
 router.post("/login", async function (req, res, next) {
     const { username, password } = req.body;
@@ -92,15 +89,15 @@ router.post("/login", async function (req, res, next) {
 /**
  * haven't tested this feature, will test once the logout tab has been created on the client side.
  */
-router.get("/logout", async function (req, res){
+router.get("/logout", async function (req, res) {
     req.logout();
     localStorage.clear();
     res.json({
         message: "user successfully logged out",
-        status: "success"
-    })
-    res.redirect('/login')
-}) 
+        status: "success",
+    });
+    res.redirect("/login");
+});
 /**
  * This will be the router that will be rendered if the user has passed the login authetication
  * to test this, run user /users/login and enter user creditials, copy the access token that will
