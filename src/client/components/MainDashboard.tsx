@@ -5,6 +5,7 @@ import axios from 'axios';
 import { UserLoggedInContext } from "../context/UserLoggedInStatus";
 import { User } from './User';
 import { Application } from './Application';
+import { Skill } from './Skill';
 import { render } from 'react-dom';
 
 
@@ -17,6 +18,7 @@ export default function Dashboard() {
     let user : User = userData ? JSON.parse(userData) : null;
     //let applications : Array<Application> = [];
     const [applications, setApplications] = useState<Application[]>([]);
+    const [skills, setSkills] = useState<Skill[]>([]);
 
     useEffect(() => {
         if (user) {
@@ -69,8 +71,6 @@ export default function Dashboard() {
                                                      "location" : current.location,
                                                      "position" : current.position,
                                                      "status" : current.status}
-                    // Another GET call to get the company name from companyID
-                    //getCompany(data.data[i].companyID, application);
                     temp.push(application);
                 }
                 setApplications(temp);
@@ -89,12 +89,15 @@ export default function Dashboard() {
                     Authorization: user.token
                 }
             }).then(data => {
-                console.log("\nALL SKILLS");
+                let temp : Array<Skill> = [];
+                // Go through all skills and create a new map
                 for (let i=0; i<data.data.length; i++) {
-                    console.log(data.data[i]);
-                    // create a dicionary with skills as key and rating as value
-                    // and store the dictionary to localStorage
+                    let current = data.data[i]
+                    // create application object
+                    let skill : Skill = {"name" : current.name, "rating" : current.rating}
+                    temp.push(skill);
                 }
+                setSkills(temp);
             })
         } else {
             //navigate('/login');
@@ -102,30 +105,30 @@ export default function Dashboard() {
     }
 
     /* 
-    Generates the main dashboard table by 
+    Generates the main application dashboard table
     */
     const GenerateMainTable = () : JSX.Element => {
         return (
             <Container className="main-table">
                 <br />
-                <SetUpTable />
+                <SetUpAppTable />
             </Container>
         );
     }
 
     // table
-    const SetUpTable = () : JSX.Element => {
+    const SetUpAppTable = () : JSX.Element => {
         return (
             <Table striped bordered hover size="sm">
-                <TableHeader></TableHeader>
+                <TableAppHeader />
                 <tbody>
-                    {tableRow}
+                    {tableAppRow}
                 </tbody>
             </Table>
         )
     }
 
-    const TableHeader = () : JSX.Element => {
+    const TableAppHeader = () : JSX.Element => {
         return(
             <thead>
                 <tr>
@@ -138,7 +141,7 @@ export default function Dashboard() {
         )
     }
 
-    const tableRow = applications.map((app) => {
+    const tableAppRow = applications.map((app) => {
         return (
             <tr>
                 <td>{app.status}</td>
@@ -149,15 +152,63 @@ export default function Dashboard() {
         )
     })
 
+    /* 
+    Generates the main skills dashboard table
+    */
+    const GenerateSkillsTable = () : JSX.Element => {
+        return (
+            <Container className="main-table">
+                <br />
+                <SetUpSkillsTable />
+            </Container>
+        );
+    }
+
+    // table
+    const SetUpSkillsTable = () : JSX.Element => {
+        return (
+            <Table striped bordered hover size="sm">
+                <TableSkillsHeader />
+                <tbody>
+                    {tableSkillsRow}
+                </tbody>
+            </Table>
+        )
+    }
+
+    const TableSkillsHeader = () : JSX.Element => {
+        return(
+            <thead>
+                <tr>
+                <th>Skills</th>
+                <th>Rating</th>
+                </tr>
+            </thead>
+        )
+    }
+
+    const tableSkillsRow = skills.map((skill) => {
+        return (
+            <tr>
+                <td>{skill.name}</td>
+                <td>{skill.rating}</td>
+            </tr>
+        )
+    })
+
     return (
         <Container>
             <Row>
-            {/*  TODO: set up bottom area for website information */}
-            <GenerateMainTable />
+                <Col xs={12} md={8}>
+                {/*  TODO: set up bottom area for website information */}
+                <GenerateMainTable />
+                </Col>
+                <Col xs={6} md={4}>
+                {/*  TODO: set up bottom area for website information */}
+                <GenerateSkillsTable />
+                </Col>
             </Row>
-            <Row>
-            {/*  TODO: set up bottom area for website information */}
-            </Row>
+            
         </Container>
     )
 }
