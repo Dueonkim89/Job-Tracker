@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { UserLoggedInContext } from "../context/UserLoggedInStatus";
 import { User } from './User';
+import { Application } from './Application';
+import { render } from 'react-dom';
 
 
 export default function Dashboard() {
@@ -13,17 +15,17 @@ export default function Dashboard() {
     // user hashmap with hashmaps as data points
     const userData = localStorage.getItem('user');
     let user : User = userData ? JSON.parse(userData) : null;
+    //let applications : Array<Application> = [];
+    const [applications, setApplications] = useState<Application[]>([]);
 
     useEffect(() => {
         if (user) {
-            console.log("USER DATA");
-            console.log(user);
             getApps();
             getSkills();
         } else {
             navigate('/login');
         }
-    }, [])
+    }, [JSON.stringify(applications)])
 
     // the get request to get user information and navigate to main dashboard page
     const checkToken = () => {
@@ -55,34 +57,28 @@ export default function Dashboard() {
                     Authorization: user.token,
                 }
             }).then(data => {
-                console.log('GET request for applications success');
+                let temp : Array<Application> = [];
+                // Go through all applications and create a new map
                 for (let i=0; i<data.data.length; i++) {
+                    let current = data.data[i]
+                    // create application object
+                    let application : Application = {"applicationID" : current.applicationID,
+                                                     "companyName" : current.companyName,
+                                                     "datetime" : new Date(current.datetime),
+                                                     "jobPostingURL" : current.jobPostingURL,
+                                                     "location" : current.location,
+                                                     "position" : current.position,
+                                                     "status" : current.status}
                     // Another GET call to get the company name from companyID
-                    getCompany(data.data[i].companyID);
-                    console.log(data.data[i])
+                    //getCompany(data.data[i].companyID, application);
+                    temp.push(application);
                 }
+                setApplications(temp);
             })
         } else {
             //navigate('/login');
         }
         
-    }
-
-    // GET request to get Company information based on companyID
-    const getCompany = (companyID : any) => {
-        if (user.token) {
-            axios.get("/api/companies?companyID=" + companyID.toString(), {
-                headers: {
-                    Authorization: user.token
-                }
-            }).then(data => {
-                console.log('GET request for Company info success');
-                // return company info from data
-                console.log(data.data);
-            })
-        } else {
-            return false
-        }
     }
 
     // GET request for all user skills
@@ -108,55 +104,56 @@ export default function Dashboard() {
     /* 
     Generates the main dashboard table by 
     */
-    const generateMainTable = (argument: void) : JSX.Element => {
+    const GenerateMainTable = () : JSX.Element => {
         return (
             <Container className="main-table">
                 <br />
-                {setUpTable()}
+                <SetUpTable />
             </Container>
         );
     }
 
     // table
-    const setUpTable = () => {
+    const SetUpTable = () : JSX.Element => {
         return (
             <Table striped bordered hover size="sm">
-                <thead>
-                    <tr>
-                    <th>#</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Username</th>
-                    </tr>
-                </thead>
+                <TableHeader></TableHeader>
                 <tbody>
-                    <tr>
-                    <td>1</td>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                    </tr>
-                    <tr>
-                    <td>2</td>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                    </tr>
-                    <tr>
-                    <td>3</td>
-                    <td colSpan={2}>Larry the Bird</td>
-                    <td>@twitter</td>
-                    </tr>
+                    {tableRow}
                 </tbody>
             </Table>
         )
     }
 
+    const TableHeader = () : JSX.Element => {
+        return(
+            <thead>
+                <tr>
+                <th>Status</th>
+                <th>Title</th>
+                <th>Location</th>
+                <th>Company</th>
+                </tr>
+            </thead>
+        )
+    }
+
+    const tableRow = applications.map((app) => {
+        return (
+            <tr>
+                <td>{app.status}</td>
+                <td>{app.position}</td>
+                <td>{app.location}</td>
+                <td>{app.companyName}</td>
+            </tr>
+        )
+    })
+
     return (
         <Container>
             <Row>
             {/*  TODO: set up bottom area for website information */}
-            {generateMainTable()}
+            <GenerateMainTable />
             </Row>
             <Row>
             {/*  TODO: set up bottom area for website information */}

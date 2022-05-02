@@ -9,8 +9,6 @@ export default function ProjectAppBar() {
   const userData = localStorage.getItem("user");
   // get loggedInstatus from context
   const {loggedInStatus, setLoggedInStatus} = useContext(UserLoggedInContext);
-  console.log("APPBAR Login Status");
-  console.log(loggedInStatus);
 
   const logout = () => {
     console.log("logging out!");
