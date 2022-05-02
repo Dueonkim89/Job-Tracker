@@ -62,6 +62,7 @@ function Login() {
                     const jsonObject = Object.fromEntries(user);
                     localStorage.setItem("user", JSON.stringify(jsonObject));
                     navigate('/main');
+                    window.location.reload();
                 })
                 .catch((err) => {
                     console.log(err);

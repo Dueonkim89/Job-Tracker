@@ -1,6 +1,6 @@
 export interface Application {
     applicationID : string;
-    companyID : string;
+    companyName : string;
     datetime : Date;
     jobPostingURL : string;
     location: string;
