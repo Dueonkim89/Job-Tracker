@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import {validIntData, validStringData, validPassword} from '../utils/formValidation';
-import {formatPhoneNumber, newUserInfo, registerNewUser} from '../utils/helper';
+import {formatPhoneNumber, registerNewUser} from '../utils/helper';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
 
 class Registration extends React.Component {
@@ -29,6 +29,14 @@ class Registration extends React.Component {
         this.enterPhoneNumber = this.enterPhoneNumber.bind(this);
         this.enterPassword = this.enterPassword.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.userNameNotAvailable = this.userNameNotAvailable.bind(this)
+    }
+
+    globalState = undefined;
+    changeGlobalState = null;
+
+    userNameNotAvailable() {
+        this.setState({userNameAvailable: false});
     }
 
     enterFirstName(event)  {
@@ -55,7 +63,7 @@ class Registration extends React.Component {
         this.setState({password: event.target.value});
     }
 
-    handleSubmit(event) {
+    async handleSubmit(event) {
         event.preventDefault();
         const {firstName, lastName, email, userName, phoneNumber, password} = this.state;
         
@@ -70,9 +78,8 @@ class Registration extends React.Component {
         });
 
         // TEST:: SEE IF GLOBAL CAN BE TOGGLED
-        const {LoggedInStatus, setLoggedInStatus} = this.context;
-        console.log(this.context);
-        console.log(LoggedInStatus);
+        // console.log(this.changeGlobalState);
+        // this.changeGlobalState(!this.globalState)
 
    
         // only make POST request when all the form field is valid
@@ -93,14 +100,32 @@ class Registration extends React.Component {
             };
             
             // send POST request
-            registerNewUser(newUser);
-                
-            // if username is taken, update state, send warning to user
+           /* registerNewUser(newUser).then(
+                (result) => { 
+                   console.log("success", result);
+                },
+                (error) => { 
+                   console.log("error", error);
+                }
+              );*/
 
+            try {
+                const status = await registerNewUser(newUser);
+                console.log(status);
+            } 
+            catch (error) {
+                // if username is taken, update state, send warning to user
+                if (error.duplicate) {
+                    this.userNameNotAvailable()
+                    return;
+                } // else, server error.
+                alert("Error while registering your account. Pleae try again!")
+                return;
+            }
             // else, CONDITIONAL route to user dashboard, pass in props received from server
             // https://stackoverflow.com/questions/45805930/react-router-redirect-conditional
 
-            // update redux store before routing, so appbar is updated. 
+            // update react context. set global logged in to true.
         }
             
     }
@@ -115,7 +140,11 @@ class Registration extends React.Component {
         );
     }
 
-    generateRightRegistrationPanel() {
+    generateRightRegistrationPanel(loggedInStatus, setLoggedInStatus) {
+        // ANTI-PATTERN: STORE context data inside class.
+        this.globalState = loggedInStatus
+        this.changeGlobalState = setLoggedInStatus
+        console.log(this.globalState);
         return (
             <Container className="registeration-form-field">
                 {this.generateRegistrationForm()}
@@ -145,6 +174,10 @@ class Registration extends React.Component {
                 <Form.Group className="mb-3">
                     <Form.Label htmlFor="userName" style={{fontWeight: 'bold'}}>Username</Form.Label>
                     <Form.Control style={{ border: !this.state.userNameValid || !this.state.userNameAvailable ? invalidStyle: ''}} id="userName" type="text" value={this.state.userName} onChange={this.enterUserName} placeholder="Enter username" />
+                    {!this.state.userNameAvailable && <Form.Text style={{color: 'red', fontWeight: 'bold'}} id="passwordHelpBlock">
+                        That username is taken, please try another name.
+                    </Form.Text>
+                    }
                 </Form.Group>
                 <Form.Group className="mb-3">
                     <Form.Label htmlFor="phoneNumber" style={{fontWeight: 'bold'}}>Phone Number</Form.Label>
@@ -167,20 +200,22 @@ class Registration extends React.Component {
         //console.log(firstNameValid, lastNameValid, emailValid, userNameValid, phoneNumberValid, passwordValid, userNameAvailable);
         //console.log(this.context);
         return (
-            <Container>
-                <Row>
-                    <Col>
-                        {this.generateLeftRegistrationPanel()}
-                    </Col>
-                    <Col>
-                        {this.generateRightRegistrationPanel()}
-                    </Col>
-                </Row>
-            </Container>
+            <UserLoggedInContext.Consumer>
+                {({loggedInStatus, setLoggedInStatus}) => (
+                <Container>
+                    <Row>
+                        <Col>
+                            {this.generateLeftRegistrationPanel()}
+                        </Col>
+                        <Col>
+                            {this.generateRightRegistrationPanel(loggedInStatus, setLoggedInStatus)}
+                        </Col>
+                    </Row>
+                </Container>
+                )}
+            </UserLoggedInContext.Consumer>
         );
     }
 }
 
-// add context to class
-Registration.contextType = UserLoggedInContext;
 export default Registration;
