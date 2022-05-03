@@ -13,7 +13,7 @@ import {UserLoggedInContext} from "./context/UserLoggedInStatus";
 
 function App() {
     // use hooks to implement context
-    const [loggedInStatus, setLoggedInStatus] = useState(true);
+    const [loggedInStatus, setLoggedInStatus] = useState( checkIfTokenExists() );
     const value = useMemo(() => ({loggedInStatus, setLoggedInStatus}), [loggedInStatus, setLoggedInStatus]);
     // console.log("i am in app.js", loggedInStatus, value)
     return (
@@ -25,6 +25,13 @@ function App() {
             </div>
         </UserLoggedInContext.Provider>
     );
+}
+
+function checkIfTokenExists() {
+    if (localStorage.getItem("user")) {
+        return true;
+    }
+    return false;
 }
 
 function setRoutes() {
