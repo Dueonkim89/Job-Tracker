@@ -16,8 +16,7 @@ export default function ProjectAppBar() {
     setLoggedInStatus(false);
   }
 
-  if (userData) {
-    setLoggedInStatus(true);
+  if (loggedInStatus) {
     return loggedInUserAppBar()
   } else {
     return notLoggedInUserAppBar();
