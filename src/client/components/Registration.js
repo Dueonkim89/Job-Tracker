@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
+import { useNavigate } from "react-router-dom";
 import {validIntData, validStringData, validPassword} from '../utils/formValidation';
 import {formatPhoneNumber, registerNewUser} from '../utils/helper';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
@@ -111,7 +112,9 @@ class Registration extends React.Component {
 
             try {
                 const status = await registerNewUser(newUser);
-                console.log(status);
+                alert("Congratulations you've made an account! Redirecting to login page...");
+                // https://stackoverflow.com/questions/63786452/react-navigate-router-v6-invalid-hook-call
+                this.props.navigate('/login');
             } 
             catch (error) {
                 // if username is taken, update state, send warning to user
@@ -218,4 +221,9 @@ class Registration extends React.Component {
     }
 }
 
-export default Registration;
+function RegistrationWithNavigation(props) {
+    let navigate = useNavigate();
+    return <Registration {...props} navigate={navigate} />
+}
+
+export default RegistrationWithNavigation;

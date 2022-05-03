@@ -24,7 +24,8 @@ function getServerURL(nodeEnv) {
 function registerNewUser(userField) {
     return axios.post("/api/users", userField).then(function (response) {
         // send promise.resolve
-        console.log(response);
+        // to send token and other user info
+        return Promise.resolve({"success": true});
     }).catch(function (error) {
         if (error.response && error.response.data.reason === "duplicate") {
             return Promise.reject({"success": false, "duplicate": true});
