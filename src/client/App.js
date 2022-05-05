@@ -9,6 +9,7 @@ import AddCompany from "./components/AddCompany";
 import AppliedCompany from "./components/AppliedCompany";
 import { Routes, Route } from "react-router-dom"; 
 import {UserLoggedInContext} from "./context/UserLoggedInStatus";
+import {checkIfTokenExists} from "./utils/helper.js"
 
 
 function App() {
@@ -26,14 +27,6 @@ function App() {
         </UserLoggedInContext.Provider>
     );
 }
-
-function checkIfTokenExists() {
-    if (localStorage.getItem("user")) {
-        return true;
-    }
-    return false;
-}
-
 function setRoutes() {
     // NOTE: Switch === Routes in In react-router-dom v6+
     // https://reactrouter.com/docs/en/v6/upgrading/v5
