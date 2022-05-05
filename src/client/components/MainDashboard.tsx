@@ -147,12 +147,19 @@ export default function Dashboard() {
         return (
             <tr>
                 <td>{app.status}</td>
-                <td>{app.position}</td>
+                <td><a href={app.jobPostingURL} target="_blank" rel="noopener">
+                    {app.position}
+                </a></td>
                 <td>{app.location}</td>
                 <td>{app.companyName}</td>
             </tr>
         )
     })
+
+    // navigates user to specific URL
+    const navigateToUrl = (url : string) => {
+        window.open(url);
+    }
 
     /* 
     Generates the main skills dashboard table
