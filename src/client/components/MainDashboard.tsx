@@ -31,27 +31,6 @@ export default function Dashboard() {
         }
     }, [JSON.stringify(applications)])
 
-    // the get request to get user information and navigate to main dashboard page
-    const checkToken = () => {
-        if (userData) {
-            axios
-                .get("/api/users/login", {
-                    headers: {
-                        Authorization: user.token,
-                    },
-                })
-                .then((res) => {
-                    console.log('user is logged in')
-                })
-                .catch((err) => {
-                    localStorage.removeItem('user');
-                    console.log(err);
-                });
-        } else {
-            navigate("/login");
-        }
-    };
-
     // function to get all of user applications
     // GET /api/applications?userID={userID}
     const getApps = (argument : void) => {
@@ -156,11 +135,6 @@ export default function Dashboard() {
         )
     })
 
-    // navigates user to specific URL
-    const navigateToUrl = (url : string) => {
-        window.open(url);
-    }
-
     /* 
     Generates the main skills dashboard table
     */
@@ -200,7 +174,6 @@ export default function Dashboard() {
         return (
             <tr>
                 <td>{skill.name}</td>
-                <td>{skill.rating}</td>
                 <td><Rating name="simple-controlled" value={skill.rating} id={skill.skillID} onChange={(event, newValue) => {
                     if (event.currentTarget.parentElement) {
                         let skillID = event.currentTarget.parentElement.id;
