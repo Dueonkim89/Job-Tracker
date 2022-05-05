@@ -196,8 +196,21 @@ export default function Dashboard() {
         )
     })
 
+    const navigateApplication = async (event: any) => {
+        event.preventDefault();
+        navigate('/application');
+
+    }
+
     return (
         <Container>
+            <Row>
+                <Col xs={12} md={8}>
+                    <br />
+                    <Button variant="outline-primary" size='sm' className='float-end' onClick={navigateApplication}>Add Application</Button>{' '}
+                </Col>
+                <Col xs={6} md={4}></Col>
+            </Row>
             <Row>
                 <Col xs={12} md={8}>
                 {/*  TODO: set up bottom area for website information */}
