@@ -22,9 +22,14 @@
         // "resolveJsonModule": true, // Include modules imported with .json extension
         // "incremental": true, // Enable incremental compilation by reading/writing information from prior compilations to a file on disk
     },
+    "ts-node": {
+        "compilerOptions": {
+            "module": "commonjs"
+        }
+    },
     "include": [
         "src/**/*", // *** The files TypeScript should type check ***
         "FLAGS.ts"
     ],
-    "exclude": ["node_modules", "build", "src/server"] // *** The files to not type check ***
+    "exclude": ["./node_modules", "./build", "./src/server"] // *** The files to not type check ***
 }
