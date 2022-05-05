@@ -1,4 +1,4 @@
-import React, { useState, useMemo }  from "react";
+import React, { useState, useMemo, useEffect }  from "react";
 import "./App.css";
 import AppBar from './components/AppBar';
 import Registration from "./components/Registration";
@@ -9,11 +9,35 @@ import AddCompany from "./components/AddCompany";
 import AppliedCompany from "./components/AppliedCompany";
 import { Routes, Route } from "react-router-dom"; 
 import {UserLoggedInContext} from "./context/UserLoggedInStatus";
-import {checkIfTokenExists} from "./utils/helper.js"
+import {checkIfTokenExists, checkIfTokenExpired} from "./utils/helper.js"
 
 
 function App() {
     // use hooks to implement context
+
+    // prevent infinte loop, https://stackoverflow.com/questions/53715465/can-i-set-state-inside-a-useeffect-hook
+    useEffect(() => {
+        // if logged in, check if token is fresh
+        if (loggedInStatus) {
+            checkIfTokenExpired().then(
+                (result) => { 
+                    console.log("token is fresh", result);
+                    return;
+                },
+                (error) => { 
+                    // remove token from localStorage and update state
+                    localStorage.removeItem('user');
+                    setLoggedInStatus(error);
+                    // cant use navigate inside callbacks.
+                    // go back to rootpage
+                    window.location.replace("/");
+                }
+            );
+        }
+    }, []);
+
+    
+
     const [loggedInStatus, setLoggedInStatus] = useState( checkIfTokenExists() );
     const value = useMemo(() => ({loggedInStatus, setLoggedInStatus}), [loggedInStatus, setLoggedInStatus]);
     // console.log("i am in app.js", loggedInStatus, value)
