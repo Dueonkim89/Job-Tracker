@@ -1,8 +1,9 @@
 import * as React from 'react';
+import { Navigate } from "react-router-dom"
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import { useNavigate } from "react-router-dom";
 import {validIntData, validStringData, validPassword} from '../utils/formValidation';
-import {formatPhoneNumber, registerNewUser} from '../utils/helper';
+import {formatPhoneNumber, registerNewUser, storeUserInfoIntoLocalStorage} from '../utils/helper';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
 
 class Registration extends React.Component {
@@ -33,7 +34,7 @@ class Registration extends React.Component {
         this.userNameNotAvailable = this.userNameNotAvailable.bind(this)
     }
 
-    globalState = undefined;
+    globalLoggedInState = undefined;
     changeGlobalState = null;
 
     userNameNotAvailable() {
@@ -82,7 +83,6 @@ class Registration extends React.Component {
         // console.log(this.changeGlobalState);
         // this.changeGlobalState(!this.globalState)
 
-   
         // only make POST request when all the form field is valid
         if (validStringData(firstName) && validStringData(lastName) 
             && validStringData(email) && validStringData(userName) 
@@ -112,9 +112,16 @@ class Registration extends React.Component {
 
             try {
                 const status = await registerNewUser(newUser);
-                alert("Congratulations you've made an account! Redirecting to login page...");
-                // https://stackoverflow.com/questions/63786452/react-navigate-router-v6-invalid-hook-call
-                this.props.navigate('/login');
+                // get token add to local storage,
+                const {token, userID} = status;
+                const userInfo = {token, userID};
+                storeUserInfoIntoLocalStorage(userInfo);
+
+                // update react context. set global logged in to true.
+                this.changeGlobalState(true);
+
+                // redirect to user dashboard
+                this.props.navigate('/main');
             } 
             catch (error) {
                 // if username is taken, update state, send warning to user
@@ -125,12 +132,7 @@ class Registration extends React.Component {
                 alert("Error while registering your account. Pleae try again!")
                 return;
             }
-            // else, CONDITIONAL route to user dashboard, pass in props received from server
-            // https://stackoverflow.com/questions/45805930/react-router-redirect-conditional
-
-            // update react context. set global logged in to true.
-        }
-            
+        } 
     }
 
     generateLeftRegistrationPanel() {
@@ -145,9 +147,8 @@ class Registration extends React.Component {
 
     generateRightRegistrationPanel(loggedInStatus, setLoggedInStatus) {
         // ANTI-PATTERN: STORE context data inside class.
-        this.globalState = loggedInStatus
+        this.globalLoggedInState = loggedInStatus
         this.changeGlobalState = setLoggedInStatus
-        console.log(this.globalState);
         return (
             <Container className="registeration-form-field">
                 {this.generateRegistrationForm()}
@@ -203,24 +204,29 @@ class Registration extends React.Component {
         //console.log(firstNameValid, lastNameValid, emailValid, userNameValid, phoneNumberValid, passwordValid, userNameAvailable);
         //console.log(this.context);
         return (
+            // if user is logged in, redirect them to dashboard
             <UserLoggedInContext.Consumer>
                 {({loggedInStatus, setLoggedInStatus}) => (
-                <Container>
-                    <Row>
-                        <Col>
-                            {this.generateLeftRegistrationPanel()}
-                        </Col>
-                        <Col>
-                            {this.generateRightRegistrationPanel(loggedInStatus, setLoggedInStatus)}
-                        </Col>
-                    </Row>
-                </Container>
+                <div>
+                    { loggedInStatus && <Navigate to="/main" replace={true} /> }
+                    <Container>
+                        <Row>
+                            <Col>
+                                {this.generateLeftRegistrationPanel()}
+                            </Col>
+                            <Col>
+                                {this.generateRightRegistrationPanel(loggedInStatus, setLoggedInStatus)}
+                            </Col>
+                        </Row>
+                    </Container>
+                </div>
                 )}
             </UserLoggedInContext.Consumer>
         );
     }
 }
 
+// https://stackoverflow.com/questions/63786452/react-navigate-router-v6-invalid-hook-call
 function RegistrationWithNavigation(props) {
     let navigate = useNavigate();
     return <Registration {...props} navigate={navigate} />
