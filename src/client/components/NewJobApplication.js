@@ -1,18 +1,41 @@
 import * as React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Container, Row, Form, Button, Col } from 'react-bootstrap';
+import {getListOfAllCompanies, getUserToken} from '../utils/helper';
 
-const formPadding: string = ".75rem";
-const labelFontSize: string = "1.2rem";
+const formPadding = ".75rem";
+const labelFontSize = "1.2rem";
 
 class NewJobApplication extends React.Component {
-    createApplicationHeader(argument: void) : JSX.Element {
+    constructor(props) {
+        super(props);
+        this.state = {
+           companyList: []
+        };
+
+        // this.enterFirstName = this.enterFirstName.bind(this);
+    }
+
+    createApplicationHeader() {
         return (
             <h2 style={{padding: "1.25rem", color: "#212529" }}>Add a New Application</h2>
         );
     }
 
-    createApplicationForm() : JSX.Element {
+    componentDidMount() {
+        // make call to server and get all company list
+        const token = getUserToken();
+        getListOfAllCompanies(token).then(
+            (result) => { 
+                this.setState({companyList: result});
+            },
+            (error) => { 
+               return;
+            }
+          );;
+    }
+
+    createApplicationForm() {
         return (
             <Form>
                 <Form.Group style={{padding: formPadding}} >
@@ -44,7 +67,7 @@ class NewJobApplication extends React.Component {
         );
     }
 
-    addCompanyNavigation(argument: void) : JSX.Element {
+    addCompanyNavigation() {
         return (
             <LinkContainer to="/add_company">
                 {/*NOTE: If no / provided to the path, routes to /application/add_company by default */}
@@ -53,7 +76,7 @@ class NewJobApplication extends React.Component {
         );
     }
 
-    createStatusDropDrownMenu(argument: void) : JSX.Element {
+    createStatusDropDrownMenu() {
         return (
             <Form.Select aria-label="Choose application status from dropdown menu" id="status">
                 <option>Pick application status</option>
@@ -68,7 +91,7 @@ class NewJobApplication extends React.Component {
     }
     
  
-    createCompanyDropDrownMenu(argument: void) : JSX.Element {
+    createCompanyDropDrownMenu() {
         //  To get company names dynamically from server
         return (
             <Form.Select style={{marginBottom: ".65rem"}} aria-label="Choose company from dropdown menu" id="companyName">
@@ -80,7 +103,13 @@ class NewJobApplication extends React.Component {
         );
     }
 
-    generateApplicationSkills(argument: void) : JSX.Element {
+    dynamicallyCreateCompanyList() {
+        return (
+            <option value="1">One</option>
+        );
+    }
+
+    generateApplicationSkills() {
         // https://stackoverflow.com/questions/45167565/does-react-js-support-html5-datalist
         return (
             <Row style={{padding: formPadding}}>
@@ -97,7 +126,7 @@ class NewJobApplication extends React.Component {
         );
     }
 
-    getSkills() : JSX.Element {
+    getSkills() {
         // will make GET request to server to get skills and render dynamically.
         return (
             <datalist id="skills">
@@ -109,7 +138,8 @@ class NewJobApplication extends React.Component {
     }
 
     render() {
-        const ApplicationFormBorder: string = "3px solid #0a2a66";
+        console.log(this.state.companyList);
+        const ApplicationFormBorder = "3px solid #0a2a66";
         return (
             <Container fluid style={{ marginTop: "2.75rem", width: '65vw', border: ApplicationFormBorder}}>
                 <Row style={{borderBottom: ApplicationFormBorder, backgroundColor: "#c0c6cc"}}>

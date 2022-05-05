@@ -21,22 +21,20 @@ function App() {
         if (loggedInStatus) {
             checkIfTokenExpired().then(
                 (result) => { 
-                    console.log("token is fresh", result);
                     return;
                 },
                 (error) => { 
                     // remove token from localStorage and update state
+                    console.log(error, "token is expired");
                     localStorage.removeItem('user');
                     setLoggedInStatus(error);
                     // cant use navigate inside callbacks.
-                    // go back to rootpage
+                    // go back to main page
                     window.location.replace("/");
                 }
             );
         }
     }, []);
-
-    
 
     const [loggedInStatus, setLoggedInStatus] = useState( checkIfTokenExists() );
     const value = useMemo(() => ({loggedInStatus, setLoggedInStatus}), [loggedInStatus, setLoggedInStatus]);
