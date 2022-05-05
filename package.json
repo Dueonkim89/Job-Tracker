@@ -98,6 +98,7 @@
         "@types/supertest": "^2.0.12",
         "jest": "^27.5.1",
         "nodemon": "^2.0.15",
+        "react-bootstrap-star-rating": "^3.5.5-alpha.0.3",
         "supertest": "^6.2.3",
         "ts-jest": "^27.1.4"
     }
