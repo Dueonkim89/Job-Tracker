@@ -2,6 +2,8 @@ import * as React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Container, Row, Form, Button, Col } from 'react-bootstrap';
 import {getListOfAllCompanies, getUserToken} from '../utils/helper';
+import {UserLoggedInContext} from "../context/UserLoggedInStatus";
+import { Navigate, useNavigate } from "react-router-dom"
 
 const formPadding = ".75rem";
 const labelFontSize = "1.2rem";
@@ -16,6 +18,8 @@ class NewJobApplication extends React.Component {
         // this.enterFirstName = this.enterFirstName.bind(this);
     }
 
+    globalLoggedInState = undefined;
+
     createApplicationHeader() {
         return (
             <h2 style={{padding: "1.25rem", color: "#212529" }}>Add a New Application</h2>
@@ -23,16 +27,18 @@ class NewJobApplication extends React.Component {
     }
 
     componentDidMount() {
-        // make call to server and get all company list
-        const token = getUserToken();
-        getListOfAllCompanies(token).then(
-            (result) => { 
-                this.setState({companyList: result});
-            },
-            (error) => { 
-               return;
-            }
-          );;
+        // make call to server and get all company list only if user logged in
+        if (this.globalLoggedInState) {
+            const token = getUserToken();
+            getListOfAllCompanies(token).then(
+                (result) => { 
+                    this.setState({companyList: result});
+                },
+                (error) => { 
+                   return;
+                }
+              );;
+        }
     }
 
     createApplicationForm() {
@@ -138,17 +144,26 @@ class NewJobApplication extends React.Component {
     }
 
     render() {
+        // redirect to login if user is not logged in
         console.log(this.state.companyList);
         const ApplicationFormBorder = "3px solid #0a2a66";
         return (
-            <Container fluid style={{ marginTop: "2.75rem", width: '65vw', border: ApplicationFormBorder}}>
-                <Row style={{borderBottom: ApplicationFormBorder, backgroundColor: "#c0c6cc"}}>
-                    {this.createApplicationHeader()}
-                </Row>
-                <Row style={{backgroundColor: "#c0c6cc", textAlign: "left"}}>
-                    {this.createApplicationForm()}
-                </Row>
-            </Container>
+            <UserLoggedInContext.Consumer>
+                {({loggedInStatus}) => (
+                <div>
+                    { !loggedInStatus && <Navigate to="/main" replace={true} /> }
+                    {this.globalLoggedInState = loggedInStatus}
+                    <Container fluid style={{ marginTop: "2.75rem", width: '65vw', border: ApplicationFormBorder}}>
+                        <Row style={{borderBottom: ApplicationFormBorder, backgroundColor: "#c0c6cc"}}>
+                            {this.createApplicationHeader()}
+                        </Row>
+                        <Row style={{backgroundColor: "#c0c6cc", textAlign: "left"}}>
+                            {this.createApplicationForm()}
+                        </Row>
+                    </Container>
+                </div>    
+                )}
+            </UserLoggedInContext.Consumer>
         );
     }
 }
