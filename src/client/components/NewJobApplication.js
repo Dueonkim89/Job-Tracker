@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
 import { Container, Row, Form, Button, Col } from 'react-bootstrap';
 import {getListOfAllCompanies, getUserToken} from '../utils/helper';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
-import { Navigate, useNavigate } from "react-router-dom"
+import { Navigate, useNavigate, Link } from "react-router-dom"
 
 const formPadding = ".75rem";
 const labelFontSize = "1.2rem";
@@ -74,11 +73,11 @@ class NewJobApplication extends React.Component {
     }
 
     addCompanyNavigation() {
-        return (
-            <LinkContainer to="/add_company">
+        return (   
+            <Link to="/add_company" state={{companies: this.state.companyList}}>
                 {/*NOTE: If no / provided to the path, routes to /application/add_company by default */}
-                <a>Don't see the company? Click here to add.</a>
-            </LinkContainer>
+                <p style={{marginBottom: "0rem"}}>Don't see the company? Click here to add.</p>
+            </Link>
         );
     }
 
@@ -145,7 +144,6 @@ class NewJobApplication extends React.Component {
 
     render() {
         // redirect to login if user is not logged in
-        console.log(this.state.companyList);
         const ApplicationFormBorder = "3px solid #0a2a66";
         return (
             <UserLoggedInContext.Consumer>
