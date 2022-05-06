@@ -1,6 +1,6 @@
 import express from "express";
 import passport from "passport";
-import * as scrapers from "../scraper/scrapers";
+import scraper from "../scraper/scrapers";
 const router = express.Router();
 
 export default router;
@@ -12,20 +12,19 @@ export default router;
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.get("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
-    const rawURL = req.query.url;
+    const url = req.query.url;
     try {
-        if (typeof rawURL !== "string") {
+        if (typeof url !== "string") {
             return res.status(400).json({ success: false, message: "Invalid url" });
         }
-        const url = new URL(rawURL);
-        if (url.host.toLowerCase().includes("greenhouse")) {
-            const result = await scrapers.greenhouse(url);
+        const result = await scraper(new URL(url));
+        if (result.success) {
             return res.status(200).json(result);
         }
-        return res.status(400).json({ success: false, message: "Scraping is not available for that job board yet." });
+        return res.status(400).json({ success: false, message: "Scraping not available." });
     } catch (err) {
-        console.error(`Error in parsing url:`);
-        console.error({ rawURL });
+        console.error(`Other error in scraping url:`);
+        console.error({ url });
         next(err);
     }
 });
