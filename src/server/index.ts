@@ -2,14 +2,10 @@ import "dotenv/config";
 import path from "path";
 import express, { Express, Request, Response, ErrorRequestHandler } from "express";
 import bodyParser from "body-parser";
-import userRouter from "./routes/userRouter";
-import applicationRouter from "./routes/applicationRouter";
 import session from "express-session";
 import passport from "passport";
-import companyRouter from "./routes/companyRouter";
-import skillRouter from "./routes/skillRouter";
-import commentRouter from "./routes/commentRouter";
 import { chosenDBConfig } from "./models/db";
+import router from "./router";
 require("./models/passport");
 const cors = require("cors");
 require("./models/passport");
@@ -48,11 +44,7 @@ app.use(
 );
 app.use(express.static(buildDir));
 
-app.use("/api/users", userRouter);
-app.use("/api/applications", applicationRouter);
-app.use("/api/companies", companyRouter);
-app.use("/api/skills", skillRouter);
-app.use("/api/comments", commentRouter);
+app.use("/api", router);
 
 // Source: https://stackoverflow.com/questions/50218878/typescript-express-error-function
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
