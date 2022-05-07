@@ -125,9 +125,30 @@ export function checkIfCompanyAlreadyExists(company) {
 }
 
 export function createCompany(company) {
-    axios.post("/api/companies", company).then(function (response) {
-        console.log(response);
+    return axios.post("/api/companies", company).then(function (response) {
+        return Promise.resolve(response.data);
     }).catch(function (error) {
-        console.log(error.response);
+        return Promise.reject(error.response);
     });;
 }
+
+export function stringContainsAlphabet(str) {
+    /*  INPUT: string
+        OUTPUT: boolean value of whether string is numeric or not
+    */
+    let charFound = false;
+    for (let char of str) {
+        if (/^[a-zA-Z]+$/.test(char)) {
+            charFound = true;
+        }
+    }
+    return charFound;
+}
+
+export function titleCase(str) {
+    // INPUT: string
+    // OUTPUT: formatted string in title case
+    return str.toLowerCase().split(' ').map(function(word) {
+      return (word.charAt(0).toUpperCase() + word.slice(1));
+    }).join(' ');
+  }
