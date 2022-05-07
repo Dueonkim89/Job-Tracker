@@ -70,10 +70,10 @@ class Registration extends React.Component {
         
         // See if all the form field has data and a valid strong password
         this.setState({ 
-            firstNameValid: validStringData(firstName),
-            lastNameValid: validStringData(lastName),
+            firstNameValid: validStringData(firstName.trim()),
+            lastNameValid: validStringData(lastName.trim()),
             emailValid: validStringData(email),
-            userNameValid: validStringData(userName),
+            userNameValid: validStringData(userName.trim()),
             phoneNumberValid: validIntData(phoneNumber),
             passwordValid: validPassword(password)
         });
