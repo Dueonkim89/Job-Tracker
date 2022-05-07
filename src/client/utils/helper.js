@@ -123,3 +123,11 @@ export function checkIfCompanyAlreadyExists(company) {
         return Promise.reject(false);
       });
 }
+
+export function createCompany(company) {
+    axios.post("/api/companies", company).then(function (response) {
+        console.log(response);
+    }).catch(function (error) {
+        console.log(error.response);
+    });;
+}

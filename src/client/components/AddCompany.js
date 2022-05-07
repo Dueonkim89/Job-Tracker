@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Container, Row, Form, Button } from 'react-bootstrap';
 import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import {validStringData} from '../utils/formValidation';
-import {companyNameAlreadyRecorded, checkIfCompanyAlreadyExists} from '../utils/helper';
+import {companyNameAlreadyRecorded, checkIfCompanyAlreadyExists, createCompany} from '../utils/helper';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
 
 const formPadding = ".75rem";
@@ -62,6 +62,9 @@ class AddCompany extends React.Component {
             && validStringData(companyIndustry.trim())) {
 
             // https://stackoverflow.com/questions/64566405/react-router-dom-v6-usenavigate-passing-value-to-another-component
+            
+            createCompany({name: companyName.trim(), industry: companyIndustry.trim(),  websiteURL: companyURL.trim()});
+            return;
 
             // user entered URL and did not click
             if (!this.props.companies.state) {
