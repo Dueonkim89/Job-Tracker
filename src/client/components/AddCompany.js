@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Container, Row, Form, Button } from 'react-bootstrap';
 import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import {validStringData} from '../utils/formValidation';
-import {companyNameAlreadyRecorded} from '../utils/helper';
+import {companyNameAlreadyRecorded, checkIfCompanyAlreadyExists} from '../utils/helper';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
 
 const formPadding = ".75rem";
@@ -39,6 +39,10 @@ class AddCompany extends React.Component {
         this.setState({companyIndustry: event.target.value});
     }
 
+    isCompanyNameAStringType() {
+        // check if company name is a string
+    }
+
     handleSubmit(event) {
         event.preventDefault();
 
@@ -52,17 +56,48 @@ class AddCompany extends React.Component {
             companyIndustryValid: validStringData(companyIndustry.trim())
         });
 
+        // only make POST request when all the form field is valid
+        if (validStringData(companyName.trim()) 
+            && validStringData(companyURL.trim()) 
+            && validStringData(companyIndustry.trim())) {
+
+            // https://stackoverflow.com/questions/64566405/react-router-dom-v6-usenavigate-passing-value-to-another-component
+
+            // user entered URL and did not click
+            if (!this.props.companies.state) {
+                // check if company name already exists
+                checkIfCompanyAlreadyExists(companyName.trim().toLowerCase()).then(
+                    (result) => { 
+                       console.log("success", result);
+                    },
+                    (error) => { 
+                       console.log("error", error);
+                    }
+                );
+            
+            }
+            // user did click the link
+            else {
+                 // company name already in list, navigate back to application page
+                if (companyNameAlreadyRecorded(this.props.companies.state.companies, companyName.trim())) {
+                    // navigate user back to app page with company name as props
+
+                // ELSE, MAKE POST request to server
+                } else {
+                     //redirect to NewJobApplication
+                }
+            }
+
+
+        }
+
+            
+
+
+        
         
 
-
-        // company name already in list, navigate back to application page
-
-
-        // https://stackoverflow.com/questions/64566405/react-router-dom-v6-usenavigate-passing-value-to-another-component
-
-        // ELSE, MAKE POST request to server
-
-        // if successful, redirect to NewJobApplication
+       
    
           
     }
