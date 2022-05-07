@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { Container, Row, Form, Button } from 'react-bootstrap';
-import { useNavigate, useLocation } from "react-router-dom";
-
+import { useNavigate, useLocation, Navigate } from "react-router-dom";
+import {validStringData} from '../utils/formValidation';
+import {companyNameAlreadyRecorded} from '../utils/helper';
+import {UserLoggedInContext} from "../context/UserLoggedInStatus";
 
 const formPadding = ".75rem";
 const labelFontSize = "1.2rem";
@@ -9,20 +11,54 @@ const labelFontSize = "1.2rem";
 class AddCompany extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            companyName: '',
+            companyURL: '',
+            companyIndustry: '',
+            companyNameValid: true,
+            companyIndustryValid: true,
+            companyURLValid: true,
+        };
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.enterCompanyName = this.enterCompanyName.bind(this);
+        this.enterCompanyURL = this.enterCompanyURL.bind(this);
+        this.enterCompanyIndustry = this.enterCompanyIndustry.bind(this);
+    }
+
+    globalLoggedInState = undefined;
+
+    enterCompanyName(event)  {
+        this.setState({companyName: event.target.value});
+    }
+
+    enterCompanyURL(event) {
+        this.setState({companyURL: event.target.value});
+    }
+
+    enterCompanyIndustry(event) {
+        this.setState({companyIndustry: event.target.value});
     }
 
     handleSubmit(event) {
-        // required data: name, industry, url
         event.preventDefault();
 
-        // TODO: validate form
+        const {companyName} = this.state;
 
-        // MAKE POST request to server
+        // Validate form for name, industry, url
+        this.setState({
+            companyNameValid: validStringData(companyName.trim())
+        });
+
+        // company name already in list, navigate back to application page
+
+
+        // https://stackoverflow.com/questions/64566405/react-router-dom-v6-usenavigate-passing-value-to-another-component
+
+        // ELSE, MAKE POST request to server
 
         // if successful, redirect to NewJobApplication
-            // pass company name as props 
-            // have company name pre-selected in select menu
-        
+   
+          
     }
 
     createApplicationHeader() {
@@ -32,11 +68,12 @@ class AddCompany extends React.Component {
     }
 
     createApplicationForm() {
+        const invalidStyle = '3px solid red';
         return (
-            <Form>
+            <Form onSubmit={this.handleSubmit}>
                 <Form.Group style={{padding: formPadding}} >
                     <Form.Label htmlFor="companyName" style={{fontWeight: 'bold', fontSize: labelFontSize}}>Company</Form.Label>
-                    <Form.Control id="companyName" type="text" placeholder="Enter company name" />
+                    <Form.Control style={{ border: !this.state.companyNameValid ? invalidStyle: ''}} id="companyName" type="text" value={this.state.companyName} onChange={this.enterCompanyName} placeholder="Enter company name" />
                 </Form.Group>
                 <Form.Group style={{padding: formPadding}} >
                     <Form.Label htmlFor="url" style={{fontWeight: 'bold', fontSize: labelFontSize}}>Url</Form.Label>
@@ -54,26 +91,39 @@ class AddCompany extends React.Component {
     }
 
     render() {
-        console.log(this.props);
         const ApplicationFormBorder = "3px solid #0a2a66";
         return (
-            <Container fluid style={{ marginTop: "2.75rem", width: '65vw', border: ApplicationFormBorder}}>
-                <Row style={{borderBottom: ApplicationFormBorder, backgroundColor: "#c0c6cc"}}>
-                    {this.createApplicationHeader()}
-                </Row>
-                <Row style={{backgroundColor: "#c0c6cc", textAlign: "left"}}>
-                    {this.createApplicationForm()}
-                </Row>
-            </Container>
+            <UserLoggedInContext.Consumer>
+                {({loggedInStatus}) => (
+                    <div>
+                        { !loggedInStatus && <Navigate to="/main" replace={true} /> }
+                        {this.globalLoggedInState = loggedInStatus}
+                        <Container fluid style={{ marginTop: "2.75rem", width: '65vw', border: ApplicationFormBorder}}>
+                            <Row style={{borderBottom: ApplicationFormBorder, backgroundColor: "#c0c6cc"}}>
+                                {this.createApplicationHeader()}
+                            </Row>
+                            <Row style={{backgroundColor: "#c0c6cc", textAlign: "left"}}>
+                                {this.createApplicationForm()}
+                            </Row>
+                        </Container>
+                    </div>
+                )}
+            </UserLoggedInContext.Consumer>
         );
     }
 }
 
 function AddCompanyWithNavigation(props) {
     let navigate = useNavigate();
+    const {loggedInStatus} = React.useContext(UserLoggedInContext);
+
+    // not logged in, send user to login page
+    if (!loggedInStatus) {
+        navigate('/login');
+    } 
     const location = useLocation();
-    const {companies} = location.state;
-    return <AddCompany {...props} navigate={navigate} companies={companies}/>
+    return <AddCompany {...props} navigate={navigate} companies={location}/>
+
 }
 
 export default AddCompanyWithNavigation;
