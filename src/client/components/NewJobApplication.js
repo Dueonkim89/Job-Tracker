@@ -95,23 +95,22 @@ class NewJobApplication extends React.Component {
         );
     }
     
- 
     createCompanyDropDrownMenu() {
         //  To get company names dynamically from server
         return (
             <Form.Select style={{marginBottom: ".65rem"}} aria-label="Choose company from dropdown menu" id="companyName">
                 <option>Pick company name</option>
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
+                {this.dynamicallyCreateCompanyList()}
             </Form.Select>
         );
     }
 
     dynamicallyCreateCompanyList() {
+        const {companyList} = this.state;
         return (
-            <option value="1">One</option>
-        );
+            companyList.map((company) => 
+             <option key={company.companyID} value={company.name}>{company.name}</option>
+        ));
     }
 
     generateApplicationSkills() {
