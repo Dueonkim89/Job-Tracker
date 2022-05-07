@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Container, Row, Form, Button } from 'react-bootstrap';
 import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import {validStringData} from '../utils/formValidation';
-import {companyNameAlreadyRecorded, checkIfCompanyAlreadyExists, createCompany} from '../utils/helper';
+import {stringContainsAlphabet, createCompany, titleCase} from '../utils/helper';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
 
 const formPadding = ".75rem";
@@ -46,63 +46,42 @@ class AddCompany extends React.Component {
     handleSubmit(event) {
         event.preventDefault();
 
-        const {companyName, companyURL, companyIndustry} = this.state;
-        console.log(this.props);
+        let {companyName, companyURL, companyIndustry} = this.state;
+        // console.log(this.props);
+
+        // trim excess white space from the form fields
+        companyName = companyName.trim();
+        companyURL = companyURL.trim();
+        companyIndustry = companyIndustry.trim();
 
         // Validate form for name, industry, url
         this.setState({
-            companyNameValid: validStringData(companyName.trim()),
-            companyURLValid: validStringData(companyURL.trim()),
-            companyIndustryValid: validStringData(companyIndustry.trim())
+            companyNameValid: validStringData(companyName) && stringContainsAlphabet(companyName),
+            companyURLValid: validStringData(companyURL),
+            companyIndustryValid: validStringData(companyIndustry)
         });
 
         // only make POST request when all the form field is valid
-        if (validStringData(companyName.trim()) 
-            && validStringData(companyURL.trim()) 
-            && validStringData(companyIndustry.trim())) {
+        if (validStringData(companyName) 
+            && validStringData(companyURL) 
+            && validStringData(companyIndustry)
+            && stringContainsAlphabet(companyName)) {
+
+            const formattedCompanyName = titleCase(companyName);
+            const formattedCompanyIndustry = titleCase(companyIndustry);
 
             // https://stackoverflow.com/questions/64566405/react-router-dom-v6-usenavigate-passing-value-to-another-component
-            
-            createCompany({name: companyName.trim(), industry: companyIndustry.trim(),  websiteURL: companyURL.trim()});
-            return;
 
-            // user entered URL and did not click
-            if (!this.props.companies.state) {
-                // check if company name already exists
-                checkIfCompanyAlreadyExists(companyName.trim().toLowerCase()).then(
-                    (result) => { 
-                       console.log("success", result);
-                    },
-                    (error) => { 
-                       console.log("error", error);
-                    }
-                );
-            
-            }
-            // user did click the link
-            else {
-                 // company name already in list, navigate back to application page
-                if (companyNameAlreadyRecorded(this.props.companies.state.companies, companyName.trim())) {
-                    // navigate user back to app page with company name as props
-
-                // ELSE, MAKE POST request to server
-                } else {
-                     //redirect to NewJobApplication
+            createCompany({name: formattedCompanyName, industry: formattedCompanyIndustry,  websiteURL: companyURL}).then(
+                (result) => { 
+                    // company succesfully registered, redirect to NewJobApplication and pass company name as props 
+                   this.props.navigate('/application',  { state: result.name });
                 }
-            }
-
-
+                ).catch((error) => {
+                    // company name already exists, redirect to NewJobApplication and pass company name as props 
+                    this.props.navigate('/application',  { state: formattedCompanyName });
+                });
         }
-
-            
-
-
-        
-        
-
-       
-   
-          
     }
 
     createApplicationHeader() {
