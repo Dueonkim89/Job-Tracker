@@ -30,7 +30,7 @@ export function companyNameAlreadyRecorded(companyList, newCompanyName) {
     */
     // keyword of is used to get the object at each iteration
     for (const company of companyList) {
-        if (company.name.toLowerCase() === newCompanyName.toLowerCase().trim()) {
+        if (company.name.toLowerCase() === newCompanyName.toLowerCase()) {
             return true;
         }
     }
@@ -100,5 +100,26 @@ export function getListOfAllCompanies(jwt) {
         return response.data;
       }).catch(function (error) {
         return [];
+      });
+}
+
+export function checkIfCompanyAlreadyExists(company) {
+    // INPUT: company name
+    // OUTPUT: array of companies match name if true
+    //         boolean false, if no match
+    const jwt = getUserToken();
+    const url = '/api/companies/search?name=' + company;
+    return axios.get(url, {
+        headers: {
+            'Authorization': jwt
+          }
+    }).then(function (response) {
+        console.log(response);
+        if (response.data.length) {
+            return Promise.resolve(response.data);
+        }
+        return Promise.reject(false);
+      }).catch(function (error) {
+        return Promise.reject(false);
       });
 }
