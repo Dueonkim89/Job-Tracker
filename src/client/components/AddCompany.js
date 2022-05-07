@@ -42,12 +42,18 @@ class AddCompany extends React.Component {
     handleSubmit(event) {
         event.preventDefault();
 
-        const {companyName} = this.state;
+        const {companyName, companyURL, companyIndustry} = this.state;
+        console.log(this.props);
 
         // Validate form for name, industry, url
         this.setState({
-            companyNameValid: validStringData(companyName.trim())
+            companyNameValid: validStringData(companyName.trim()),
+            companyURLValid: validStringData(companyURL.trim()),
+            companyIndustryValid: validStringData(companyIndustry.trim())
         });
+
+        
+
 
         // company name already in list, navigate back to application page
 
@@ -77,11 +83,11 @@ class AddCompany extends React.Component {
                 </Form.Group>
                 <Form.Group style={{padding: formPadding}} >
                     <Form.Label htmlFor="url" style={{fontWeight: 'bold', fontSize: labelFontSize}}>Url</Form.Label>
-                    <Form.Control id="url" type="text" placeholder="Enter company website" />
+                    <Form.Control style={{ border: !this.state.companyURLValid ? invalidStyle: ''}} id="url" type="text" value={this.state.companyURL} onChange={this.enterCompanyURL} placeholder="Enter company website" />
                 </Form.Group>
                 <Form.Group style={{padding: formPadding}} >
                     <Form.Label htmlFor="industry" style={{fontWeight: 'bold', fontSize: labelFontSize}}>Industry</Form.Label>
-                    <Form.Control id="industry" type="text" placeholder="Enter company industry" />
+                    <Form.Control style={{ border: !this.state.companyIndustryValid ? invalidStyle: ''}} id="industry" type="text" value={this.state.companyIndustry} onChange={this.enterCompanyIndustry} placeholder="Enter company industry" />
                 </Form.Group>
                 <div style={{padding: formPadding}}>
                     <Button type="submit">Submit</Button>
@@ -123,7 +129,6 @@ function AddCompanyWithNavigation(props) {
     } 
     const location = useLocation();
     return <AddCompany {...props} navigate={navigate} companies={location}/>
-
 }
 
 export default AddCompanyWithNavigation;
