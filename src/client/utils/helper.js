@@ -149,6 +149,16 @@ export function titleCase(str) {
     // INPUT: string
     // OUTPUT: formatted string in title case
     return str.toLowerCase().split(' ').map(function(word) {
-      return (word.charAt(0).toUpperCase() + word.slice(1));
+        return (word.charAt(0).toUpperCase() + word.slice(1));
     }).join(' ');
-  }
+}
+
+export function getAllSkills() {
+    //  INPUT: none
+    // OUTPUT: get request of user skills in promise
+    return axios.get('/api/skills').then(function (response) {
+        return Promise.resolve(response.data);
+    }).catch(function (error) {
+        return Promise.reject(error.response);
+    });;
+}
