@@ -1,20 +1,25 @@
 import * as React from 'react';
 import { Container, Row, Form, Button, Col } from 'react-bootstrap';
-import {getListOfAllCompanies, getUserToken} from '../utils/helper';
+import {getListOfAllCompanies, getUserToken, getAllSkills} from '../utils/helper';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
-import { Navigate, useNavigate, Link } from "react-router-dom"
+import { Navigate, useNavigate, Link,  useLocation } from "react-router-dom"
 
 const formPadding = ".75rem";
 const labelFontSize = "1.2rem";
 
 class NewJobApplication extends React.Component {
     constructor(props) {
+        console.log(props);
         super(props);
         this.state = {
-           companyList: []
+           companyList: [],
+           skillList: [],
+           applicationSkillList: [],
+           companyName: ""
         };
 
         // this.enterFirstName = this.enterFirstName.bind(this);
+        this.pickCompany = this.pickCompany.bind(this);
     }
 
     globalLoggedInState = undefined;
@@ -25,18 +30,36 @@ class NewJobApplication extends React.Component {
         );
     }
 
+    pickCompany(event) {
+        this.setState({companyName: event.target.value});
+      }
+
     componentDidMount() {
-        // make call to server and get all company list only if user logged in
+        // make call to server and get all company list and skills only if user logged in
+        // set company value to props if passed in
         if (this.globalLoggedInState) {
             const token = getUserToken();
             getListOfAllCompanies(token).then(
                 (result) => { 
                     this.setState({companyList: result});
+                    // get company name if props are provided and set drop down value to props
+                    if (this.props.companies.state) {
+                        this.setState({companyName: this.props.companies.state});
+                    }
                 },
                 (error) => { 
                    return;
                 }
-              );;
+            );
+
+            getAllSkills().then(
+                (result) => {
+                    this.setState({skillList: result});
+                }
+            ).catch((error) => {
+                return;
+                }
+            );
         }
     }
 
@@ -98,8 +121,8 @@ class NewJobApplication extends React.Component {
     createCompanyDropDrownMenu() {
         //  To get company names dynamically from server
         return (
-            <Form.Select style={{marginBottom: ".65rem"}} aria-label="Choose company from dropdown menu" id="companyName">
-                <option>Pick company name</option>
+            <Form.Select style={{marginBottom: ".65rem"}} value={this.state.companyName} onChange={this.pickCompany} aria-label="Choose company from dropdown menu" id="companyName">
+                <option value="">Pick company name</option>
                 {this.dynamicallyCreateCompanyList()}
             </Form.Select>
         );
@@ -120,7 +143,9 @@ class NewJobApplication extends React.Component {
                 <Form.Group as={Col}>
                     <Form.Label htmlFor="jobSkills" style={{fontWeight: 'bold', fontSize: labelFontSize}}>Job skills</Form.Label>
                     <Form.Control list="skills" id="jobSkills" type="text" placeholder="Enter job skills" name="jobSkills"/>
-                    {this.getSkills()}
+                    <datalist id="skills">
+                        {this.getSkills()}
+                    </datalist>
                 </Form.Group>
                 <Form.Group as={Col} style={{position: "relative", marginLeft: "2.5rem"}}>      
                         {/*Position the button at bottomn left corner of parent*/}
@@ -131,14 +156,12 @@ class NewJobApplication extends React.Component {
     }
 
     getSkills() {
-        // will make GET request to server to get skills and render dynamically.
+        // render dynamically from state
+        const {skillList} = this.state;
         return (
-            <datalist id="skills">
-                <option value="C++"></option>
-                <option value="Java"></option>
-                <option value="Python"></option>
-            </datalist>
-        );
+            skillList.map((skill) => 
+             <option key={skill.skillID} value={skill.name}>{skill.name}</option>
+        ));
     }
 
     render() {
@@ -165,4 +188,16 @@ class NewJobApplication extends React.Component {
     }
 }
 
-export default NewJobApplication;
+function AddApplicationWithNavigation(props) {
+    let navigate = useNavigate();
+    const {loggedInStatus} = React.useContext(UserLoggedInContext);
+
+    // not logged in, send user to login page
+    if (!loggedInStatus) {
+        navigate('/login');
+    } 
+    const location = useLocation();
+    return <NewJobApplication {...props} navigate={navigate} companies={location}/>
+}
+
+export default AddApplicationWithNavigation;
