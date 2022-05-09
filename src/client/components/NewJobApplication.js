@@ -1,20 +1,28 @@
 import * as React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
 import { Container, Row, Form, Button, Col } from 'react-bootstrap';
-import {getListOfAllCompanies, getUserToken} from '../utils/helper';
+import {getListOfAllCompanies, getUserToken, getAllSkills} from '../utils/helper';
+import {UserLoggedInContext} from "../context/UserLoggedInStatus";
+import { Navigate, useNavigate, Link,  useLocation } from "react-router-dom"
 
 const formPadding = ".75rem";
 const labelFontSize = "1.2rem";
 
 class NewJobApplication extends React.Component {
     constructor(props) {
+        console.log(props);
         super(props);
         this.state = {
-           companyList: []
+           companyList: [],
+           skillList: [],
+           applicationSkillList: [],
+           companyName: ""
         };
 
         // this.enterFirstName = this.enterFirstName.bind(this);
+        this.pickCompany = this.pickCompany.bind(this);
     }
+
+    globalLoggedInState = undefined;
 
     createApplicationHeader() {
         return (
@@ -22,17 +30,37 @@ class NewJobApplication extends React.Component {
         );
     }
 
+    pickCompany(event) {
+        this.setState({companyName: event.target.value});
+      }
+
     componentDidMount() {
-        // make call to server and get all company list
-        const token = getUserToken();
-        getListOfAllCompanies(token).then(
-            (result) => { 
-                this.setState({companyList: result});
-            },
-            (error) => { 
-               return;
-            }
-          );;
+        // make call to server and get all company list and skills only if user logged in
+        // set company value to props if passed in
+        if (this.globalLoggedInState) {
+            const token = getUserToken();
+            getListOfAllCompanies(token).then(
+                (result) => { 
+                    this.setState({companyList: result});
+                    // get company name if props are provided and set drop down value to props
+                    if (this.props.companies.state) {
+                        this.setState({companyName: this.props.companies.state});
+                    }
+                },
+                (error) => { 
+                   return;
+                }
+            );
+
+            getAllSkills().then(
+                (result) => {
+                    this.setState({skillList: result});
+                }
+            ).catch((error) => {
+                return;
+                }
+            );
+        }
     }
 
     createApplicationForm() {
@@ -68,11 +96,11 @@ class NewJobApplication extends React.Component {
     }
 
     addCompanyNavigation() {
-        return (
-            <LinkContainer to="/add_company">
+        return (   
+            <Link to="/add_company" state={{companies: this.state.companyList}}>
                 {/*NOTE: If no / provided to the path, routes to /application/add_company by default */}
-                <a>Don't see the company? Click here to add.</a>
-            </LinkContainer>
+                <p style={{marginBottom: "0rem"}}>Don't see the company? Click here to add.</p>
+            </Link>
         );
     }
 
@@ -90,23 +118,22 @@ class NewJobApplication extends React.Component {
         );
     }
     
- 
     createCompanyDropDrownMenu() {
         //  To get company names dynamically from server
         return (
-            <Form.Select style={{marginBottom: ".65rem"}} aria-label="Choose company from dropdown menu" id="companyName">
-                <option>Pick company name</option>
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
+            <Form.Select style={{marginBottom: ".65rem"}} value={this.state.companyName} onChange={this.pickCompany} aria-label="Choose company from dropdown menu" id="companyName">
+                <option value="">Pick company name</option>
+                {this.dynamicallyCreateCompanyList()}
             </Form.Select>
         );
     }
 
     dynamicallyCreateCompanyList() {
+        const {companyList} = this.state;
         return (
-            <option value="1">One</option>
-        );
+            companyList.map((company) => 
+             <option key={company.companyID} value={company.name}>{company.name}</option>
+        ));
     }
 
     generateApplicationSkills() {
@@ -116,7 +143,9 @@ class NewJobApplication extends React.Component {
                 <Form.Group as={Col}>
                     <Form.Label htmlFor="jobSkills" style={{fontWeight: 'bold', fontSize: labelFontSize}}>Job skills</Form.Label>
                     <Form.Control list="skills" id="jobSkills" type="text" placeholder="Enter job skills" name="jobSkills"/>
-                    {this.getSkills()}
+                    <datalist id="skills">
+                        {this.getSkills()}
+                    </datalist>
                 </Form.Group>
                 <Form.Group as={Col} style={{position: "relative", marginLeft: "2.5rem"}}>      
                         {/*Position the button at bottomn left corner of parent*/}
@@ -127,30 +156,48 @@ class NewJobApplication extends React.Component {
     }
 
     getSkills() {
-        // will make GET request to server to get skills and render dynamically.
+        // render dynamically from state
+        const {skillList} = this.state;
         return (
-            <datalist id="skills">
-                <option value="C++"></option>
-                <option value="Java"></option>
-                <option value="Python"></option>
-            </datalist>
-        );
+            skillList.map((skill) => 
+             <option key={skill.skillID} value={skill.name}>{skill.name}</option>
+        ));
     }
 
     render() {
-        console.log(this.state.companyList);
+        // redirect to login if user is not logged in
         const ApplicationFormBorder = "3px solid #0a2a66";
         return (
-            <Container fluid style={{ marginTop: "2.75rem", width: '65vw', border: ApplicationFormBorder}}>
-                <Row style={{borderBottom: ApplicationFormBorder, backgroundColor: "#c0c6cc"}}>
-                    {this.createApplicationHeader()}
-                </Row>
-                <Row style={{backgroundColor: "#c0c6cc", textAlign: "left"}}>
-                    {this.createApplicationForm()}
-                </Row>
-            </Container>
+            <UserLoggedInContext.Consumer>
+                {({loggedInStatus}) => (
+                <div>
+                    { !loggedInStatus && <Navigate to="/main" replace={true} /> }
+                    {this.globalLoggedInState = loggedInStatus}
+                    <Container fluid style={{ marginTop: "2.75rem", width: '65vw', border: ApplicationFormBorder}}>
+                        <Row style={{borderBottom: ApplicationFormBorder, backgroundColor: "#c0c6cc"}}>
+                            {this.createApplicationHeader()}
+                        </Row>
+                        <Row style={{backgroundColor: "#c0c6cc", textAlign: "left"}}>
+                            {this.createApplicationForm()}
+                        </Row>
+                    </Container>
+                </div>    
+                )}
+            </UserLoggedInContext.Consumer>
         );
     }
 }
 
-export default NewJobApplication;
+function AddApplicationWithNavigation(props) {
+    let navigate = useNavigate();
+    const {loggedInStatus} = React.useContext(UserLoggedInContext);
+
+    // not logged in, send user to login page
+    if (!loggedInStatus) {
+        navigate('/login');
+    } 
+    const location = useLocation();
+    return <NewJobApplication {...props} navigate={navigate} companies={location}/>
+}
+
+export default AddApplicationWithNavigation;

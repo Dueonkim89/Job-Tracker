@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { Navigate } from "react-router-dom"
+import { Navigate, useNavigate } from "react-router-dom"
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
-import { useNavigate } from "react-router-dom";
 import {validIntData, validStringData, validPassword} from '../utils/formValidation';
 import {formatPhoneNumber, registerNewUser, storeUserInfoIntoLocalStorage} from '../utils/helper';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
@@ -71,10 +70,10 @@ class Registration extends React.Component {
         
         // See if all the form field has data and a valid strong password
         this.setState({ 
-            firstNameValid: validStringData(firstName),
-            lastNameValid: validStringData(lastName),
+            firstNameValid: validStringData(firstName.trim()),
+            lastNameValid: validStringData(lastName.trim()),
             emailValid: validStringData(email),
-            userNameValid: validStringData(userName),
+            userNameValid: validStringData(userName.trim()),
             phoneNumberValid: validIntData(phoneNumber),
             passwordValid: validPassword(password)
         });
@@ -200,8 +199,6 @@ class Registration extends React.Component {
     }
 
     render() {
-        //const {firstNameValid, lastNameValid, emailValid, userNameValid, phoneNumberValid, passwordValid, userNameAvailable} = this.state;
-        //console.log(firstNameValid, lastNameValid, emailValid, userNameValid, phoneNumberValid, passwordValid, userNameAvailable);
         //console.log(this.context);
         return (
             // if user is logged in, redirect them to dashboard

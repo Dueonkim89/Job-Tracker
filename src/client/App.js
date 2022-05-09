@@ -25,7 +25,6 @@ function App() {
                 },
                 (error) => { 
                     // remove token from localStorage and update state
-                    console.log(error, "token is expired");
                     localStorage.removeItem('user');
                     setLoggedInStatus(error);
                     // cant use navigate inside callbacks.
