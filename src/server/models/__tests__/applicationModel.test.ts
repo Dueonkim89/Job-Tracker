@@ -80,3 +80,16 @@ test("Update non-existant user app status", async () => {
     const result = await appModel.updateAppStatus(100, "Interview");
     expect(result).toBe(false);
 });
+
+test("Create new app contact", async () => {
+    const payload = {
+        applicationID: 4,
+        firstName: "testfirst",
+        lastName: "testlast",
+        emailAddress: "test@email.com",
+        phoneNumber: "111-111-1293",
+        role: "testrole",
+    };
+    const result = await appModel.createContact(payload);
+    expect(result).toBeGreaterThan(4);
+});

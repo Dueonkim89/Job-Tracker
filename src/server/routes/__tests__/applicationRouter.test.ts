@@ -111,3 +111,18 @@ test("[Valid] Updating a user status", async () => {
     expect(result.statusCode).toEqual(201);
     expect(result.body.success).toEqual(true);
 });
+
+test("[Valid] Adding an app contact", async () => {
+    const payload = {
+        applicationID: 4,
+        firstName: "testfirst",
+        lastName: "testlast",
+        emailAddress: "test@email.com",
+        phoneNumber: "111-111-1295",
+        role: "testrole",
+    };
+    const result = await request(server).post("/api/applications/contact").set("Authorization", token).send(payload);
+    expect(result.statusCode).toEqual(201);
+    expect(result.body.success).toEqual(true);
+    expect(result.body.contactID).toBeGreaterThan(4);
+});

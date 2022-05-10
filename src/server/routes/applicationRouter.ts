@@ -38,6 +38,7 @@ router.get("/", passport.authenticate("jwt", { session: false }), async function
  */
 router.post("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { companyID, jobPostingURL, position, userID, status, location, notes } = req.body;
+    // TODO - input validation
     const datetime = new Date();
     try {
         const applicationID = await appModel.createApp({
@@ -63,6 +64,37 @@ router.post("/", passport.authenticate("jwt", { session: false }), async functio
 });
 
 /**
+ * @description: Adds a contact to a user's job application
+ * @method: POST /api/applications/contact
+ * @param: JSON of {applicationID, firstName, lastName, emailAddress, phoneNumber, role}
+ * @returns: HTTP 201 and JSON of {success: true, contactID}
+ * or HTTP 400 and JSON of {success: false, message: "reason for error"}
+ */
+router.post("/contact", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
+    const { applicationID, firstName, lastName, emailAddress, phoneNumber, role } = req.body;
+    // TODO - input validation
+    try {
+        const contactID = await appModel.createContact({
+            applicationID,
+            firstName,
+            lastName,
+            emailAddress,
+            phoneNumber,
+            role,
+        });
+        const response = {
+            success: true,
+            contactID,
+        };
+        return res.status(201).json(response);
+    } catch (err) {
+        console.error(`Error in creating new application contact:`);
+        console.error({ applicationID, firstName, lastName, emailAddress, phoneNumber, role });
+        next(err);
+    }
+});
+
+/**
  * @description: Updates the status of a user's job application
  * @method: POST /api/applications/status
  * @param: JSON of {applicationID, status}
@@ -71,6 +103,7 @@ router.post("/", passport.authenticate("jwt", { session: false }), async functio
  */
 router.post("/status", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { applicationID, status } = req.body;
+    // TODO - input validation
     try {
         if (typeof applicationID !== "number") {
             return res.status(400).json({ success: false, message: "Application ID is not a number" });
