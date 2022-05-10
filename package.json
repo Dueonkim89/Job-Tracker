@@ -57,7 +57,7 @@
         "database:local": "node ./config/setupScript.mjs LOCAL",
         "database:azure": "node ./config/setupScript.mjs AZURE",
         "test:frontend": "react-scripts test",
-        "test:backend": "jest --selectProjects backend --forceExit #--detectOpenHandles",
+        "test:backend": "jest --selectProjects backend --forceExit",
         "eject": "react-scripts eject",
         "dev": "concurrently -p name -c \"yellow,magenta,blue\" -n \"webpack-server,nodemon-server,CRA\" \"npm run dev:server:webpack\" \"npm run dev:server:nodemon\" \"npm run dev:client\"",
         "dev:client": "wait-on -l tcp:3001 && react-scripts start",

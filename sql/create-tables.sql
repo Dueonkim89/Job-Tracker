@@ -53,10 +53,11 @@ DROP TABLE IF EXISTS ApplicationContacts;
 CREATE TABLE `ApplicationContacts`(
     `contactID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `applicationID` INT NOT NULL,
-    `phoneNumber` VARCHAR(15) NULL,
-    `emailAddress` VARCHAR(50) NOT NULL,
+    `firstName` VARCHAR(255) NOT NULL,
+    `lastName` VARCHAR(255) NOT NULL,
+    `phoneNumber` VARCHAR(15),
+    `emailAddress` VARCHAR(50),
     `role` VARCHAR(255),
-    `notes` TEXT,
     FOREIGN KEY(`applicationID`) REFERENCES `Applications`(`applicationID`)
 );
 -- Creating Skills Table

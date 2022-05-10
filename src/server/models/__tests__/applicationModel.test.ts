@@ -12,8 +12,27 @@ test("Get user 1 apps", async () => {
             userID: 1,
             status: "Phone Screen",
             location: "Seattle, WA",
+            notes: "here are my notes",
             datetime: new Date("2022-01-01T00:00:00.000Z"),
             companyName: "Amazon",
+            contacts: [
+                {
+                    contactID: 1,
+                    firstName: "Amanda",
+                    lastName: "Alpha",
+                    emailAddress: "HiringManager@amazonemail.com",
+                    phoneNumber: "444-444-4444",
+                    role: "Hiring Manager 1",
+                },
+                {
+                    contactID: 2,
+                    firstName: "Barry",
+                    lastName: "Beta",
+                    emailAddress: "HiringManager2@amazonemail.com",
+                    phoneNumber: "444-444-5555",
+                    role: "Hiring Manager 2",
+                },
+            ],
         },
         {
             applicationID: 2,
@@ -23,8 +42,10 @@ test("Get user 1 apps", async () => {
             userID: 1,
             status: "Applied",
             location: "Tel Aviv, Israel",
+            notes: "here are my notes",
             datetime: new Date("2022-01-02T00:00:00.000Z"),
             companyName: "Amazon",
+            contacts: null,
         },
     ];
     expect(result).toEqual(expected);
@@ -43,6 +64,7 @@ test("Create new user app", async () => {
         userID: 2,
         status: "pending",
         location: "remote",
+        notes: "Notes here!",
         datetime: new Date(),
     };
     const result = await appModel.createApp(payload);

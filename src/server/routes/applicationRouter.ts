@@ -6,7 +6,8 @@ const router = express.Router();
 /**
  * @description: Returns all of a user's job applications
  * @method: GET /api/applications?userID={userID}
- * @returns: HTTP 200 and all fields from Applications tables, along with companyName
+ * @returns: HTTP 200 and all fields from Applications tables, companyName, and contacts
+ * NOTE: contacts will be an array OR null if no contacts exist
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.get("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
@@ -31,12 +32,12 @@ router.get("/", passport.authenticate("jwt", { session: false }), async function
 /**
  * @description: Adds a user's job application to the database
  * @method: POST /api/applications
- * @param: JSON of {companyID, jobPostingURL, position, userID, status, location}
- * @returns: HTTP 201 and JSON of {success: true, applicationID, userID, jobID, status, location, datetime}
+ * @param: JSON of {companyID, jobPostingURL, position, userID, status, location, notes}
+ * @returns: HTTP 201 and JSON of {success: true, applicationID}
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.post("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
-    const { companyID, jobPostingURL, position, userID, status, location } = req.body;
+    const { companyID, jobPostingURL, position, userID, status, location, notes } = req.body;
     const datetime = new Date();
     try {
         const applicationID = await appModel.createApp({
@@ -46,23 +47,17 @@ router.post("/", passport.authenticate("jwt", { session: false }), async functio
             userID,
             status,
             location,
+            notes,
             datetime,
         });
         const response = {
             success: true,
             applicationID,
-            companyID,
-            jobPostingURL,
-            position,
-            userID,
-            status,
-            location,
-            datetime,
         };
         return res.status(201).json(response);
     } catch (err) {
         console.error(`Error in creating new application:`);
-        console.error({ companyID, jobPostingURL, position, userID, status, location, datetime });
+        console.error({ companyID, jobPostingURL, position, userID, status, location, notes, datetime });
         next(err);
     }
 });

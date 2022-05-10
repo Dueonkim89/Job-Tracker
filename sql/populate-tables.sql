@@ -88,9 +88,9 @@ VALUES
 
 -- Populate ApplicationContacts table
 INSERT INTO `ApplicationContacts` 
-(`contactID`, `applicationID`, `emailAddress`, `phoneNumber`, `role`, `notes`)
+(`contactID`, `applicationID`, `firstName`, `lastName`, `emailAddress`, `phoneNumber`, `role`)
 VALUES
-(1, 1, 'HiringManager@amazonemail.com', '444-444-4444', 'Hiring Manager', 'Great chat with this person'),
-(2, 1, 'HiringManager2@amazonemail.com', '444-444-5555', 'Hiring Manager 2', 'Great chat with this person too'),
-(3, 3, 'HiringManager@blackbaudemail.com', '555-555-5555', 'Hiring Manager', 'Great chat with this person'),
-(4, 5, 'HiringManager@clouderaemail.com', '666-666-6666', 'Hiring Manager', 'Great chat with this person');
+(1, 1, 'Amanda', 'Alpha', 'HiringManager@amazonemail.com', '444-444-4444', 'Hiring Manager 1'),
+(2, 1, 'Barry', 'Beta', 'HiringManager2@amazonemail.com', '444-444-5555', 'Hiring Manager 2'),
+(3, 3, 'Cassandra', 'Charlie', 'HiringManager@blackbaudemail.com', '555-555-5555', 'Hiring Manager'),
+(4, 5, 'DeAndre', 'Delta', 'HiringManager@clouderaemail.com', '666-666-6666', 'Hiring Manager');
