@@ -85,6 +85,21 @@ export async function updateAppStatus(applicationID: number, status: string) {
 }
 
 /**
+ * Updates the notes section of the given application
+ * @returns true if the update was successful, else false (e.g. applicationID doesn't exist)
+ */
+export async function updateAppNotes(applicationID: number, notes: string) {
+    const sql = `
+    UPDATE Applications
+    SET notes = ?
+    WHERE applicationID = ?;
+    `;
+    const vals = [notes, applicationID];
+    const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.promise().query(sql, vals);
+    return result.affectedRows === 1;
+}
+
+/**
  * Returns contact by contactID
  */
 export async function getContactByID(contactID: number) {

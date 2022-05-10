@@ -173,13 +173,40 @@ router.get("/contact", passport.authenticate("jwt", { session: false }), async f
 });
 
 /**
+ * @description: Updates the notes of a user's job application
+ * @method: PUT /api/applications/notes
+ * @param: JSON of {applicationID, status}
+ * @returns: HTTP 201 and JSON of {success: true, applicationID, notes}
+ * or HTTP 400 and JSON of {success: false, message: "reason for error"}
+ */
+router.put("/notes", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
+    const { applicationID, notes } = req.body;
+    // TODO - input validation
+    try {
+        if (typeof applicationID !== "number") {
+            return res.status(400).json({ success: false, message: "Application ID is not a number" });
+        }
+        const didUpdate = await appModel.updateAppStatus(applicationID, notes);
+        if (didUpdate) {
+            return res.status(201).json({ success: true, applicationID, notes });
+        } else {
+            return res.status(400).json({ success: false, message: "Invalid Application ID." });
+        }
+    } catch (err) {
+        console.error(`Error in updating application notes:`);
+        console.error({ applicationID, notes });
+        next(err);
+    }
+});
+
+/**
  * @description: Updates the status of a user's job application
- * @method: POST /api/applications/status
+ * @method: PUT /api/applications/status
  * @param: JSON of {applicationID, status}
  * @returns: HTTP 201 and JSON of {success: true, applicationID, status}
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
-router.post("/status", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
+router.put("/status", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { applicationID, status } = req.body;
     // TODO - input validation
     try {

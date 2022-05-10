@@ -102,16 +102,6 @@ test("[Valid] Adding a user application", async () => {
     expect(result.body.success).toEqual(true);
 });
 
-test("[Valid] Updating a user status", async () => {
-    const payload = {
-        applicationID: 5,
-        status: "Interview Again",
-    };
-    const result = await request(server).post("/api/applications/status").set("Authorization", token).send(payload);
-    expect(result.statusCode).toEqual(201);
-    expect(result.body.success).toEqual(true);
-});
-
 test("[Valid] Adding an app contact", async () => {
     const payload = {
         applicationID: 4,
@@ -156,4 +146,24 @@ test("[Valid] Updating an app contact #1", async () => {
         .send();
     expect(updatedResult.statusCode).toEqual(200);
     expect(updatedResult.body).toEqual(expected);
+});
+
+test("[Valid] Updating an app status", async () => {
+    const payload = {
+        applicationID: 5,
+        status: "Interview Again",
+    };
+    const result = await request(server).put("/api/applications/status").set("Authorization", token).send(payload);
+    expect(result.statusCode).toEqual(201);
+    expect(result.body.success).toEqual(true);
+});
+
+test("[Valid] Updating an app notes", async () => {
+    const payload = {
+        applicationID: 5,
+        notes: "Great stuff",
+    };
+    const result = await request(server).put("/api/applications/notes").set("Authorization", token).send(payload);
+    expect(result.statusCode).toEqual(201);
+    expect(result.body.success).toEqual(true);
 });
