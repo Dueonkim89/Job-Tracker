@@ -98,3 +98,13 @@ export async function createContact(p: ContactFields) {
     const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.promise().query(sql, vals);
     return result.insertId;
 }
+
+/**
+ * Deletes the contact with given contactID
+ * @returns true upon succcess
+ */
+export async function deleteContact(contactID: number) {
+    const sql = "DELETE FROM ApplicationContacts WHERE contactID = ?;";
+    const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.promise().query(sql, [contactID]);
+    return result.affectedRows === 1;
+}

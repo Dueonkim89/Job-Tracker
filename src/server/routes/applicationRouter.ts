@@ -94,6 +94,23 @@ router.post("/contact", passport.authenticate("jwt", { session: false }), async 
     }
 });
 
+router.delete("/contact", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
+    const { contactID } = req.query;
+    // TODO - input validation
+    try {
+        if (typeof contactID !== "string") {
+            return res.status(400).json({ success: false, message: "Invalid Contact ID" });
+        }
+        const parsedcontactID = parseInt(contactID);
+        await appModel.deleteContact(parsedcontactID);
+        return res.status(200).json({ success: true, contactID });
+    } catch (err) {
+        console.error(`Error in deleting application contact:`);
+        console.error({ contactID });
+        next(err);
+    }
+});
+
 /**
  * @description: Updates the status of a user's job application
  * @method: POST /api/applications/status

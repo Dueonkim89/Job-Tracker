@@ -126,3 +126,12 @@ test("[Valid] Adding an app contact", async () => {
     expect(result.body.success).toEqual(true);
     expect(result.body.contactID).toBeGreaterThan(4);
 });
+
+test("[Valid] Deleting an app contact", async () => {
+    const result = await request(server)
+        .delete("/api/applications/contact?contactID=3")
+        .set("Authorization", token)
+        .send();
+    expect(result.statusCode).toEqual(200);
+    expect(result.body.success).toEqual(true);
+});
