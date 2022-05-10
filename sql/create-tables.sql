@@ -21,19 +21,6 @@ CREATE TABLE `Companies`(
     `industry` VARCHAR(255),
     `websiteURL` VARCHAR(255)
 );
--- Creating Company Contacts Table
-DROP TABLE IF EXISTS CompanyContacts;
-CREATE TABLE `CompanyContacts`(
-    `contactID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `userID` INT NOT NULL,
-    `phoneNumber` VARCHAR(15) NULL,
-    `emailAddress` VARCHAR(50) NOT NULL,
-    `companyID` INT NOT NULL,
-    `role` VARCHAR(255),
-    `notes` TINYTEXT,
-    FOREIGN KEY(`userID`) REFERENCES `Users`(`userID`),
-    FOREIGN KEY(`companyID`) REFERENCES `Companies`(`companyID`)
-);
 -- Creating Company Comments Table
 DROP TABLE IF EXISTS CompanyComments;
 CREATE TABLE `CompanyComments`(
@@ -57,8 +44,20 @@ CREATE TABLE `Applications`(
     `status` VARCHAR(255),
     `location` VARCHAR(255),
     `datetime` DATETIME,
+    `notes` TEXT,
     FOREIGN KEY(`userID`) REFERENCES `Users`(`userID`),
     FOREIGN KEY(`companyID`) REFERENCES `Companies`(`companyID`)
+);
+-- Creating Application Contacts Table
+DROP TABLE IF EXISTS ApplicationContacts;
+CREATE TABLE `ApplicationContacts`(
+    `contactID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `applicationID` INT NOT NULL,
+    `phoneNumber` VARCHAR(15) NULL,
+    `emailAddress` VARCHAR(50) NOT NULL,
+    `role` VARCHAR(255),
+    `notes` TEXT,
+    FOREIGN KEY(`applicationID`) REFERENCES `Applications`(`applicationID`)
 );
 -- Creating Skills Table
 DROP TABLE IF EXISTS Skills;
