@@ -94,6 +94,12 @@ router.post("/contact", passport.authenticate("jwt", { session: false }), async 
     }
 });
 
+/**
+ * @description: Delete an application contact
+ * @method: DELETE /api/applications/contact?contactID={contactID}
+ * @returns: HTTP 200 and JSON of {success: true, contactID}
+ * or HTTP 400 and JSON of {success: false, message: "reason for error"}
+ */
 router.delete("/contact", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { contactID } = req.query;
     // TODO - input validation
