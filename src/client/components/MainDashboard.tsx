@@ -1,4 +1,4 @@
-import { Container, Row, Col, Form, Button, Nav, Table } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Nav, Table, DropdownButton, Dropdown } from 'react-bootstrap';
 import Rating from '@mui/material/Rating';
 import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -9,6 +9,9 @@ import { Application } from './Application';
 import { Skill } from './Skill';
 import { setConstantValue } from 'typescript';
 import RaisedButton from 'material-ui/RaisedButton';
+import { application } from 'express';
+import { EventEmitter } from 'stream';
+import { constants } from 'buffer';
 
 
 export default function Dashboard() {
@@ -21,6 +24,10 @@ export default function Dashboard() {
     //let applications : Array<Application> = [];
     const [applications, setApplications] = useState<Application[]>([]);
     const [skills, setSkills] = useState<Skill[]>([]);
+
+    const statuslist={
+        myarray:["Applied","Online Assessment","Phone Interview","Technical Interview","Accepted","Rejected"]
+    }
 
     useEffect(() => {
         if (user) {
@@ -125,7 +132,21 @@ export default function Dashboard() {
     const tableAppRow = applications.map((app) => {
         return (
             <tr>
-                <td>{app.status}</td>
+                <td>
+                    <div>
+                        <DropdownButton align="end" title={app.status} variant="" onSelect={value=>{
+                            if (value === null) {
+                                value = app.status;
+                            }
+                            updateAppStatus(Number(app.applicationID), value)
+                        }}>
+                            {statuslist.myarray.map(data=>(
+                                <Dropdown.Item eventKey={data}>{data}</Dropdown.Item>
+                            ))}
+                        </DropdownButton>
+                    </div>
+                    
+                </td>
                 <td><a href={app.jobPostingURL} target="_blank" rel="noopener">
                     {app.position}
                 </a></td>
@@ -134,6 +155,27 @@ export default function Dashboard() {
             </tr>
         )
     })
+
+    // sends a post request to change the application status
+    const updateAppStatus = (applicationID : number, status : string) => {
+        if (user) {
+            axios.put("/api/applications/status", {applicationID, status}, {
+                headers: {
+                    Authorization: user.token
+                }
+            })
+            .then((res) => {
+                // creates a temporary array to make edits
+                // then resets skills state
+                let tempApplications = applications.slice();
+                tempApplications[applicationID-1].status = status;
+                setApplications(tempApplications);
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+        }
+    }
 
     /* 
     Generates the main skills dashboard table
