@@ -95,6 +95,38 @@ router.post("/contact", passport.authenticate("jwt", { session: false }), async 
 });
 
 /**
+ * @description: Update an application contact
+ * @method: PUT /api/applications/contact
+ * @param: JSON of {contactID, applicationID, firstName, lastName, emailAddress, phoneNumber, role}
+ *   NOTE: contactID is mandatory, all other fields are optional
+ * @returns: HTTP 200 and JSON of {success: true, contactID}
+ * or HTTP 400 and JSON of {success: false, message: "reason for error"}
+ */
+router.put("/contact", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
+    const { contactID, applicationID, firstName, lastName, emailAddress, phoneNumber, role } = req.body;
+    // TODO - input validation
+    try {
+        if (!contactID || typeof contactID !== "number") {
+            return res.status(400).json({ success: false, message: "Invalid Contact ID" });
+        }
+        await appModel.updateContact({
+            contactID,
+            applicationID,
+            firstName,
+            lastName,
+            emailAddress,
+            phoneNumber,
+            role,
+        });
+        return res.status(201).json({ success: true, contactID });
+    } catch (err) {
+        console.error(`Error in updating application contact:`);
+        console.error({ contactID, applicationID, firstName, lastName, emailAddress, phoneNumber, role });
+        next(err);
+    }
+});
+
+/**
  * @description: Delete an application contact
  * @method: DELETE /api/applications/contact?contactID={contactID}
  * @returns: HTTP 200 and JSON of {success: true, contactID}
@@ -112,6 +144,29 @@ router.delete("/contact", passport.authenticate("jwt", { session: false }), asyn
         return res.status(200).json({ success: true, contactID });
     } catch (err) {
         console.error(`Error in deleting application contact:`);
+        console.error({ contactID });
+        next(err);
+    }
+});
+
+/**
+ * @description: Delete an application contact
+ * @method: GET /api/applications/contact?contactID={contactID}
+ * @returns: HTTP 200 and JSON of all fields from contact table
+ * or HTTP 400 and JSON of {success: false, message: "reason for error"}
+ */
+router.get("/contact", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
+    const { contactID } = req.query;
+    // TODO - input validation
+    try {
+        if (typeof contactID !== "string") {
+            return res.status(400).json({ success: false, message: "Invalid Contact ID" });
+        }
+        const parsedcontactID = parseInt(contactID);
+        const result = await appModel.getContactByID(parsedcontactID);
+        return res.status(200).json(result);
+    } catch (err) {
+        console.error(`Error in getting application contact:`);
         console.error({ contactID });
         next(err);
     }

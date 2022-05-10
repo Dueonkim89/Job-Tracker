@@ -135,3 +135,25 @@ test("[Valid] Deleting an app contact", async () => {
     expect(result.statusCode).toEqual(200);
     expect(result.body.success).toEqual(true);
 });
+
+test("[Valid] Updating an app contact #1", async () => {
+    const payload = { contactID: 4, firstName: "Z" };
+    const expected = {
+        contactID: 4,
+        applicationID: 5,
+        firstName: "Z", // previously DeAndre
+        lastName: "Delta",
+        emailAddress: "HiringManager@clouderaemail.com",
+        phoneNumber: "666-666-6666",
+        role: "Hiring Manager",
+    };
+    const result = await request(server).put("/api/applications/contact").set("Authorization", token).send(payload);
+    expect(result.statusCode).toEqual(201);
+    expect(result.body.success).toEqual(true);
+    const updatedResult = await request(server)
+        .get("/api/applications/contact?contactID=4")
+        .set("Authorization", token)
+        .send();
+    expect(updatedResult.statusCode).toEqual(200);
+    expect(updatedResult.body).toEqual(expected);
+});

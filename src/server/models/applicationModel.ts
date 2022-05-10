@@ -85,6 +85,15 @@ export async function updateAppStatus(applicationID: number, status: string) {
 }
 
 /**
+ * Returns contact by contactID
+ */
+export async function getContactByID(contactID: number) {
+    const sql = "SELECT * FROM ApplicationContacts WHERE contactID = ?";
+    const [result, fields] = <[RowDataPacket, FieldPacket[]]>await db.promise().query(sql, [contactID]);
+    return result[0] as ContactFields;
+}
+
+/**
  * Creates a new contact for an application
  * @returns the contactID if successful
  */
@@ -97,6 +106,17 @@ export async function createContact(p: ContactFields) {
     const vals = [p.applicationID, p.firstName, p.lastName, p.emailAddress, p.phoneNumber, p.role];
     const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.promise().query(sql, vals);
     return result.insertId;
+}
+
+/**
+ * Updates an existing contact for an application
+ * @returns the contactID if successful
+ */
+export async function updateContact(p: Partial<ContactFields>) {
+    let sql = "UPDATE ApplicationContacts SET ? WHERE contactID = ?";
+    const updates = Object.fromEntries(Object.entries(p).filter(([key, val]) => val));
+    const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.promise().query(sql, [updates, p.contactID]);
+    return result.affectedRows === 1;
 }
 
 /**
