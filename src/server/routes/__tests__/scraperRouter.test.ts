@@ -31,16 +31,18 @@ afterAll((done) => {
 
 // Tests start here
 test("[Greenhouse] Notion URL", async () => {
-    const url = "https://boards.greenhouse.io/notion/jobs/5032410003?utm_campaign=google_jobs_apply";
+    const url = "https://boards.greenhouse.io/notion/jobs/4779256003";
     const expected = {
         success: true,
         company: "Notion",
         location: "New York, New York, United States",
-        title: "Software Engineer, Early Career",
+        title: "Software Engineer, Fullstack",
     };
     const result = await request(server).get(`/api/scrape?url=${url}`).set("Authorization", token).send();
     expect(result.statusCode).toEqual(200);
     expect(result.body).toEqual(expected);
+    // TODO - get a new notion URL
+    // expect(true).toEqual(true);
 });
 
 test("[Linkedin] Vanguard URL Type 1", async () => {
