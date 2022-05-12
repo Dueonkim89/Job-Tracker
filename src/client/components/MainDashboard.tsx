@@ -50,7 +50,7 @@ export default function Dashboard() {
                 let temp : Array<Application> = [];
                 // Go through all applications and create a new map
                 for (let i=0; i<data.data.length; i++) {
-                    let current = data.data[i]
+                    let current = data.data[i];
                     // create application object
                     let application : Application = {"applicationID" : current.applicationID,
                                                      "companyName" : current.companyName,
@@ -58,7 +58,8 @@ export default function Dashboard() {
                                                      "jobPostingURL" : current.jobPostingURL,
                                                      "location" : current.location,
                                                      "position" : current.position,
-                                                     "status" : current.status}
+                                                     "status" : current.status,
+                                                     "notes" : current.notes}
                     temp.push(application);
                 }
                 setApplications(temp);
@@ -124,6 +125,7 @@ export default function Dashboard() {
                 <th>Title</th>
                 <th>Location</th>
                 <th>Company</th>
+                <th>Notes</th>
                 </tr>
             </thead>
         )
@@ -152,6 +154,7 @@ export default function Dashboard() {
                 </a></td>
                 <td>{app.location}</td>
                 <td>{app.companyName}</td>
+                <td>{app.notes}</td>
             </tr>
         )
     })
