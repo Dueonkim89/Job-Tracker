@@ -1,6 +1,6 @@
 import express from "express";
 import passport from "passport";
-import * as commentModel from "../models/commentModel";
+import commentModel from "../models/commentModel";
 const router = express.Router();
 
 export default router;

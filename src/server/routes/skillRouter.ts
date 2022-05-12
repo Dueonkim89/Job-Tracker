@@ -1,6 +1,6 @@
 import express from "express";
 import passport from "passport";
-import * as skillModel from "../models/skillModel";
+import skillModel from "../models/skillModel";
 const router = express.Router();
 
 /**

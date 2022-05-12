@@ -1,6 +1,6 @@
 import express from "express";
 import passport from "passport";
-import * as appModel from "../models/applicationModel";
+import appModel from "../models/applicationModel";
 const router = express.Router();
 
 /**

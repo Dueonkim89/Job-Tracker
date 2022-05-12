@@ -1,4 +1,4 @@
-import * as appModel from "../applicationModel";
+import appModel from "../applicationModel";
 
 test("Get user 1 apps", async () => {
     const result = await appModel.getUserApps(1);

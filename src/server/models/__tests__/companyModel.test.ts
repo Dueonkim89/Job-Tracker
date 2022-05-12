@@ -1,4 +1,4 @@
-import * as companyModel from "../companyModel";
+import companyModel from "../companyModel";
 
 test("Get company by ID", async () => {
     const result = await companyModel.getCompanyByID(1);

@@ -1,6 +1,6 @@
 import express from "express";
 import passport from "passport";
-import * as companyModel from "../models/companyModel";
+import companyModel from "../models/companyModel";
 import { parseStringID } from "./utils";
 const router = express.Router();
 

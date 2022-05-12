@@ -1,3 +1,4 @@
+// Boilerplate code
 import http from "http";
 import request from "supertest";
 
@@ -27,6 +28,8 @@ beforeAll((done) => {
 afterAll((done) => {
     server.close(() => done());
 });
+
+// Tests start here
 
 test("[Valid] user login", async () => {
     const expected = {

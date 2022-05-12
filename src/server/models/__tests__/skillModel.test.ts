@@ -1,4 +1,4 @@
-import * as skillModel from "../skillModel";
+import skillModel from "../skillModel";
 
 test("Get user 1 skills", async () => {
     const result = await skillModel.getUserSkills(1);

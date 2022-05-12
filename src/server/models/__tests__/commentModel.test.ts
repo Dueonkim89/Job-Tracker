@@ -1,4 +1,4 @@
-import * as commentModel from "../commentModel";
+import commentModel from "../commentModel";
 
 test("Get company 1 comments", async () => {
     const result = await commentModel.getCompanyComments(1);

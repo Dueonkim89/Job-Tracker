@@ -1,6 +1,6 @@
 import express from "express";
 import * as bcrypt from "bcrypt";
-import * as userModel from "../models/userModel";
+import userModel from "../models/userModel";
 import * as jwt from "jsonwebtoken";
 import passport from "passport";
 const router = express.Router();
