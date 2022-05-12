@@ -3,12 +3,10 @@ import path from "path";
 import express, { Express, Request, Response, ErrorRequestHandler } from "express";
 import bodyParser from "body-parser";
 import session from "express-session";
-import passport from "passport";
-import { chosenDBConfig } from "./models/db";
+import { chosenDBConfig } from "./config/db";
 import router from "./router";
-require("./models/passport");
+import passport from "./config/passport";
 const cors = require("cors");
-require("./models/passport");
 const MySqlStore = require("express-mysql-session")(session);
 
 const buildDir = path.join(process.cwd(), "/build");

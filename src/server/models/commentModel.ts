@@ -1,5 +1,5 @@
 import { FieldPacket, OkPacket, ResultSetHeader, RowDataPacket } from "mysql2";
-import db from "./db";
+import db from "../config/db";
 
 export interface CommentFields {
     commentID?: number;
