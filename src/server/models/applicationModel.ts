@@ -1,33 +1,6 @@
 import { FieldPacket, OkPacket, ResultSetHeader, RowDataPacket } from "mysql2";
+import { AppFields, ReturnedAppFields, ContactFields } from "../types/application";
 import db from "../config/db";
-
-export interface AppFields {
-    applicationID?: number;
-    companyID: number;
-    jobPostingURL: string;
-    position: string;
-    userID: number;
-    status: string;
-    location: string;
-    notes: string;
-    datetime: Date;
-}
-
-export interface ContactFields {
-    contactID?: number;
-    applicationID: number;
-    firstName: string;
-    lastName: string;
-    phoneNumber: string;
-    emailAddress: string;
-    role: string;
-}
-
-interface AppReturnedFields extends AppFields {
-    applicationID: number;
-    companyName: string;
-    contacts: ContactFields[] | null;
-}
 
 export default {
     /**
@@ -52,7 +25,7 @@ export default {
         WHERE app.userID = ?;
         `;
         const [rows, fields] = <[RowDataPacket[], FieldPacket[]]>await db.promise().query(sql, [userID]);
-        return rows as AppReturnedFields[];
+        return rows as ReturnedAppFields[];
     },
 
     /**

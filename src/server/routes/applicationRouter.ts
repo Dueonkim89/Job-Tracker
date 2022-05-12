@@ -1,6 +1,7 @@
 import express from "express";
 import passport from "passport";
 import appModel from "../models/applicationModel";
+import { validateApp } from "../types/validators";
 const router = express.Router();
 
 /**
@@ -38,23 +39,14 @@ router.get("/", passport.authenticate("jwt", { session: false }), async function
  */
 router.post("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { companyID, jobPostingURL, position, userID, status, location, notes } = req.body;
-    // TODO - input validation
     const datetime = new Date();
+    const fields = { companyID, jobPostingURL, position, userID, status, location, notes, datetime };
+    const required = ["companyID", "userID", "position", "jobPostingURL"];
+    const validation = validateApp(fields, required);
+    if (!validation.isValid) return res.status(400).json({ success: false, message: validation.message });
     try {
-        const applicationID = await appModel.createApp({
-            companyID,
-            jobPostingURL,
-            position,
-            userID,
-            status,
-            location,
-            notes,
-            datetime,
-        });
-        const response = {
-            success: true,
-            applicationID,
-        };
+        const applicationID = await appModel.createApp(validation.fields);
+        const response = { success: true, applicationID };
         return res.status(201).json(response);
     } catch (err) {
         console.error(`Error in creating new application:`);

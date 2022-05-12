@@ -1,7 +1,7 @@
 import express from "express";
 import passport from "passport";
 import companyModel from "../models/companyModel";
-import { parseStringID } from "./utils";
+import { parseStringID } from "../types/validators";
 const router = express.Router();
 
 /**
