@@ -1,18 +1,6 @@
 import { FieldPacket, OkPacket, ResultSetHeader, RowDataPacket } from "mysql2";
 import db from "../config/db";
-
-export interface CommentFields {
-    commentID?: number;
-    userID: number;
-    companyID: number;
-    title: string;
-    text: string;
-    datetime: Date;
-}
-
-interface ReturnedCommentFields extends CommentFields {
-    commentID: number;
-}
+import { CommentFields, ReturnedCommentFields } from "../types/comment";
 
 export default {
     /**

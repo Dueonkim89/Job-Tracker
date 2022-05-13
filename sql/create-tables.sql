@@ -27,9 +27,9 @@ CREATE TABLE `CompanyComments`(
     `commentID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `userID` INT NOT NULL,
     `companyID` INT NOT NULL,
-    `title` VARCHAR(255),
-    `text` TEXT,
-    `datetime` DATETIME,
+    `title` VARCHAR(255) NOT NULL,
+    `text` TEXT NOT NULL,
+    `datetime` DATETIME NOT NULL,
     FOREIGN KEY(`userID`) REFERENCES `Users`(`userID`),
     FOREIGN KEY(`companyID`) REFERENCES `Companies`(`companyID`)
 );

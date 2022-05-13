@@ -1,19 +1,6 @@
 import { FieldPacket, OkPacket, ResultSetHeader, RowDataPacket } from "mysql2";
 import db from "../config/db";
-
-export interface UserFields {
-    userID?: number;
-    firstName: string;
-    lastName: string;
-    username: string;
-    phoneNumber: string;
-    emailAddress: string;
-    passwordHash: string;
-}
-
-interface ReturnedUserFields extends UserFields {
-    userID: number;
-}
+import { ReturnedUserFields, UserFields } from "../types/user";
 
 function userOrNull(rows: RowDataPacket[]) {
     if (Array.isArray(rows) && rows.length > 0) {

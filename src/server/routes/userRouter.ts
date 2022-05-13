@@ -3,6 +3,7 @@ import * as bcrypt from "bcrypt";
 import userModel from "../models/userModel";
 import * as jwt from "jsonwebtoken";
 import passport from "passport";
+import { validateUser, ValidationError } from "../types/validators";
 const router = express.Router();
 const saltRounds = 10;
 
@@ -18,14 +19,9 @@ router.post("/", async function (req, res, next) {
     const { firstName, lastName, username, phoneNumber, emailAddress, password } = req.body;
     try {
         const passwordHash = await bcrypt.hash(password, saltRounds);
-        const userID = await userModel.createUser({
-            firstName,
-            lastName,
-            username,
-            phoneNumber,
-            emailAddress,
-            passwordHash,
-        });
+        const fields = { firstName, lastName, username, phoneNumber, emailAddress, passwordHash };
+        validateUser(fields, ["firstName", "lastName", "username", "emailAddress", "passwordHash"]);
+        const userID = await userModel.createUser(fields);
         if (!userID || typeof userID !== "number") {
             throw Error("Invalid user creation: create user did not return userID");
         }
@@ -43,6 +39,7 @@ router.post("/", async function (req, res, next) {
         if (err?.code === "ER_DUP_ENTRY" && err?.sqlMessage?.includes("username")) {
             return res.status(400).json({ success: false, reason: "duplicate", field: "username" });
         }
+        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
         console.error(`Error in creating user:`);
         console.error({ firstName, lastName, username, phoneNumber, emailAddress }); // purposely excluding password
         next(err);
@@ -68,13 +65,12 @@ router.post("/login", async function (req, res, next) {
             const accessToken = jwt.sign({ id: user.userID }, process.env.JWT_SECRET as jwt.Secret, {
                 expiresIn: "1h",
             });
-            res.status(200).json({
+            return res.status(200).json({
                 success: true,
                 userID: user.userID,
                 message: "login sucessfully",
                 token: "Bearer " + accessToken,
             });
-            return;
         } else {
             res.status(400).json({ success: false, message: "Invalid Password or Username" });
             return;

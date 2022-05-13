@@ -29,7 +29,7 @@ router.get("/", passport.authenticate("jwt", { session: false }), async function
  * @description: Adds a user's job application to the database
  * @method: POST /api/applications
  * @param: JSON of {companyID, jobPostingURL, position, userID, status, location, notes}
- * @returns: HTTP 201 and JSON of {success: true, applicationID}
+ * @returns: HTTP 201 and JSON of {success: true, applicationID, datetime}
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.post("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
@@ -39,7 +39,7 @@ router.post("/", passport.authenticate("jwt", { session: false }), async functio
     try {
         validateApp(fields, ["companyID", "userID", "position", "jobPostingURL", "status"]);
         const applicationID = await appModel.createApp(fields);
-        const response = { success: true, applicationID };
+        const response = { success: true, applicationID, datetime };
         return res.status(201).json(response);
     } catch (err) {
         if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });

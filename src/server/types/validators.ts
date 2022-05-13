@@ -1,5 +1,8 @@
-import { AppFields, appValidators, contactValidators } from "./application";
-import { CompanyFields, companyValidators } from "./company";
+import { appValidators, contactValidators } from "./application";
+import { commentValidators } from "./comment";
+import { companyValidators } from "./company";
+import { skillValidators } from "./skill";
+import { userValidators } from "./user";
 
 // Source: https://javascript.info/custom-errors
 export class ValidationError extends Error {
@@ -50,10 +53,13 @@ function validatorCurry(validators: Validators) {
                 throw new ValidationError(`Invalid: ${key}`);
             }
         }
-        return true;
+        return;
     };
 }
 
 export const validateApp = validatorCurry(appValidators);
 export const validateContact = validatorCurry(contactValidators);
 export const validateCompany = validatorCurry(companyValidators);
+export const validateSkill = validatorCurry(skillValidators);
+export const validateUser = validatorCurry(userValidators);
+export const validateComment = validatorCurry(commentValidators);

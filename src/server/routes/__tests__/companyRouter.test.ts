@@ -63,7 +63,7 @@ test("[Valid] Getting a company by ID", async () => {
 });
 
 test("[Invalid] Getting a company by ID: no match", async () => {
-    const expected = { success: false, message: "No company found" };
+    const expected = { success: false, message: "companyID not found" };
     const result = await request(server).get("/api/companies?companyID=100").set("Authorization", token).send();
     expect(result.body).toEqual(expected);
     expect(result.statusCode).toEqual(400);

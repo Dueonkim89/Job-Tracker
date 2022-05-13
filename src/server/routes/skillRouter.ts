@@ -1,6 +1,7 @@
 import express from "express";
 import passport from "passport";
 import skillModel from "../models/skillModel";
+import { parseStringID, validateSkill, ValidationError } from "../types/validators";
 const router = express.Router();
 
 /**
@@ -28,16 +29,11 @@ router.get("/", async function (req, res, next) {
 router.get("/user", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { userID } = req.query;
     try {
-        if (typeof userID !== "string") {
-            return res.status(400).json({ success: false, message: "Invalid User ID" });
-        }
-        const parsedUserID = parseInt(userID);
-        if (isNaN(parsedUserID)) {
-            return res.status(400).json({ success: false, message: "Invalid User ID" });
-        }
+        const parsedUserID = parseStringID(userID);
         const rows = await skillModel.getUserSkills(parsedUserID);
         res.status(200).send(rows);
     } catch (err) {
+        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
         console.error(`Error in getting user skills:`);
         console.error({ userID });
         next(err);
@@ -53,16 +49,11 @@ router.get("/user", passport.authenticate("jwt", { session: false }), async func
 router.get("/application", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { applicationID } = req.query;
     try {
-        if (typeof applicationID !== "string") {
-            return res.status(400).json({ success: false, message: "Invalid Application ID" });
-        }
-        const parsedApplicationID = parseInt(applicationID);
-        if (isNaN(parsedApplicationID)) {
-            return res.status(400).json({ success: false, message: "Invalid Application ID" });
-        }
+        const parsedApplicationID = parseStringID(applicationID);
         const rows = await skillModel.getApplicationSkills(parsedApplicationID);
         res.status(200).send(rows);
     } catch (err) {
+        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
         console.error(`Error in getting application skills:`);
         console.error({ applicationID });
         next(err);
@@ -78,13 +69,13 @@ router.get("/application", passport.authenticate("jwt", { session: false }), asy
  */
 router.post("/", async function (req, res, next) {
     const { name } = req.body;
+    const fields = { name };
     try {
-        if (typeof name !== "string") {
-            return res.status(400).json({ success: false, message: "Invalid name: not a string" });
-        }
+        validateSkill(fields, ["name"]);
         const skillID = await skillModel.createSkill({ name });
         res.status(201).send({ success: true, skillID, name });
     } catch (err) {
+        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
         console.error(`Error in creating new skill:`);
         console.error({ name });
         next(err);
@@ -94,28 +85,19 @@ router.post("/", async function (req, res, next) {
 /**
  * @description: Adds a skill to a user
  * @method: POST /api/skills/user
- * @param: JSON of {userID, skillID, name, rating}
- * @returns: HTTP 201 and JSON of {success: true, userID, skillID, name, rating}
+ * @param: JSON of {userID, skillID, rating}
+ * @returns: HTTP 201 and JSON of {success: true}
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.post("/user", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
-    const { userID, skillID, name, rating } = req.body;
+    const { userID, skillID, rating, name } = req.body;
+    const fields = { userID, skillID, name, rating };
     try {
-        if (typeof userID !== "number") {
-            return res.status(400).json({ success: false, message: "Invalid userID: not a number" });
-        }
-        if (typeof skillID !== "number") {
-            return res.status(400).json({ success: false, message: "Invalid skillID: not a number" });
-        }
-        if (typeof name !== "string") {
-            return res.status(400).json({ success: false, message: "Invalid name: not a string" });
-        }
-        if (typeof rating !== "number") {
-            return res.status(400).json({ success: false, message: "Invalid rating: not a number" });
-        }
-        await skillModel.createUserSkill({ userID, skillID, name, rating });
-        res.status(201).send({ success: true, userID, skillID, name, rating });
+        validateSkill(fields, ["userID", "skillID", "rating"]);
+        await skillModel.createUserSkill(fields);
+        res.status(201).send({ success: true });
     } catch (err) {
+        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
         console.error(`Error in creating new skill:`);
         console.error({ userID, skillID, name, rating });
         next(err);
@@ -125,25 +107,19 @@ router.post("/user", passport.authenticate("jwt", { session: false }), async fun
 /**
  * @description: Adds a skill to an application
  * @method: POST /api/skills/application
- * @param: JSON of {applicationID, skillID, name}
+ * @param: JSON of {applicationID, skillID}
  * @returns: HTTP 201 and JSON of {success: true, applicationID, skillID, name}
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.post("/application", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { applicationID, skillID, name } = req.body;
+    const fields = { applicationID, skillID, name };
     try {
-        if (typeof applicationID !== "number") {
-            return res.status(400).json({ success: false, message: "Invalid userID: not a number" });
-        }
-        if (typeof skillID !== "number") {
-            return res.status(400).json({ success: false, message: "Invalid skillID: not a number" });
-        }
-        if (typeof name !== "string") {
-            return res.status(400).json({ success: false, message: "Invalid name: not a string" });
-        }
+        validateSkill(fields, ["applicationID", "skillID"]);
         await skillModel.createApplicationSkill({ applicationID, skillID, name });
         res.status(201).send({ success: true, applicationID, skillID, name });
     } catch (err) {
+        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
         console.error(`Error in creating new skill:`);
         console.error({ applicationID, skillID, name });
         next(err);
@@ -159,22 +135,16 @@ router.post("/application", passport.authenticate("jwt", { session: false }), as
  */
 router.patch("/user", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { userID, skillID, rating } = req.body;
+    const fields = { userID, skillID, rating };
     try {
-        if (typeof userID !== "number" || userID < 1) {
-            return res.status(400).json({ success: false, message: "Invalid userID: not a valid number" });
-        }
-        if (typeof skillID !== "number" || skillID < 1) {
-            return res.status(400).json({ success: false, message: "Invalid skillID: not a valid number" });
-        }
-        if (typeof rating !== "number") {
-            return res.status(400).json({ success: false, message: "Invalid rating: not a number" });
-        }
+        validateSkill(fields, ["userID", "skillID", "rating"]);
         const didUpdate = await skillModel.updateUserSkillRating(userID, skillID, rating);
         if (!didUpdate) {
             return res.status(404).json({ success: false, message: "No matching row found for that userID/skillID" });
         }
         res.status(200).send({ success: true, userID, skillID, rating });
     } catch (err) {
+        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
         console.error(`Error in updating user skill rating:`);
         console.error({ userID, skillID, rating });
         next(err);

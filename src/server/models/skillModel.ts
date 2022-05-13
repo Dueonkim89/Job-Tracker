@@ -1,21 +1,6 @@
 import { FieldPacket, OkPacket, ResultSetHeader, RowDataPacket } from "mysql2";
 import db from "../config/db";
-
-export interface SkillFields {
-    skillID?: number;
-    name: string;
-}
-
-export interface UserSkillFields extends SkillFields {
-    skillID: number;
-    userID: number;
-    rating: number;
-}
-
-export interface ApplicationSkillFields extends SkillFields {
-    skillID: number;
-    applicationID: number;
-}
+import { ApplicationSkillFields, SkillFields, UserSkillFields } from "../types/skill";
 
 export default {
     async createSkill(p: SkillFields) {
