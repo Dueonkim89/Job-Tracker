@@ -115,6 +115,16 @@ class NewJobApplication extends React.Component {
                     {this.createCompanyDropDrownMenu()}
                     {this.addCompanyNavigation()}
                 </Form.Group>
+                <Row style={{padding: formPadding}}>
+                    <Form.Group as={Col}>
+                        <Form.Label htmlFor="url" style={{fontWeight: 'bold', fontSize: labelFontSize}}>Url</Form.Label>
+                        <Form.Control id="url" type="text" placeholder="Enter url" />
+                    </Form.Group>
+                    <Form.Group as={Col} style={{position: "relative", marginLeft: "2.5rem"}}>      
+                        {/*Position the button at bottomn left corner of parent*/}
+                        <Button style={{position: "absolute", bottom: "0px", "left": "0px"}} variant="primary">Scrape data from url</Button>
+                    </Form.Group>
+                </Row>
                 <Form.Group style={{padding: formPadding}} >
                     <Form.Label htmlFor="title" style={{fontWeight: 'bold', fontSize: labelFontSize}}>Title</Form.Label>
                     <Form.Control id="title" type="text" placeholder="Enter title" />
@@ -122,10 +132,6 @@ class NewJobApplication extends React.Component {
                 <Form.Group style={{padding: formPadding}} >
                     <Form.Label htmlFor="location" style={{fontWeight: 'bold', fontSize: labelFontSize}}>Location</Form.Label>
                     <Form.Control id="location" type="text" placeholder="Enter location" />
-                </Form.Group>
-                <Form.Group style={{padding: formPadding}} >
-                    <Form.Label htmlFor="url" style={{fontWeight: 'bold', fontSize: labelFontSize}}>Url</Form.Label>
-                    <Form.Control id="url" type="text" placeholder="Enter url" />
                 </Form.Group>
                 {this.generateApplicationSkills()}
                 {this.displayCurrentJobRequiredSkills()}
