@@ -153,7 +153,9 @@ export default function Dashboard() {
                     {app.position}
                 </a></td>
                 <td>{app.location}</td>
-                <td>{app.companyName}</td>
+                <td><a href={window.origin + "/applied_company/" + app.companyName} target="_blank" rel="noopener">
+                    {app.companyName}
+                </a></td>
                 <td>{app.notes}</td>
             </tr>
         )
