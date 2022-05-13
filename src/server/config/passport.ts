@@ -1,6 +1,7 @@
 import passport from "passport";
 import userModel from "../models/userModel";
 import passportJWT from "passport-jwt";
+import { UserFields } from "../types/user";
 const { Strategy, ExtractJwt } = passportJWT;
 
 function init() {
@@ -21,6 +22,12 @@ function init() {
     // use the strategy
     passport.use(strategy);
     return passport;
+}
+
+declare global {
+    namespace Express {
+        interface User extends UserFields {}
+    }
 }
 
 export default init();

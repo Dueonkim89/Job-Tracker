@@ -20,6 +20,10 @@ export interface ContactFields {
     role: string;
 }
 
+export interface ContactAndAppFields extends ContactFields, AppFields {
+    applicationID: number;
+}
+
 export interface ReturnedAppFields extends AppFields {
     applicationID: number;
     companyName: string;

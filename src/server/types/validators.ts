@@ -5,10 +5,20 @@ import { skillValidators } from "./skill";
 import { userValidators } from "./user";
 
 // Source: https://javascript.info/custom-errors
+// https://www.dannyguo.com/blog/how-to-fix-instanceof-not-working-for-custom-errors-in-typescript/
 export class ValidationError extends Error {
     constructor(message: string) {
-        super(message); // (1)
+        super(message);
         this.name = "ValidationError";
+        Object.setPrototypeOf(this, ValidationError.prototype);
+    }
+}
+
+export class AuthError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "AuthError";
+        Object.setPrototypeOf(this, AuthError.prototype);
     }
 }
 
@@ -63,3 +73,9 @@ export const validateCompany = validatorCurry(companyValidators);
 export const validateSkill = validatorCurry(skillValidators);
 export const validateUser = validatorCurry(userValidators);
 export const validateComment = validatorCurry(commentValidators);
+
+export function checkReqAuth(reqID: number, userID: number) {
+    if (reqID !== userID) {
+        throw new AuthError("User does not have access to that resource");
+    }
+}

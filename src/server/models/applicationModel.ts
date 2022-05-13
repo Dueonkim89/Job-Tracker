@@ -1,8 +1,17 @@
 import { FieldPacket, OkPacket, ResultSetHeader, RowDataPacket } from "mysql2";
-import { AppFields, ReturnedAppFields, ContactFields } from "../types/application";
+import { AppFields, ReturnedAppFields, ContactFields, ContactAndAppFields } from "../types/application";
 import db from "../config/db";
 
 export default {
+    /**
+     * @returns the application corresponding to given applicationID
+     */
+    async getAppByID(applicationID: number) {
+        const sql = "SELECT * FROM Applications WHERE applicationID = ?";
+        const [result, fields] = <[RowDataPacket, FieldPacket[]]>await db.promise().query(sql, [applicationID]);
+        return result[0] as AppFields;
+    },
+
     /**
      * @returns all applications for the given userID
      */
@@ -80,6 +89,19 @@ export default {
         const sql = "SELECT * FROM ApplicationContacts WHERE contactID = ?";
         const [result, fields] = <[RowDataPacket, FieldPacket[]]>await db.promise().query(sql, [contactID]);
         return result[0] as ContactFields;
+    },
+
+    /**
+     * Returns contact by contactID
+     */
+    async getContactAndAppByID(contactID: number) {
+        const sql = `
+        SELECT * FROM ApplicationContacts AS cont 
+        JOIN Applications AS app ON cont.applicationID = app.applicationID
+        WHERE contactID = ?
+        `;
+        const [result, fields] = <[RowDataPacket, FieldPacket[]]>await db.promise().query(sql, [contactID]);
+        return result[0] as ContactAndAppFields;
     },
 
     /**
