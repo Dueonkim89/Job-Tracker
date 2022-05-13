@@ -24,7 +24,7 @@ class NewJobApplication extends React.Component {
            status: ""
         };
 
-        // this.enterFirstName = this.enterFirstName.bind(this);
+        // this.enterFirstName = this.enterFirstName.bind(this);enterLocationaa
         this.pickCompany = this.pickCompany.bind(this);
         this.enterTitle = this.enterTitle.bind(this);
         this.enterLocation = this.enterLocation.bind(this);
@@ -118,7 +118,7 @@ class NewJobApplication extends React.Component {
                 <Row style={{padding: formPadding}}>
                     <Form.Group as={Col}>
                         <Form.Label htmlFor="url" style={{fontWeight: 'bold', fontSize: labelFontSize}}>Url</Form.Label>
-                        <Form.Control id="url" type="text" placeholder="Enter url" />
+                        <Form.Control id="url" type="text" value={this.state.url} onChange={this.enterURL} placeholder="Enter url" />
                     </Form.Group>
                     <Form.Group as={Col} style={{position: "relative", marginLeft: "2.5rem"}}>      
                         {/*Position the button at bottomn left corner of parent*/}
@@ -127,11 +127,11 @@ class NewJobApplication extends React.Component {
                 </Row>
                 <Form.Group style={{padding: formPadding}} >
                     <Form.Label htmlFor="title" style={{fontWeight: 'bold', fontSize: labelFontSize}}>Title</Form.Label>
-                    <Form.Control id="title" type="text" placeholder="Enter title" />
+                    <Form.Control id="title" type="text" value={this.state.title} onChange={this.enterTitle} placeholder="Enter title" />
                 </Form.Group>
                 <Form.Group style={{padding: formPadding}} >
                     <Form.Label htmlFor="location" style={{fontWeight: 'bold', fontSize: labelFontSize}}>Location</Form.Label>
-                    <Form.Control id="location" type="text" placeholder="Enter location" />
+                    <Form.Control id="location" type="text" value={this.state.location} onChange={this.enterLocation} placeholder="Enter location" />
                 </Form.Group>
                 {this.generateApplicationSkills()}
                 {this.displayCurrentJobRequiredSkills()}
