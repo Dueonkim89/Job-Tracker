@@ -126,12 +126,8 @@ router.delete("/contact", passport.authenticate("jwt", { session: false }), asyn
  */
 router.get("/contact", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { contactID } = req.query;
-    // TODO - input validation
     try {
-        if (typeof contactID !== "string") {
-            return res.status(400).json({ success: false, message: "Invalid Contact ID" });
-        }
-        const parsedcontactID = parseInt(contactID);
+        const parsedcontactID = parseStringID(contactID);
         const result = await appModel.getContactByID(parsedcontactID);
         return res.status(200).json(result);
     } catch (err) {
@@ -151,16 +147,14 @@ router.get("/contact", passport.authenticate("jwt", { session: false }), async f
  */
 router.put("/notes", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { applicationID, notes } = req.body;
-    // TODO - input validation
+    const fields = { applicationID, notes };
     try {
-        if (typeof applicationID !== "number") {
-            return res.status(400).json({ success: false, message: "Application ID is not a number" });
-        }
+        validateApp(fields, ["applicationID", "notes"]);
         const didUpdate = await appModel.updateAppStatus(applicationID, notes);
         if (didUpdate) {
             return res.status(201).json({ success: true, applicationID, notes });
         } else {
-            return res.status(400).json({ success: false, message: "Invalid Application ID." });
+            return res.status(400).json({ success: false, message: "applicationID not found" });
         }
     } catch (err) {
         if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
@@ -179,16 +173,14 @@ router.put("/notes", passport.authenticate("jwt", { session: false }), async fun
  */
 router.put("/status", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { applicationID, status } = req.body;
-    // TODO - input validation
+    const fields = { applicationID, status };
     try {
-        if (typeof applicationID !== "number") {
-            return res.status(400).json({ success: false, message: "Application ID is not a number" });
-        }
+        validateApp(fields, ["applicationID", "status"]);
         const didUpdate = await appModel.updateAppStatus(applicationID, status);
         if (didUpdate) {
             return res.status(201).json({ success: true, applicationID, status });
         } else {
-            return res.status(400).json({ success: false, message: "Invalid Application ID." });
+            return res.status(400).json({ success: false, message: "applicationID not found" });
         }
     } catch (err) {
         if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
