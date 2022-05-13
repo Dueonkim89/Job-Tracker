@@ -1,12 +1,21 @@
-import { appValidators } from "./application";
+import { AppFields, appValidators, contactValidators } from "./application";
+import { CompanyFields, companyValidators } from "./company";
 
-export function parseStringID(id: any): number | null {
+// Source: https://javascript.info/custom-errors
+export class ValidationError extends Error {
+    constructor(message: string) {
+        super(message); // (1)
+        this.name = "ValidationError";
+    }
+}
+
+export function parseStringID(id: any): number {
     if (typeof id !== "string") {
-        return null;
+        throw new ValidationError("ID is not a string datatype.");
     }
     const parsedID = parseInt(id);
     if (isNaN(parsedID)) {
-        return null;
+        throw new ValidationError("ID can not be converted to a number.");
     }
     return parsedID;
 }
@@ -29,23 +38,22 @@ function validatorCurry(validators: Validators) {
                 typeof input[requiredKey] === "undefined" ||
                 input[requiredKey] === null
             ) {
-                return { isValid: false, message: `Missing: ${requiredKey}` };
+                throw new ValidationError(`Missing: ${requiredKey}`);
             }
         }
         // for all keys, ensure if that they are present, their types are as specified
-        const validatedFields = {} as any;
         for (const key in input) {
             const val = input[key];
             if (typeof val === "undefined" || val === null) {
                 continue;
             } else if (!(key in validators) || !validators[key](val)) {
-                return { isValid: false, message: `Invalid: ${key}` };
-            } else {
-                validatedFields[key] = val;
+                throw new ValidationError(`Invalid: ${key}`);
             }
         }
-        return { isValid: true, fields: validatedFields };
+        return true;
     };
 }
 
 export const validateApp = validatorCurry(appValidators);
+export const validateContact = validatorCurry(contactValidators);
+export const validateCompany = validatorCurry(companyValidators);

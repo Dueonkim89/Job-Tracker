@@ -1,12 +1,12 @@
 export interface AppFields {
     applicationID?: number;
     companyID: number;
+    userID: number;
     jobPostingURL: string;
     position: string;
-    userID: number;
     status: string;
-    location: string;
-    notes: string;
+    location: string | null;
+    notes: string | null;
     datetime: Date;
 }
 
@@ -36,4 +36,15 @@ export const appValidators = {
     location: (v: any) => typeof v === "string",
     notes: (v: any) => typeof v === "string",
     datetime: (v: any) => v instanceof Date,
+};
+
+// TODO - regex validation for phone and email
+export const contactValidators = {
+    contactID: (v: any) => typeof v === "number",
+    applicationID: (v: any) => typeof v === "number",
+    firstName: (v: any) => typeof v === "string",
+    lastName: (v: any) => typeof v === "string",
+    phoneNumber: (v: any) => typeof v === "string",
+    emailAddress: (v: any) => typeof v === "string",
+    role: (v: any) => typeof v === "string",
 };

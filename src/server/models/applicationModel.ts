@@ -103,6 +103,7 @@ export default {
      */
     async updateContact(p: Partial<ContactFields>) {
         let sql = "UPDATE ApplicationContacts SET ? WHERE contactID = ?";
+        // TODO - can probably remove this updates field
         const updates = Object.fromEntries(Object.entries(p).filter(([key, val]) => val));
         const [result, fields] = <[ResultSetHeader, FieldPacket[]]>(
             await db.promise().query(sql, [updates, p.contactID])

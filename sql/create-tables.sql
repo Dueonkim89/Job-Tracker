@@ -41,7 +41,7 @@ CREATE TABLE `Applications`(
     `jobPostingURL` VARCHAR(300) NOT NULL,
     `position` VARCHAR(255) NOT NULL,
     `userID` INT NOT NULL,
-    `status` VARCHAR(255),
+    `status` VARCHAR(255) NOT NULL,
     `location` VARCHAR(255),
     `datetime` DATETIME,
     `notes` TEXT,

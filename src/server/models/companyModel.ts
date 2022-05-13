@@ -1,12 +1,6 @@
 import { FieldPacket, OkPacket, ResultSetHeader, RowDataPacket } from "mysql2";
 import db from "../config/db";
-
-export interface CompanyFields {
-    companyID?: number;
-    name: string;
-    industry: string;
-    websiteURL: string;
-}
+import { CompanyFields } from "../types/company";
 
 function companyOrNull(rows: RowDataPacket[]) {
     if (Array.isArray(rows) && rows.length > 0) {

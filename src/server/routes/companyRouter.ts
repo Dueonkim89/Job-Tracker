@@ -1,7 +1,7 @@
 import express from "express";
 import passport from "passport";
 import companyModel from "../models/companyModel";
-import { parseStringID } from "../types/validators";
+import { parseStringID, ValidationError } from "../types/validators";
 const router = express.Router();
 
 /**
@@ -13,9 +13,6 @@ router.get("/", passport.authenticate("jwt", { session: false }), async function
     const { companyID } = req.query;
     try {
         const parsedID = parseStringID(companyID);
-        if (parsedID === null) {
-            return res.status(400).json({ success: false, message: "Invalid Company ID" });
-        }
         const data = await companyModel.getCompanyByID(parsedID);
         if (data === null) {
             return res.status(400).json({ success: false, message: "No company found" });
@@ -23,6 +20,9 @@ router.get("/", passport.authenticate("jwt", { session: false }), async function
         const response = { success: true, ...data };
         return res.status(200).json(response);
     } catch (err) {
+        if (err instanceof ValidationError) {
+            return res.status(400).json({ success: false, message: "Invalid Company ID" });
+        }
         console.error(`Error in gett company by id:`);
         console.error({ companyID });
         next(err);
