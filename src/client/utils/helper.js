@@ -28,9 +28,12 @@ export function companyNameAlreadyRecorded(companyList, newCompanyName) {
     /*  INPUT: list of companies and new company name
         OUTPUT: boolean value of company already recorded in database
     */
+
+    let lowerCase = newCompanyName.toLowerCase();
+
     // keyword of is used to get the object at each iteration
     for (const company of companyList) {
-        if (company.name.toLowerCase() === newCompanyName.toLowerCase()) {
+        if (company.name.toLowerCase() === lowerCase) {
             return true;
         }
     }
@@ -160,5 +163,26 @@ export function getAllSkills() {
         return Promise.resolve(response.data);
     }).catch(function (error) {
         return Promise.reject(error.response);
-    });;
+    });
+}
+
+export function scrapeJobURL(jobURL) {
+    // INPUT: url of job application
+    // OUTPUT: map with company location, title and success - true if succesful.
+    //         map with succes - false if unable to scrape
+    const jwt = getUserToken();
+    const apiURL = '/api/scrape?url=' + jobURL;
+
+    return axios.get(apiURL, {
+        headers: {
+            'Authorization': jwt
+          }
+    }).then(function (response) {
+        // payload contains: location, company, success and title
+        return Promise.resolve(response.data);
+    }).catch(function (error) {
+        // send back error
+        return Promise.reject(error.response.data);
+    });
+
 }
