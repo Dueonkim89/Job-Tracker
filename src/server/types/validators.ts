@@ -1,4 +1,3 @@
-import { appValidators, contactValidators } from "./application";
 import { commentValidators } from "./comment";
 import { companyValidators } from "./company";
 import { skillValidators } from "./skill";
@@ -33,12 +32,40 @@ export function parseStringID(id: any): number {
     return parsedID;
 }
 
-interface Validators {
+export interface Validators {
     [key: string]: (val: any) => boolean;
 }
 
 interface Input {
     [key: string]: any;
+}
+
+export type RequiredKeys<T, K extends keyof T> = Exclude<T, K> & Required<Pick<T, K>>;
+
+export abstract class BaseValidator<T> {
+    fields: Readonly<Partial<T>>;
+    abstract validators: { [Property in keyof T as string]: (val: any) => boolean };
+
+    constructor(fields: Partial<T>) {
+        this.fields = fields;
+    }
+
+    validateAndAssertContains<Key extends keyof T>(
+        keys: Key[]
+    ): asserts this is this & { fields: RequiredKeys<Partial<T>, Key> } {
+        // ensure that required keys are present
+        for (const key of keys) {
+            if (this.fields[key] === undefined) throw new ValidationError(`Missing: ${key}`);
+        }
+        // for any keys that are  present, ensure their inputs are valid
+        for (const key in this.fields) {
+            const val = this.fields[key];
+            if (val !== undefined) {
+                if (!(key in this.validators) || !this.validators[key](val))
+                    throw new ValidationError(`Invalid input: ${key}`);
+            }
+        }
+    }
 }
 
 function validatorCurry(validators: Validators) {
@@ -67,8 +94,6 @@ function validatorCurry(validators: Validators) {
     };
 }
 
-export const validateApp = validatorCurry(appValidators);
-export const validateContact = validatorCurry(contactValidators);
 export const validateCompany = validatorCurry(companyValidators);
 export const validateSkill = validatorCurry(skillValidators);
 export const validateUser = validatorCurry(userValidators);

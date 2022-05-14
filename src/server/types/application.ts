@@ -1,3 +1,5 @@
+import { BaseValidator, ValidationError, Validators } from "./validators";
+
 export interface AppFields {
     applicationID?: number;
     companyID: number;
@@ -5,8 +7,8 @@ export interface AppFields {
     jobPostingURL: string;
     position: string;
     status: string;
-    location: string | null;
-    notes: string | null;
+    location?: string | null;
+    notes?: string | null;
     datetime: Date;
 }
 
@@ -15,9 +17,9 @@ export interface ContactFields {
     applicationID: number;
     firstName: string;
     lastName: string;
-    phoneNumber: string;
-    emailAddress: string;
-    role: string;
+    phoneNumber?: string | null;
+    emailAddress?: string | null;
+    role?: string | null;
 }
 
 export interface ContactAndAppFields extends ContactFields, AppFields {
@@ -30,25 +32,46 @@ export interface ReturnedAppFields extends AppFields {
     contacts: ContactFields[] | null;
 }
 
-export const appValidators = {
-    applicationID: (v: any) => typeof v === "number",
-    companyID: (v: any) => typeof v === "number",
-    jobPostingURL: (v: any) => typeof v === "string",
-    position: (v: any) => typeof v === "string",
-    userID: (v: any) => typeof v === "number",
-    status: (v: any) => typeof v === "string",
-    location: (v: any) => typeof v === "string",
-    notes: (v: any) => typeof v === "string",
-    datetime: (v: any) => v instanceof Date,
-};
+// https://www.typescriptlang.org/docs/handbook/2/classes.html#this-types
+// https://www.typescriptlang.org/docs/handbook/2/classes.html#abstract-classes-and-members
+export class Application extends BaseValidator<AppFields> {
+    constructor(input: any) {
+        const { applicationID, companyID, jobPostingURL, position, userID, status, location, notes } = input;
+        const datetime = input.datetime === undefined ? new Date() : input.datetime;
+        super({ applicationID, companyID, jobPostingURL, position, userID, status, location, notes, datetime });
+    }
 
-// TODO - regex validation for phone and email
-export const contactValidators = {
-    contactID: (v: any) => typeof v === "number",
-    applicationID: (v: any) => typeof v === "number",
-    firstName: (v: any) => typeof v === "string",
-    lastName: (v: any) => typeof v === "string",
-    phoneNumber: (v: any) => typeof v === "string",
-    emailAddress: (v: any) => typeof v === "string",
-    role: (v: any) => typeof v === "string",
-};
+    validators: Validators = {
+        applicationID: (v: any) => typeof v === "number",
+        companyID: (v: any) => typeof v === "number",
+        jobPostingURL: (v: any) => typeof v === "string",
+        position: (v: any) => typeof v === "string",
+        userID: (v: any) => typeof v === "number",
+        status: (v: any) => typeof v === "string",
+        location: (v: any) => typeof v === "string",
+        notes: (v: any) => typeof v === "string",
+        datetime: (v: any) => v instanceof Date,
+    };
+}
+
+export class Contact extends BaseValidator<ContactFields> {
+    constructor(input: any) {
+        const { contactID, applicationID, firstName, lastName, phoneNumber, emailAddress, role } = input;
+        super({ contactID, applicationID, firstName, lastName, phoneNumber, emailAddress, role });
+    }
+
+    validators: Validators = {
+        contactID: (v: any) => typeof v === "number",
+        applicationID: (v: any) => typeof v === "number",
+        firstName: (v: any) => typeof v === "string",
+        lastName: (v: any) => typeof v === "string",
+        phoneNumber: (v: any) => typeof v === "string",
+        emailAddress: (v: any) => typeof v === "string",
+        role: (v: any) => typeof v === "string",
+    };
+}
+
+const app: Application = new Application({});
+app.validateAndAssertContains(["applicationID", "companyID"]);
+const appID = app.fields.applicationID;
+const companyID = app.fields.companyID;

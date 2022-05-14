@@ -71,16 +71,6 @@ test("Create new user app", async () => {
     expect(result).toBeGreaterThan(5);
 });
 
-test("Update valid user app status", async () => {
-    const result = await appModel.updateAppStatus(4, "Interview");
-    expect(result).toBe(true);
-});
-
-test("Update non-existant user app status", async () => {
-    const result = await appModel.updateAppStatus(100, "Interview");
-    expect(result).toBe(false);
-});
-
 test("Create new app contact", async () => {
     const payload = {
         applicationID: 4,

@@ -53,32 +53,15 @@ export default {
     },
 
     /**
-     * Updates the status of the given application
-     * @returns true if the update was successful, else false (e.g. applicationID doesn't exist)
-     */
-    async updateAppStatus(applicationID: number, status: string) {
-        const sql = `
-        UPDATE Applications
-        SET status = ?
-        WHERE applicationID = ?;
-        `;
-        const vals = [status, applicationID];
-        const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.promise().query(sql, vals);
-        return result.affectedRows > 0;
-    },
-
-    /**
      * Updates the notes section of the given application
      * @returns true if the update was successful, else false (e.g. applicationID doesn't exist)
      */
-    async updateAppNotes(applicationID: number, notes: string) {
-        const sql = `
-        UPDATE Applications
-        SET notes = ?
-        WHERE applicationID = ?;
-        `;
-        const vals = [notes, applicationID];
-        const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.promise().query(sql, vals);
+    async updateApp(p: Partial<ContactFields>) {
+        let sql = "UPDATE Applications SET ? WHERE applicationID = ?";
+        const updates = Object.fromEntries(Object.entries(p).filter(([key, val]) => val !== undefined));
+        const [result, fields] = <[ResultSetHeader, FieldPacket[]]>(
+            await db.promise().query(sql, [updates, p.applicationID])
+        );
         return result.affectedRows === 1;
     },
 
@@ -126,7 +109,7 @@ export default {
     async updateContact(p: Partial<ContactFields>) {
         let sql = "UPDATE ApplicationContacts SET ? WHERE contactID = ?";
         // TODO - can probably remove this updates field
-        const updates = Object.fromEntries(Object.entries(p).filter(([key, val]) => val));
+        const updates = Object.fromEntries(Object.entries(p).filter(([key, val]) => val !== undefined));
         const [result, fields] = <[ResultSetHeader, FieldPacket[]]>(
             await db.promise().query(sql, [updates, p.contactID])
         );

@@ -1,14 +1,8 @@
 import express from "express";
 import passport from "passport";
 import appModel from "../models/applicationModel";
-import {
-    AuthError,
-    checkReqAuth,
-    parseStringID,
-    validateApp,
-    validateContact,
-    ValidationError,
-} from "../types/validators";
+import { Application, Contact } from "../types/application";
+import { AuthError, checkReqAuth, parseStringID, ValidationError } from "../types/validators";
 const router = express.Router();
 
 /**
@@ -43,19 +37,43 @@ router.get("/", passport.authenticate("jwt", { session: false }), async function
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.post("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
-    const { companyID, jobPostingURL, position, userID, status, location, notes } = req.body;
-    const datetime = new Date();
-    const fields = { companyID, jobPostingURL, position, userID, status, location, notes, datetime };
+    const app: Application = new Application(req.body);
     try {
-        validateApp(fields, ["companyID", "userID", "position", "jobPostingURL", "status"]);
-        const applicationID = await appModel.createApp(fields);
-        const response = { success: true, applicationID, datetime };
+        app.validateAndAssertContains(["companyID", "userID", "position", "jobPostingURL", "status", "datetime"]);
+        const applicationID = await appModel.createApp(app.fields);
+        const response = { success: true, applicationID, datetime: app.fields.datetime };
         return res.status(201).json(response);
     } catch (err) {
         if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
         if (err instanceof AuthError) return res.status(401).json({ success: false, message: err.message });
         console.error(`Error in creating new application:`);
-        console.error({ companyID, jobPostingURL, position, userID, status, location, notes, datetime });
+        console.error(req.body);
+        next(err);
+    }
+});
+
+/**
+ * @description: Updates a user's job application
+ * @method: PUT /api/applications
+ * @param: JSON of {applicationID, companyID, jobPostingURL, position, userID, status, location, notes}
+ *   NOTE: applicationID is mandatory, all other fields are optional
+ * @returns: HTTP 201 and JSON of {success: true, applicationID}
+ * or HTTP 400 and JSON of {success: false, message: "reason for error"}
+ */
+router.put("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
+    const reqID = req.user?.userID as number;
+    const app: Application = new Application(req.body);
+    try {
+        app.validateAndAssertContains(["applicationID"]);
+        const { userID } = await appModel.getAppByID(app.fields.applicationID);
+        checkReqAuth(reqID, userID);
+        await appModel.updateApp(app.fields);
+        return res.status(201).json({ success: true, applicationID: app.fields.applicationID });
+    } catch (err) {
+        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
+        if (err instanceof AuthError) return res.status(401).json({ success: false, message: err.message });
+        console.error(`Error in creating new application:`);
+        console.error(req.body);
         next(err);
     }
 });
@@ -69,23 +87,18 @@ router.post("/", passport.authenticate("jwt", { session: false }), async functio
  */
 router.post("/contact", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const reqID = req.user?.userID as number;
-    const { applicationID, firstName, lastName, emailAddress, phoneNumber, role } = req.body;
-    const fields = { applicationID, firstName, lastName, emailAddress, phoneNumber, role };
+    const contact: Contact = new Contact(req.body);
     try {
-        validateContact(fields, ["applicationID", "firstName", "lastName"]);
-        const { userID } = await appModel.getAppByID(applicationID);
+        contact.validateAndAssertContains(["applicationID", "firstName", "lastName"]);
+        const { userID } = await appModel.getAppByID(contact.fields.applicationID);
         checkReqAuth(reqID, userID);
-        const contactID = await appModel.createContact(fields);
-        const response = {
-            success: true,
-            contactID,
-        };
-        return res.status(201).json(response);
+        const contactID = await appModel.createContact(contact.fields);
+        return res.status(201).json({ success: true, contactID });
     } catch (err) {
         if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
         if (err instanceof AuthError) return res.status(401).json({ success: false, message: err.message });
         console.error(`Error in creating new application contact:`);
-        console.error({ applicationID, firstName, lastName, emailAddress, phoneNumber, role });
+        console.error(req.body);
         next(err);
     }
 });
@@ -100,19 +113,18 @@ router.post("/contact", passport.authenticate("jwt", { session: false }), async 
  */
 router.put("/contact", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const reqID = req.user?.userID as number;
-    const { contactID, applicationID, firstName, lastName, emailAddress, phoneNumber, role } = req.body;
-    const fields = { contactID, applicationID, firstName, lastName, emailAddress, phoneNumber, role };
+    const contact: Contact = new Contact(req.body);
     try {
-        validateContact(fields, ["contactID"]);
-        const { userID } = await appModel.getContactAndAppByID(contactID);
+        contact.validateAndAssertContains(["contactID"]);
+        const { userID } = await appModel.getContactAndAppByID(contact.fields.contactID);
         checkReqAuth(reqID, userID);
-        await appModel.updateContact(fields);
-        return res.status(201).json({ success: true, contactID });
+        await appModel.updateContact(contact.fields);
+        return res.status(201).json({ success: true, contactID: contact.fields.contactID });
     } catch (err) {
         if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
         if (err instanceof AuthError) return res.status(401).json({ success: false, message: err.message });
         console.error(`Error in updating application contact:`);
-        console.error({ contactID, applicationID, firstName, lastName, emailAddress, phoneNumber, role });
+        console.error(req.body);
         next(err);
     }
 });
@@ -161,66 +173,6 @@ router.get("/contact", passport.authenticate("jwt", { session: false }), async f
         if (err instanceof AuthError) return res.status(401).json({ success: false, message: err.message });
         console.error(`Error in getting application contact:`);
         console.error({ contactID });
-        next(err);
-    }
-});
-
-/**
- * @description: Updates the notes of a user's job application
- * @method: PUT /api/applications/notes
- * @param: JSON of {applicationID, status}
- * @returns: HTTP 201 and JSON of {success: true, applicationID, notes}
- * or HTTP 400 and JSON of {success: false, message: "reason for error"}
- */
-router.put("/notes", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
-    const reqID = req.user?.userID as number;
-    const { applicationID, notes } = req.body;
-    const fields = { applicationID, notes };
-    try {
-        validateApp(fields, ["applicationID", "notes"]);
-        const { userID } = await appModel.getAppByID(applicationID);
-        checkReqAuth(reqID, userID);
-        const didUpdate = await appModel.updateAppStatus(applicationID, notes);
-        if (didUpdate) {
-            return res.status(201).json({ success: true, applicationID, notes });
-        } else {
-            return res.status(400).json({ success: false, message: "applicationID not found" });
-        }
-    } catch (err) {
-        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
-        if (err instanceof AuthError) return res.status(401).json({ success: false, message: err.message });
-        console.error(`Error in updating application notes:`);
-        console.error({ applicationID, notes });
-        next(err);
-    }
-});
-
-/**
- * @description: Updates the status of a user's job application
- * @method: PUT /api/applications/status
- * @param: JSON of {applicationID, status}
- * @returns: HTTP 201 and JSON of {success: true, applicationID, status}
- * or HTTP 400 and JSON of {success: false, message: "reason for error"}
- */
-router.put("/status", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
-    const reqID = req.user?.userID as number;
-    const { applicationID, status } = req.body;
-    const fields = { applicationID, status };
-    try {
-        validateApp(fields, ["applicationID", "status"]);
-        const { userID } = await appModel.getAppByID(applicationID);
-        checkReqAuth(reqID, userID);
-        const didUpdate = await appModel.updateAppStatus(applicationID, status);
-        if (didUpdate) {
-            return res.status(201).json({ success: true, applicationID, status });
-        } else {
-            return res.status(400).json({ success: false, message: "applicationID not found" });
-        }
-    } catch (err) {
-        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
-        if (err instanceof AuthError) return res.status(401).json({ success: false, message: err.message });
-        console.error(`Error in updating application status:`);
-        console.error({ applicationID, status });
         next(err);
     }
 });
