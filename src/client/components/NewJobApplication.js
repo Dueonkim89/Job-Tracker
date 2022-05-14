@@ -23,6 +23,7 @@ class NewJobApplication extends React.Component {
            url: "",
            skill: "",
            status: "",
+           notes: "",
            disableScrapeButton: false,
            urlValid: true,
            companyNameValid: true,
@@ -42,6 +43,7 @@ class NewJobApplication extends React.Component {
         this.addSkillToRequiredList = this.addSkillToRequiredList.bind(this);
         this.scrapeData = this.scrapeData.bind(this);
         this.submitApplication = this.submitApplication.bind(this);
+        this.enterNotes = this.enterNotes.bind(this);
     }
 
     globalLoggedInState = undefined;
@@ -74,6 +76,10 @@ class NewJobApplication extends React.Component {
 
     pickAppStatus(event) {
         this.setState({status: event.target.value});
+    }
+
+    enterNotes(event) {
+        this.setState({ notes: event.target.value});
     }
 
     submitApplication(event) {
@@ -207,6 +213,10 @@ class NewJobApplication extends React.Component {
                 <Form.Group style={{padding: formPadding}} >
                     <Form.Label htmlFor="status" style={{fontWeight: 'bold', fontSize: labelFontSize}}>Application status</Form.Label>
                     {this.createStatusDropDrownMenu()}
+                </Form.Group>
+                <Form.Group style={{padding: formPadding}} >
+                    <Form.Label htmlFor="notes" style={{fontWeight: 'bold', fontSize: labelFontSize}}>Notes</Form.Label>
+                    <Form.Control id="notes" as="textarea" rows={3} value={this.state.notes} onChange={this.enterNotes} placeholder="Leave optional notes here..."/>
                 </Form.Group>
                 <div style={{padding: formPadding}}>
                     <Button type="submit">Submit</Button>
