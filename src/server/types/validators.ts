@@ -16,7 +16,7 @@ export class AuthError extends Error {
     }
 }
 
-export function parseStringID(id: any): number {
+export function validateAndParseStringID(id: any): number {
     if (typeof id !== "string") {
         throw new ValidationError("ID is not a string datatype.");
     }
@@ -27,7 +27,7 @@ export function parseStringID(id: any): number {
     return parsedID;
 }
 
-export function checkReqAuth(reqID: number, userID: number) {
+export function validateAuthorization(reqID: number, userID: number) {
     if (reqID !== userID) {
         throw new AuthError("User does not have access to that resource");
     }

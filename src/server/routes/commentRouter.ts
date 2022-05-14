@@ -2,7 +2,7 @@ import express from "express";
 import passport from "passport";
 import commentModel from "../models/commentModel";
 import { CompanyComment } from "../types/comment";
-import { parseStringID, ValidationError } from "../types/validators";
+import { validateAndParseStringID, ValidationError } from "../types/validators";
 const router = express.Router();
 
 export default router;
@@ -16,7 +16,7 @@ export default router;
 router.get("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { companyID } = req.query;
     try {
-        const parsedCompanyID = parseStringID(companyID);
+        const parsedCompanyID = validateAndParseStringID(companyID);
         const rows = await commentModel.getCompanyComments(parsedCompanyID);
         res.status(200).json(rows);
     } catch (err) {

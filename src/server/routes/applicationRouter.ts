@@ -2,7 +2,7 @@ import express from "express";
 import passport from "passport";
 import appModel from "../models/applicationModel";
 import { Application, Contact } from "../types/application";
-import { AuthError, checkReqAuth, parseStringID, ValidationError } from "../types/validators";
+import { AuthError, validateAuthorization, validateAndParseStringID, ValidationError } from "../types/validators";
 const router = express.Router();
 
 /**
@@ -13,11 +13,11 @@ const router = express.Router();
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.get("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
-    const reqID = req.user?.userID as number;
+    const requestorID = req.user?.userID as number;
     const { userID } = req.query;
     try {
-        const parsedUserID = parseStringID(userID);
-        checkReqAuth(reqID, parsedUserID);
+        const parsedUserID = validateAndParseStringID(userID);
+        validateAuthorization(requestorID, parsedUserID);
         const rows = await appModel.getUserApps(parsedUserID);
         res.status(200).json(rows);
     } catch (err) {
@@ -61,12 +61,12 @@ router.post("/", passport.authenticate("jwt", { session: false }), async functio
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.put("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
-    const reqID = req.user?.userID as number;
+    const requestorID = req.user?.userID as number;
     const app: Application = new Application(req.body);
     try {
         app.validateAndAssertContains(["applicationID"]);
         const { userID } = await appModel.getAppByID(app.fields.applicationID);
-        checkReqAuth(reqID, userID);
+        validateAuthorization(requestorID, userID);
         await appModel.updateApp(app.fields);
         return res.status(201).json({ success: true, applicationID: app.fields.applicationID });
     } catch (err) {
@@ -86,12 +86,12 @@ router.put("/", passport.authenticate("jwt", { session: false }), async function
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.post("/contact", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
-    const reqID = req.user?.userID as number;
+    const requestorID = req.user?.userID as number;
     const contact: Contact = new Contact(req.body);
     try {
         contact.validateAndAssertContains(["applicationID", "firstName", "lastName"]);
         const { userID } = await appModel.getAppByID(contact.fields.applicationID);
-        checkReqAuth(reqID, userID);
+        validateAuthorization(requestorID, userID);
         const contactID = await appModel.createContact(contact.fields);
         return res.status(201).json({ success: true, contactID });
     } catch (err) {
@@ -112,12 +112,12 @@ router.post("/contact", passport.authenticate("jwt", { session: false }), async 
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.put("/contact", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
-    const reqID = req.user?.userID as number;
+    const requestorID = req.user?.userID as number;
     const contact: Contact = new Contact(req.body);
     try {
         contact.validateAndAssertContains(["contactID"]);
         const { userID } = await appModel.getContactAndAppByID(contact.fields.contactID);
-        checkReqAuth(reqID, userID);
+        validateAuthorization(requestorID, userID);
         await appModel.updateContact(contact.fields);
         return res.status(201).json({ success: true, contactID: contact.fields.contactID });
     } catch (err) {
@@ -136,12 +136,12 @@ router.put("/contact", passport.authenticate("jwt", { session: false }), async f
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.delete("/contact", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
-    const reqID = req.user?.userID as number;
+    const requestorID = req.user?.userID as number;
     const { contactID } = req.query;
     try {
-        const parsedcontactID = parseStringID(contactID);
+        const parsedcontactID = validateAndParseStringID(contactID);
         const { userID } = await appModel.getContactAndAppByID(parsedcontactID);
-        checkReqAuth(reqID, userID);
+        validateAuthorization(requestorID, userID);
         await appModel.deleteContact(parsedcontactID);
         return res.status(200).json({ success: true, contactID });
     } catch (err) {
@@ -160,12 +160,12 @@ router.delete("/contact", passport.authenticate("jwt", { session: false }), asyn
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.get("/contact", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
-    const reqID = req.user?.userID as number;
+    const requestorID = req.user?.userID as number;
     const { contactID } = req.query;
     try {
-        const parsedcontactID = parseStringID(contactID);
+        const parsedcontactID = validateAndParseStringID(contactID);
         const { userID } = await appModel.getContactAndAppByID(parsedcontactID);
-        checkReqAuth(reqID, userID);
+        validateAuthorization(requestorID, userID);
         const result = await appModel.getContactByID(parsedcontactID);
         return res.status(200).json(result);
     } catch (err) {

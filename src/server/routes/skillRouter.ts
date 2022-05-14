@@ -2,7 +2,7 @@ import express from "express";
 import passport from "passport";
 import skillModel from "../models/skillModel";
 import { ApplicationSkillFields, Skill, UserSkillFields } from "../types/skill";
-import { parseStringID, ValidationError } from "../types/validators";
+import { validateAndParseStringID, ValidationError } from "../types/validators";
 const router = express.Router();
 
 /**
@@ -31,7 +31,7 @@ router.get("/user", passport.authenticate("jwt", { session: false }), async func
     // TODO - auth verification
     const { userID } = req.query;
     try {
-        const parsedUserID = parseStringID(userID);
+        const parsedUserID = validateAndParseStringID(userID);
         const rows = await skillModel.getUserSkills(parsedUserID);
         res.status(200).send(rows);
     } catch (err) {
@@ -52,7 +52,7 @@ router.get("/application", passport.authenticate("jwt", { session: false }), asy
     // TODO - auth verification
     const { applicationID } = req.query;
     try {
-        const parsedApplicationID = parseStringID(applicationID);
+        const parsedApplicationID = validateAndParseStringID(applicationID);
         const rows = await skillModel.getApplicationSkills(parsedApplicationID);
         res.status(200).send(rows);
     } catch (err) {

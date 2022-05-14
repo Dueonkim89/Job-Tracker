@@ -2,7 +2,7 @@ import express from "express";
 import passport from "passport";
 import companyModel from "../models/companyModel";
 import { Company } from "../types/company";
-import { parseStringID, ValidationError } from "../types/validators";
+import { validateAndParseStringID, ValidationError } from "../types/validators";
 const router = express.Router();
 
 /**
@@ -13,7 +13,7 @@ const router = express.Router();
 router.get("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { companyID } = req.query;
     try {
-        const parsedID = parseStringID(companyID);
+        const parsedID = validateAndParseStringID(companyID);
         const data = await companyModel.getCompanyByID(parsedID);
         if (data === null) {
             return res.status(400).json({ success: false, message: "companyID not found" });
