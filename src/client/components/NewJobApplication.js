@@ -24,7 +24,12 @@ class NewJobApplication extends React.Component {
            skill: "",
            status: "",
            disableScrapeButton: false,
-           urlValid: true
+           urlValid: true,
+           companyNameValid: true,
+           titleValid: true,
+           locationValid: true,
+           statusValid: true,
+           appSkillsValid: true,
         };
 
         // this.enterFirstName = this.enterFirstName.bind(this);enterLocationaa
@@ -36,6 +41,7 @@ class NewJobApplication extends React.Component {
         this.pickAppStatus = this.pickAppStatus.bind(this);
         this.addSkillToRequiredList = this.addSkillToRequiredList.bind(this);
         this.scrapeData = this.scrapeData.bind(this);
+        this.submitApplication = this.submitApplication.bind(this);
     }
 
     globalLoggedInState = undefined;
@@ -70,6 +76,31 @@ class NewJobApplication extends React.Component {
         this.setState({status: event.target.value});
     }
 
+    submitApplication(event) {
+        event.preventDefault();
+        let {applicationSkillList, companyName, title, location, url, status} = this.state;
+
+        url = url.trim();
+        title = title.trim();
+        location = location.trim();
+
+        // check if form fields are valid
+        this.setState({ 
+            urlValid: validStringData(url),
+            titleValid: validStringData(title),
+            locationValid: validStringData(location),
+            companyNameValid: validStringData(companyName),
+            statusValid: validStringData(status),
+            appSkillsValid: applicationSkillList.length > 0 ? true : false
+        });
+
+
+        // only make POST request when all the form field is valid
+
+
+        console.log("submitting")
+    }
+
     scrapeData() {
         let {url} = this.state;
         url = url.trim();
@@ -82,14 +113,16 @@ class NewJobApplication extends React.Component {
             scrapeJobURL(url).then((result) => { 
                 // scrape was succesful
                 // extract the company, title, location
+                const {company, location, title} = result;
 
-                // if company in list, update company
-                // companyNameAlreadyRecorded
-
-                // update title and location
-
-
-                this.setState({urlValid: true});
+                // if company name in list, 
+                if (companyNameAlreadyRecorded(this.state.companyList, company)) {
+                    // update companyName
+                    this.setState({urlValid: true, companyName: company});
+                } 
+                // update title, location, disableScrapeButton
+                this.setState({location, title, disableScrapeButton: false});
+                
             }).catch((error) => {
                 // let user know data could not be scraped
                 alert("Could not scrape any data for the url!");
@@ -145,7 +178,7 @@ class NewJobApplication extends React.Component {
 
     createApplicationForm() {
         return (
-            <Form>
+            <Form onSubmit={this.submitApplication}>
                 <Form.Group style={{padding: formPadding}} >
                     <Form.Label htmlFor="companyName" style={{fontWeight: 'bold', fontSize: labelFontSize}}>Company</Form.Label>
                     {this.createCompanyDropDrownMenu()}
@@ -163,11 +196,11 @@ class NewJobApplication extends React.Component {
                 </Row>
                 <Form.Group style={{padding: formPadding}} >
                     <Form.Label htmlFor="title" style={{fontWeight: 'bold', fontSize: labelFontSize}}>Title</Form.Label>
-                    <Form.Control id="title" type="text" value={this.state.title} onChange={this.enterTitle} placeholder="Enter title" />
+                    <Form.Control style={{ border: !this.state.titleValid ? invalidStyle: ''}} id="title" type="text" value={this.state.title} onChange={this.enterTitle} placeholder="Enter title" />
                 </Form.Group>
                 <Form.Group style={{padding: formPadding}} >
                     <Form.Label htmlFor="location" style={{fontWeight: 'bold', fontSize: labelFontSize}}>Location</Form.Label>
-                    <Form.Control id="location" type="text" value={this.state.location} onChange={this.enterLocation} placeholder="Enter location" />
+                    <Form.Control style={{ border: !this.state.locationValid ? invalidStyle: ''}} id="location" type="text" value={this.state.location} onChange={this.enterLocation} placeholder="Enter location" />
                 </Form.Group>
                 {this.generateApplicationSkills()}
                 {this.displayCurrentJobRequiredSkills()}
@@ -193,7 +226,7 @@ class NewJobApplication extends React.Component {
 
     createStatusDropDrownMenu() {
         return (
-            <Form.Select value={this.state.status} onChange={this.pickAppStatus} aria-label="Choose application status from dropdown menu" id="status">
+            <Form.Select style={{ border: !this.state.statusValid ? invalidStyle: ''}} value={this.state.status} onChange={this.pickAppStatus} aria-label="Choose application status from dropdown menu" id="status">
                 <option value="">Pick application status</option>
                 <option value="applied">Applied</option>
                 <option value="online_assessment">Online Assessment</option>
@@ -204,11 +237,11 @@ class NewJobApplication extends React.Component {
             </Form.Select>
         );
     }
-    
+
     createCompanyDropDrownMenu() {
         //  To get company names dynamically from server
         return (
-            <Form.Select style={{marginBottom: ".65rem"}} value={this.state.companyName} onChange={this.pickCompany} aria-label="Choose company from dropdown menu" id="companyName">
+            <Form.Select style={{marginBottom: ".65rem", border: !this.state.companyNameValid ? invalidStyle: ''}} value={this.state.companyName} onChange={this.pickCompany} aria-label="Choose company from dropdown menu" id="companyName">
                 <option value="">Pick company name</option>
                 {this.dynamicallyCreateCompanyList()}
             </Form.Select>
@@ -229,7 +262,7 @@ class NewJobApplication extends React.Component {
             <Row style={{padding: formPadding}}>
                 <Form.Group as={Col}>
                     <Form.Label htmlFor="jobSkills" style={{fontWeight: 'bold', fontSize: labelFontSize}}>Job skills</Form.Label>
-                    <Form.Control list="skills" id="jobSkills" type="text" placeholder="Enter job skills" name="jobSkills" value={this.state.skill} onChange={this.enterSkill} />
+                    <Form.Control style={{ border: !this.state.appSkillsValid ? invalidStyle: ''}} list="skills" id="jobSkills" type="text" placeholder="Enter job skills" name="jobSkills" value={this.state.skill} onChange={this.enterSkill} />
                     <datalist id="skills">
                         {this.getSkills()}
                     </datalist>
