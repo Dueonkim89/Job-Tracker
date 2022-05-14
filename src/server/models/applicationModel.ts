@@ -53,6 +53,16 @@ export default {
     },
 
     /**
+     * Deletes an application from the database
+     * @returns true or false
+     */
+    async deleteApp(applicationID: number) {
+        const sql = "DELETE FROM Applications WHERE applicationID = ?;";
+        const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.promise().query(sql, [applicationID]);
+        return result.affectedRows === 1;
+    },
+
+    /**
      * Updates the notes section of the given application
      * @returns true if the update was successful, else false (e.g. applicationID doesn't exist)
      */
@@ -108,7 +118,6 @@ export default {
      */
     async updateContact(p: Partial<ContactFields>) {
         let sql = "UPDATE ApplicationContacts SET ? WHERE contactID = ?";
-        // TODO - can probably remove this updates field
         const updates = Object.fromEntries(Object.entries(p).filter(([key, val]) => val !== undefined));
         const [result, fields] = <[ResultSetHeader, FieldPacket[]]>(
             await db.promise().query(sql, [updates, p.contactID])

@@ -143,7 +143,7 @@ test("[Valid] Updating an app contact #1", async () => {
         phoneNumber: "666-666-6666",
         role: "Hiring Manager",
     };
-    const result = await request(server).put("/api/applications/contact").set("Authorization", token3).send(payload);
+    const result = await request(server).patch("/api/applications/contact").set("Authorization", token3).send(payload);
     expect(result.statusCode).toEqual(201);
     expect(result.body.success).toEqual(true);
     const updatedResult = await request(server)
@@ -159,7 +159,7 @@ test("[Valid] Updating an app status", async () => {
         applicationID: 5,
         status: "Interview Again",
     };
-    let result = await request(server).put("/api/applications").set("Authorization", token3).send(payload);
+    let result = await request(server).patch("/api/applications").set("Authorization", token3).send(payload);
     expect(result.statusCode).toEqual(201);
     expect(result.body.success).toEqual(true);
     result = await request(server).get("/api/applications?userID=3").set("Authorization", token3).send(payload);
@@ -173,7 +173,7 @@ test("[Valid] Updating an app notes", async () => {
         applicationID: 5,
         notes: "Great stuff",
     };
-    let result = await request(server).put("/api/applications").set("Authorization", token3).send(payload);
+    let result = await request(server).patch("/api/applications").set("Authorization", token3).send(payload);
     expect(result.statusCode).toEqual(201);
     expect(result.body.success).toEqual(true);
     result = await request(server).get("/api/applications?userID=3").set("Authorization", token3).send(payload);
