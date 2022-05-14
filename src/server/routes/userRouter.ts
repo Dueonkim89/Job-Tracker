@@ -3,7 +3,8 @@ import * as bcrypt from "bcrypt";
 import userModel from "../models/userModel";
 import * as jwt from "jsonwebtoken";
 import passport from "passport";
-import { validateUser, ValidationError } from "../types/validators";
+import { ValidationError } from "../types/validators";
+import { User } from "../types/user";
 const router = express.Router();
 const saltRounds = 10;
 
@@ -19,9 +20,9 @@ router.post("/", async function (req, res, next) {
     const { firstName, lastName, username, phoneNumber, emailAddress, password } = req.body;
     try {
         const passwordHash = await bcrypt.hash(password, saltRounds);
-        const fields = { firstName, lastName, username, phoneNumber, emailAddress, passwordHash };
-        validateUser(fields, ["firstName", "lastName", "username", "emailAddress", "passwordHash"]);
-        const userID = await userModel.createUser(fields);
+        const user: User = new User({ firstName, lastName, username, phoneNumber, emailAddress, passwordHash });
+        user.validateAndAssertContains(["firstName", "lastName", "username", "emailAddress", "passwordHash"]);
+        const userID = await userModel.createUser(user.fields);
         if (!userID || typeof userID !== "number") {
             throw Error("Invalid user creation: create user did not return userID");
         }

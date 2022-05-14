@@ -1,7 +1,3 @@
-import { commentValidators } from "./comment";
-import { companyValidators } from "./company";
-import { userValidators } from "./user";
-
 // Source: https://javascript.info/custom-errors
 // https://www.dannyguo.com/blog/how-to-fix-instanceof-not-working-for-custom-errors-in-typescript/
 export class ValidationError extends Error {
@@ -29,6 +25,12 @@ export function parseStringID(id: any): number {
         throw new ValidationError("ID can not be converted to a number.");
     }
     return parsedID;
+}
+
+export function checkReqAuth(reqID: number, userID: number) {
+    if (reqID !== userID) {
+        throw new AuthError("User does not have access to that resource");
+    }
 }
 
 export interface Validators {
@@ -91,14 +93,4 @@ function validatorCurry(validators: Validators) {
         }
         return;
     };
-}
-
-export const validateCompany = validatorCurry(companyValidators);
-export const validateUser = validatorCurry(userValidators);
-export const validateComment = validatorCurry(commentValidators);
-
-export function checkReqAuth(reqID: number, userID: number) {
-    if (reqID !== userID) {
-        throw new AuthError("User does not have access to that resource");
-    }
 }

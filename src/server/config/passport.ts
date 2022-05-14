@@ -26,7 +26,7 @@ function init() {
 
 declare global {
     namespace Express {
-        interface User extends UserFields {}
+        interface User extends Required<UserFields> {}
     }
 }
 

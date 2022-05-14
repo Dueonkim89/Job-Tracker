@@ -1,7 +1,8 @@
 import express from "express";
 import passport from "passport";
 import companyModel from "../models/companyModel";
-import { parseStringID, validateCompany, ValidationError } from "../types/validators";
+import { Company } from "../types/company";
+import { parseStringID, ValidationError } from "../types/validators";
 const router = express.Router();
 
 /**
@@ -35,16 +36,16 @@ router.get("/", passport.authenticate("jwt", { session: false }), async function
  */
 router.post("/", async function (req, res, next) {
     const { name, industry, websiteURL } = req.body;
-    const fields = { name, industry, websiteURL };
     try {
-        validateCompany(fields, ["name"]);
-        const companyID = await companyModel.createCompany({ name, industry, websiteURL });
+        const company: Company = new Company({ name, industry, websiteURL });
+        company.validateAndAssertContains(["name"]);
+        const companyID = await companyModel.createCompany(company.fields);
         const response = { success: true, companyID };
         return res.status(201).json(response);
     } catch (err) {
         if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
         console.error(`Error in creating new company:`);
-        console.error({ name, industry, websiteURL });
+        console.error(req.body);
         next(err);
     }
 });

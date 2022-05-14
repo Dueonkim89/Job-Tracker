@@ -1,7 +1,8 @@
 import express from "express";
 import passport from "passport";
 import commentModel from "../models/commentModel";
-import { parseStringID, validateComment, ValidationError } from "../types/validators";
+import { CompanyComment } from "../types/comment";
+import { parseStringID, ValidationError } from "../types/validators";
 const router = express.Router();
 
 export default router;
@@ -35,17 +36,17 @@ router.get("/", passport.authenticate("jwt", { session: false }), async function
  */
 router.post("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { userID, companyID, title, text } = req.body;
-    const datetime = new Date();
-    const fields = { userID, companyID, title, text, datetime };
     try {
-        validateComment(fields, ["userID", "companyID", "title", "text", "datetime"]);
-        const commentID = await commentModel.createComment(fields);
+        const datetime = new Date();
+        const comment: CompanyComment = new CompanyComment({ userID, companyID, title, text, datetime });
+        comment.validateAndAssertContains(["userID", "companyID", "title", "text", "datetime"]);
+        const commentID = await commentModel.createComment(comment.fields);
         const response = { success: true, commentID, datetime };
         return res.status(201).json(response);
     } catch (err) {
         if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
         console.error(`Error in creating new company comment:`);
-        console.error({ userID, companyID, title, text, datetime });
+        console.error(req.body);
         next(err);
     }
 });
