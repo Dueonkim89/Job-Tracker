@@ -1,7 +1,8 @@
 import express from "express";
 import passport from "passport";
 import skillModel from "../models/skillModel";
-import { parseStringID, validateSkill, ValidationError } from "../types/validators";
+import { ApplicationSkillFields, Skill, UserSkillFields } from "../types/skill";
+import { parseStringID, ValidationError } from "../types/validators";
 const router = express.Router();
 
 /**
@@ -27,6 +28,7 @@ router.get("/", async function (req, res, next) {
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.get("/user", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
+    // TODO - auth verification
     const { userID } = req.query;
     try {
         const parsedUserID = parseStringID(userID);
@@ -47,6 +49,7 @@ router.get("/user", passport.authenticate("jwt", { session: false }), async func
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.get("/application", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
+    // TODO - auth verification
     const { applicationID } = req.query;
     try {
         const parsedApplicationID = parseStringID(applicationID);
@@ -69,15 +72,15 @@ router.get("/application", passport.authenticate("jwt", { session: false }), asy
  */
 router.post("/", async function (req, res, next) {
     const { name } = req.body;
-    const fields = { name };
     try {
-        validateSkill(fields, ["name"]);
+        const skill: Skill = new Skill({ name });
+        skill.validateAndAssertContains(["name"]);
         const skillID = await skillModel.createSkill({ name });
         res.status(201).send({ success: true, skillID, name });
     } catch (err) {
         if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
         console.error(`Error in creating new skill:`);
-        console.error({ name });
+        console.error(req.body);
         next(err);
     }
 });
@@ -90,16 +93,16 @@ router.post("/", async function (req, res, next) {
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.post("/user", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
-    const { userID, skillID, rating, name } = req.body;
-    const fields = { userID, skillID, name, rating };
+    const { userID, skillID, rating } = req.body;
     try {
-        validateSkill(fields, ["userID", "skillID", "rating"]);
-        await skillModel.createUserSkill(fields);
+        const skill: Skill = new Skill({ userID, skillID, rating });
+        skill.validateAndAssertContains(["userID", "skillID", "rating"]);
+        await skillModel.createUserSkill(skill.fields as UserSkillFields);
         res.status(201).send({ success: true });
     } catch (err) {
         if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
         console.error(`Error in creating new skill:`);
-        console.error({ userID, skillID, name, rating });
+        console.error(req.body);
         next(err);
     }
 });
@@ -113,10 +116,10 @@ router.post("/user", passport.authenticate("jwt", { session: false }), async fun
  */
 router.post("/application", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { applicationID, skillID, name } = req.body;
-    const fields = { applicationID, skillID, name };
     try {
-        validateSkill(fields, ["applicationID", "skillID"]);
-        await skillModel.createApplicationSkill({ applicationID, skillID, name });
+        const skill: Skill = new Skill({ applicationID, skillID, name });
+        skill.validateAndAssertContains(["applicationID", "skillID"]);
+        await skillModel.createApplicationSkill(skill.fields as ApplicationSkillFields);
         res.status(201).send({ success: true, applicationID, skillID, name });
     } catch (err) {
         if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
@@ -135,9 +138,9 @@ router.post("/application", passport.authenticate("jwt", { session: false }), as
  */
 router.patch("/user", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { userID, skillID, rating } = req.body;
-    const fields = { userID, skillID, rating };
     try {
-        validateSkill(fields, ["userID", "skillID", "rating"]);
+        const skill: Skill = new Skill({ userID, skillID, rating });
+        skill.validateAndAssertContains(["userID", "skillID", "rating"]);
         const didUpdate = await skillModel.updateUserSkillRating(userID, skillID, rating);
         if (!didUpdate) {
             return res.status(404).json({ success: false, message: "No matching row found for that userID/skillID" });

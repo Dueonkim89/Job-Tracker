@@ -162,10 +162,10 @@ test("[Valid] Updating an app status", async () => {
     let result = await request(server).put("/api/applications").set("Authorization", token3).send(payload);
     expect(result.statusCode).toEqual(201);
     expect(result.body.success).toEqual(true);
-    result = await request(server).get("/api/applications?applicationID=5").set("Authorization", token3).send(payload);
+    result = await request(server).get("/api/applications?userID=3").set("Authorization", token3).send(payload);
     expect(result.statusCode).toEqual(200);
-    expect(result.body.status).toEqual("Interview Again");
-    expect(result.body.location).toEqual("Remote");
+    expect(result.body[1].status).toEqual("Interview Again");
+    expect(result.body[1].location).toEqual("Remote");
 });
 
 test("[Valid] Updating an app notes", async () => {
@@ -176,8 +176,8 @@ test("[Valid] Updating an app notes", async () => {
     let result = await request(server).put("/api/applications").set("Authorization", token3).send(payload);
     expect(result.statusCode).toEqual(201);
     expect(result.body.success).toEqual(true);
-    result = await request(server).get("/api/applications?applicationID=5").set("Authorization", token3).send(payload);
+    result = await request(server).get("/api/applications?userID=3").set("Authorization", token3).send(payload);
     expect(result.statusCode).toEqual(200);
-    expect(result.body.notes).toEqual("Great stuff");
-    expect(result.body.location).toEqual("Remote");
+    expect(result.body[1].notes).toEqual("Great stuff");
+    expect(result.body[1].location).toEqual("Remote");
 });

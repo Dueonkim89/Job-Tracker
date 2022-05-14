@@ -1,6 +1,5 @@
 import { commentValidators } from "./comment";
 import { companyValidators } from "./company";
-import { skillValidators } from "./skill";
 import { userValidators } from "./user";
 
 // Source: https://javascript.info/custom-errors
@@ -95,7 +94,6 @@ function validatorCurry(validators: Validators) {
 }
 
 export const validateCompany = validatorCurry(companyValidators);
-export const validateSkill = validatorCurry(skillValidators);
 export const validateUser = validatorCurry(userValidators);
 export const validateComment = validatorCurry(commentValidators);
 

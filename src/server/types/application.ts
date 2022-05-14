@@ -1,4 +1,4 @@
-import { BaseValidator, ValidationError, Validators } from "./validators";
+import { BaseValidator, Validators } from "./validators";
 
 export interface AppFields {
     applicationID?: number;
@@ -70,8 +70,3 @@ export class Contact extends BaseValidator<ContactFields> {
         role: (v: any) => typeof v === "string",
     };
 }
-
-const app: Application = new Application({});
-app.validateAndAssertContains(["applicationID", "companyID"]);
-const appID = app.fields.applicationID;
-const companyID = app.fields.companyID;
