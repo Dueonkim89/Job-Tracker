@@ -1,5 +1,11 @@
 // Source: https://javascript.info/custom-errors
 // https://www.dannyguo.com/blog/how-to-fix-instanceof-not-working-for-custom-errors-in-typescript/
+declare global {
+    interface Error {
+        sourceMessage: string;
+    }
+}
+
 export class ValidationError extends Error {
     constructor(message: string) {
         super(message);

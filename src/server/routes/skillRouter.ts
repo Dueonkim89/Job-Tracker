@@ -3,7 +3,7 @@ import passport from "passport";
 import appModel from "../models/applicationModel";
 import skillModel from "../models/skillModel";
 import { ApplicationSkillFields, Skill, UserSkillFields } from "../types/skill";
-import { AuthError, validateAndParseStringID, validateAuthorization, ValidationError } from "../types/validators";
+import { validateAndParseStringID, validateAuthorization } from "../types/validators";
 const router = express.Router();
 
 /**
@@ -16,8 +16,8 @@ router.get("/", async function (req, res, next) {
     try {
         const rows = await skillModel.getAllSkills();
         res.status(200).send(rows);
-    } catch (err) {
-        console.error(`Error in getting all skills:`);
+    } catch (err: any) {
+        err.sourceMessage = `Error in getting all skills:`;
         next(err);
     }
 });
@@ -36,11 +36,8 @@ router.get("/user", passport.authenticate("jwt", { session: false }), async func
         validateAuthorization(requestorID, parsedUserID);
         const rows = await skillModel.getUserSkills(parsedUserID);
         res.status(200).send(rows);
-    } catch (err) {
-        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
-        if (err instanceof AuthError) return res.status(401).json({ success: false, message: err.message });
-        console.error(`Error in getting user skills:`);
-        console.error({ userID });
+    } catch (err: any) {
+        err.sourceMessage = `Error in getting user skills`;
         next(err);
     }
 });
@@ -60,11 +57,8 @@ router.get("/application", passport.authenticate("jwt", { session: false }), asy
         validateAuthorization(requestorID, userID);
         const rows = await skillModel.getApplicationSkills(parsedApplicationID);
         res.status(200).send(rows);
-    } catch (err) {
-        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
-        if (err instanceof AuthError) return res.status(401).json({ success: false, message: err.message });
-        console.error(`Error in getting application skills:`);
-        console.error({ applicationID });
+    } catch (err: any) {
+        err.sourceMessage = `Error in getting application skills`;
         next(err);
     }
 });
@@ -83,10 +77,8 @@ router.post("/", async function (req, res, next) {
         skill.validateAndAssertContains(["name"]);
         const skillID = await skillModel.createSkill({ name });
         res.status(201).send({ success: true, skillID, name });
-    } catch (err) {
-        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
-        console.error(`Error in creating new skill:`);
-        console.error(req.body);
+    } catch (err: any) {
+        err.sourceMessage = `Error in creating new skill`;
         next(err);
     }
 });
@@ -107,11 +99,8 @@ router.post("/user", passport.authenticate("jwt", { session: false }), async fun
         validateAuthorization(requestorID, skill.fields.userID);
         await skillModel.createUserSkill(skill.fields as UserSkillFields);
         res.status(201).send({ success: true });
-    } catch (err) {
-        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
-        if (err instanceof AuthError) return res.status(401).json({ success: false, message: err.message });
-        console.error(`Error in creating new skill:`);
-        console.error(req.body);
+    } catch (err: any) {
+        err.sourceMessage = `Error in creating new skill`;
         next(err);
     }
 });
@@ -133,11 +122,8 @@ router.post("/application", passport.authenticate("jwt", { session: false }), as
         validateAuthorization(requestorID, userID);
         await skillModel.createApplicationSkill(skill.fields as ApplicationSkillFields);
         res.status(201).send({ success: true, applicationID, skillID, name });
-    } catch (err) {
-        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
-        if (err instanceof AuthError) return res.status(401).json({ success: false, message: err.message });
-        console.error(`Error in creating new skill:`);
-        console.error({ applicationID, skillID, name });
+    } catch (err: any) {
+        err.sourceMessage = `Error in creating new skill`;
         next(err);
     }
 });
@@ -161,11 +147,8 @@ router.patch("/user", passport.authenticate("jwt", { session: false }), async fu
             return res.status(404).json({ success: false, message: "No matching row found for that userID/skillID" });
         }
         res.status(200).send({ success: true, userID, skillID, rating });
-    } catch (err) {
-        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
-        if (err instanceof AuthError) return res.status(401).json({ success: false, message: err.message });
-        console.error(`Error in updating user skill rating:`);
-        console.error({ userID, skillID, rating });
+    } catch (err: any) {
+        err.sourceMessage = `Error in updating user skill rating`;
         next(err);
     }
 });

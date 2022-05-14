@@ -2,7 +2,7 @@ import express from "express";
 import passport from "passport";
 import companyModel from "../models/companyModel";
 import { Company } from "../types/company";
-import { validateAndParseStringID, ValidationError } from "../types/validators";
+import { validateAndParseStringID } from "../types/validators";
 const router = express.Router();
 
 /**
@@ -20,10 +20,8 @@ router.get("/", passport.authenticate("jwt", { session: false }), async function
         }
         const response = { success: true, ...data };
         return res.status(200).json(response);
-    } catch (err) {
-        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
-        console.error(`Error in gett company by id:`);
-        console.error({ companyID });
+    } catch (err: any) {
+        err.sourceMessage = `Error in gett company by id`;
         next(err);
     }
 });
@@ -42,10 +40,8 @@ router.post("/", async function (req, res, next) {
         const companyID = await companyModel.createCompany(company.fields);
         const response = { success: true, companyID };
         return res.status(201).json(response);
-    } catch (err) {
-        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
-        console.error(`Error in creating new company:`);
-        console.error(req.body);
+    } catch (err: any) {
+        err.sourceMessage = `Error in creating new company`;
         next(err);
     }
 });
@@ -65,10 +61,8 @@ router.get("/search", passport.authenticate("jwt", { session: false }), async fu
         }
         const companies = await companyModel.searchCompaniesByName(name);
         return res.status(200).json(companies);
-    } catch (err) {
-        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
-        console.error(`Error in searching for company:`);
-        console.error({ name });
+    } catch (err: any) {
+        err.sourceMessage = `Error in searching for company`;
         next(err);
     }
 });

@@ -6,6 +6,7 @@ import session from "express-session";
 import { chosenDBConfig } from "./config/db";
 import router from "./router";
 import passport from "./config/passport";
+import { AuthError, ValidationError } from "./types/validators";
 const cors = require("cors");
 const MySqlStore = require("express-mysql-session")(session);
 
@@ -44,12 +45,24 @@ app.use(express.static(buildDir));
 
 app.use("/api", router);
 
+function printErr(err: Error, req: Request, res: Response) {
+    console.error(`[-[${err.name}]-]`, `${err.sourceMessage}:`, err.message);
+    console.error("Query params:\n", req.query, "\nRequest body:\n", req.body);
+}
+
 // Source: https://stackoverflow.com/questions/50218878/typescript-express-error-function
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-    const statusCode = err.statusCode || 500;
-    console.error(err.message, err.stack);
-    res.status(statusCode).json({ success: false, message: err.message });
-    return;
+    if (err instanceof ValidationError) {
+        if (process.env.NODE_ENV !== "test") printErr(err, req, res);
+        return res.status(400).json({ success: false, message: err.message });
+    } else if (err instanceof AuthError) {
+        if (process.env.NODE_ENV !== "test") printErr(err, req, res);
+        return res.status(401).json({ success: false, message: err.message });
+    } else {
+        printErr(err, req, res);
+        console.error("Stack:\n", err.stack);
+        return res.status(err.statusCode || 500).json({ success: false, message: err.message });
+    }
 };
 
 app.use(errorHandler);

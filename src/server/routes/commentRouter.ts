@@ -2,7 +2,7 @@ import express from "express";
 import passport from "passport";
 import commentModel from "../models/commentModel";
 import { CompanyComment } from "../types/comment";
-import { validateAndParseStringID, ValidationError } from "../types/validators";
+import { validateAndParseStringID } from "../types/validators";
 const router = express.Router();
 
 export default router;
@@ -19,10 +19,8 @@ router.get("/", passport.authenticate("jwt", { session: false }), async function
         const parsedCompanyID = validateAndParseStringID(companyID);
         const rows = await commentModel.getCompanyComments(parsedCompanyID);
         res.status(200).json(rows);
-    } catch (err) {
-        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
-        console.error(`Error in getting company comments:`);
-        console.error({ companyID });
+    } catch (err: any) {
+        err.sourceMessage = `Error in getting company comments`;
         next(err);
     }
 });
@@ -43,10 +41,8 @@ router.post("/", passport.authenticate("jwt", { session: false }), async functio
         const commentID = await commentModel.createComment(comment.fields);
         const response = { success: true, commentID, datetime };
         return res.status(201).json(response);
-    } catch (err) {
-        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
-        console.error(`Error in creating new company comment:`);
-        console.error(req.body);
+    } catch (err: any) {
+        err.sourceMessage = `Error in creating new company comment`;
         next(err);
     }
 });

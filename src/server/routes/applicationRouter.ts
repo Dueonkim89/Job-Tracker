@@ -2,7 +2,7 @@ import express from "express";
 import passport from "passport";
 import appModel from "../models/applicationModel";
 import { Application, Contact } from "../types/application";
-import { AuthError, validateAuthorization, validateAndParseStringID, ValidationError } from "../types/validators";
+import { validateAuthorization, validateAndParseStringID } from "../types/validators";
 const router = express.Router();
 
 /**
@@ -20,11 +20,8 @@ router.get("/", passport.authenticate("jwt", { session: false }), async function
         validateAuthorization(requestorID, parsedUserID);
         const rows = await appModel.getUserApps(parsedUserID);
         res.status(200).json(rows);
-    } catch (err) {
-        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
-        if (err instanceof AuthError) return res.status(401).json({ success: false, message: err.message });
-        console.error(`Error in getting user applications:`);
-        console.error({ userID });
+    } catch (err: any) {
+        err.sourceMessage = `Error in getting user applications`;
         next(err);
     }
 });
@@ -43,11 +40,8 @@ router.post("/", passport.authenticate("jwt", { session: false }), async functio
         const applicationID = await appModel.createApp(app.fields);
         const response = { success: true, applicationID, datetime: app.fields.datetime };
         return res.status(201).json(response);
-    } catch (err) {
-        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
-        if (err instanceof AuthError) return res.status(401).json({ success: false, message: err.message });
-        console.error(`Error in creating new application:`);
-        console.error(req.body);
+    } catch (err: any) {
+        err.sourceMessage = `Error in creating new application`;
         next(err);
     }
 });
@@ -69,11 +63,8 @@ router.put("/", passport.authenticate("jwt", { session: false }), async function
         validateAuthorization(requestorID, userID);
         await appModel.updateApp(app.fields);
         return res.status(201).json({ success: true, applicationID: app.fields.applicationID });
-    } catch (err) {
-        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
-        if (err instanceof AuthError) return res.status(401).json({ success: false, message: err.message });
-        console.error(`Error in creating new application:`);
-        console.error(req.body);
+    } catch (err: any) {
+        err.sourceMessage = `Error in updating application`;
         next(err);
     }
 });
@@ -94,11 +85,8 @@ router.post("/contact", passport.authenticate("jwt", { session: false }), async 
         validateAuthorization(requestorID, userID);
         const contactID = await appModel.createContact(contact.fields);
         return res.status(201).json({ success: true, contactID });
-    } catch (err) {
-        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
-        if (err instanceof AuthError) return res.status(401).json({ success: false, message: err.message });
-        console.error(`Error in creating new application contact:`);
-        console.error(req.body);
+    } catch (err: any) {
+        err.sourceMessage = `Error in creating new application contact`;
         next(err);
     }
 });
@@ -120,11 +108,8 @@ router.put("/contact", passport.authenticate("jwt", { session: false }), async f
         validateAuthorization(requestorID, userID);
         await appModel.updateContact(contact.fields);
         return res.status(201).json({ success: true, contactID: contact.fields.contactID });
-    } catch (err) {
-        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
-        if (err instanceof AuthError) return res.status(401).json({ success: false, message: err.message });
-        console.error(`Error in updating application contact:`);
-        console.error(req.body);
+    } catch (err: any) {
+        err.sourceMessage = `Error in updating application contact:`;
         next(err);
     }
 });
@@ -144,11 +129,8 @@ router.delete("/contact", passport.authenticate("jwt", { session: false }), asyn
         validateAuthorization(requestorID, userID);
         await appModel.deleteContact(parsedcontactID);
         return res.status(200).json({ success: true, contactID });
-    } catch (err) {
-        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
-        if (err instanceof AuthError) return res.status(401).json({ success: false, message: err.message });
-        console.error(`Error in deleting application contact:`);
-        console.error({ contactID });
+    } catch (err: any) {
+        err.sourceMessage = `Error in deleting application contact`;
         next(err);
     }
 });
@@ -168,11 +150,8 @@ router.get("/contact", passport.authenticate("jwt", { session: false }), async f
         validateAuthorization(requestorID, userID);
         const result = await appModel.getContactByID(parsedcontactID);
         return res.status(200).json(result);
-    } catch (err) {
-        if (err instanceof ValidationError) return res.status(400).json({ success: false, message: err.message });
-        if (err instanceof AuthError) return res.status(401).json({ success: false, message: err.message });
-        console.error(`Error in getting application contact:`);
-        console.error({ contactID });
+    } catch (err: any) {
+        err.sourceMessage = `Error in getting application contact`;
         next(err);
     }
 });
