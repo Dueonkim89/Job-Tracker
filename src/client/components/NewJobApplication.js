@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { Container, Row, Form, Button, Col } from 'react-bootstrap';
-import {getListOfAllCompanies, getUserToken, getAllSkills} from '../utils/helper';
+import {getListOfAllCompanies, getUserToken, getAllSkills, scrapeJobURL, companyNameAlreadyRecorded} from '../utils/helper';
 import {validStringData} from '../utils/formValidation';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
 import { Navigate, useNavigate, Link,  useLocation } from "react-router-dom"
 
 const formPadding = ".75rem";
 const labelFontSize = "1.2rem";
+const invalidStyle = '3px solid red';
 
 class NewJobApplication extends React.Component {
     constructor(props) {
@@ -21,7 +22,9 @@ class NewJobApplication extends React.Component {
            location: "",
            url: "",
            skill: "",
-           status: ""
+           status: "",
+           disableScrapeButton: false,
+           urlValid: true
         };
 
         // this.enterFirstName = this.enterFirstName.bind(this);enterLocationaa
@@ -32,6 +35,7 @@ class NewJobApplication extends React.Component {
         this.enterSkill = this.enterSkill.bind(this);
         this.pickAppStatus = this.pickAppStatus.bind(this);
         this.addSkillToRequiredList = this.addSkillToRequiredList.bind(this);
+        this.scrapeData = this.scrapeData.bind(this);
     }
 
     globalLoggedInState = undefined;
@@ -64,6 +68,38 @@ class NewJobApplication extends React.Component {
 
     pickAppStatus(event) {
         this.setState({status: event.target.value});
+    }
+
+    scrapeData() {
+        let {url} = this.state;
+        url = url.trim();
+
+        if (validStringData(url)) {
+            // disable button to prevent server congestion
+            this.setState({disableScrapeButton: true});
+
+            // make API request to scrape available data
+            scrapeJobURL(url).then((result) => { 
+                // scrape was succesful
+                // extract the company, title, location
+
+                // if company in list, update company
+                // companyNameAlreadyRecorded
+
+                // update title and location
+
+
+                this.setState({urlValid: true});
+            }).catch((error) => {
+                // let user know data could not be scraped
+                alert("Could not scrape any data for the url!");
+                // update state
+                this.setState({urlValid: true, disableScrapeButton: false});
+            });
+        } else {
+            // set red border to warn user
+            this.setState({urlValid: false});
+        }
     }
 
     addSkillToRequiredList() {
@@ -118,11 +154,11 @@ class NewJobApplication extends React.Component {
                 <Row style={{padding: formPadding}}>
                     <Form.Group as={Col}>
                         <Form.Label htmlFor="url" style={{fontWeight: 'bold', fontSize: labelFontSize}}>Url</Form.Label>
-                        <Form.Control id="url" type="text" value={this.state.url} onChange={this.enterURL} placeholder="Enter url" />
+                        <Form.Control style={{ border: !this.state.urlValid ? invalidStyle: ''}} id="url" type="text" value={this.state.url} onChange={this.enterURL} placeholder="Enter url" />
                     </Form.Group>
                     <Form.Group as={Col} style={{position: "relative", marginLeft: "2.5rem"}}>      
                         {/*Position the button at bottomn left corner of parent*/}
-                        <Button style={{position: "absolute", bottom: "0px", "left": "0px"}} variant="primary">Scrape data from url</Button>
+                        <Button disabled={this.state.disableScrapeButton} style={{position: "absolute", bottom: "0px", "left": "0px"}} onClick={this.scrapeData} variant="primary">Scrape data from url</Button>
                     </Form.Group>
                 </Row>
                 <Form.Group style={{padding: formPadding}} >
