@@ -23,7 +23,7 @@ export class Skill extends BaseValidator<SkillFields & UserSkillFields & Applica
     }
 
     // TODO - what is the rating limit? is there a name length limit?
-    validators: Validators = {
+    validators: Validators<SkillFields & UserSkillFields & ApplicationSkillFields> = {
         skillID: (v: any) => typeof v === "number",
         applicationID: (v: any) => typeof v === "number",
         userID: (v: any) => typeof v === "number",

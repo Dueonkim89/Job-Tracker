@@ -1,5 +1,5 @@
 import { CompanyFields } from "./company";
-import { BaseValidator } from "./validators";
+import { BaseValidator, Validators } from "./validators";
 
 export interface CommentFields {
     commentID?: number;
@@ -21,7 +21,7 @@ export class CompanyComment extends BaseValidator<CommentFields> {
     }
 
     // TODO - regex validation for phone and email
-    validators = {
+    validators: Validators<CommentFields> = {
         commentID: (v: any) => typeof v === "number",
         userID: (v: any) => typeof v === "number",
         companyID: (v: any) => typeof v === "number",

@@ -1,4 +1,4 @@
-import { BaseValidator } from "./validators";
+import { BaseValidator, Validators } from "./validators";
 
 export interface UserFields {
     userID?: number;
@@ -21,7 +21,7 @@ export class User extends BaseValidator<UserFields> {
     }
 
     // TODO - regex validation for phone and email, username as well
-    validators = {
+    validators: Validators<UserFields> = {
         userID: (v: any) => typeof v === "number",
         firstName: (v: any) => typeof v === "string",
         lastName: (v: any) => typeof v === "string",

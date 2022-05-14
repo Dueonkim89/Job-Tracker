@@ -13,11 +13,10 @@ export class Company extends BaseValidator<CompanyFields> {
         super({ companyID, name, industry, websiteURL });
     }
 
-    validators = {
+    validators: Validators<CompanyFields> = {
         companyID: (v: any) => typeof v === "number",
         name: (v: any) => typeof v === "string",
         industry: (v: any) => typeof v === "string",
         websiteURL: (v: any) => typeof v === "string",
-        industryID: (v: any) => typeof v === "string",
     };
 }

@@ -33,19 +33,15 @@ export function checkReqAuth(reqID: number, userID: number) {
     }
 }
 
-export interface Validators {
-    [key: string]: (val: any) => boolean;
-}
+type Validator = (val: any) => boolean;
 
-interface Input {
-    [key: string]: any;
-}
+export type Validators<T> = Record<keyof Required<T>, Validator>;
 
 export type RequiredKeys<T, K extends keyof T> = Exclude<T, K> & Required<Pick<T, K>>;
 
 export abstract class BaseValidator<T> {
     fields: Readonly<Partial<T>>;
-    abstract validators: { [Property in keyof T as string]: (val: any) => boolean };
+    abstract validators: Validators<T>;
 
     constructor(fields: Partial<T>) {
         this.fields = fields;
@@ -67,30 +63,4 @@ export abstract class BaseValidator<T> {
             }
         }
     }
-}
-
-function validatorCurry(validators: Validators) {
-    return function (input: Input, requiredKeys: string[]) {
-        // if a key is required, ensure it is present in the input
-        const inputKeys = Object.keys(input);
-        for (const requiredKey of requiredKeys) {
-            if (
-                !inputKeys.includes(requiredKey) ||
-                typeof input[requiredKey] === "undefined" ||
-                input[requiredKey] === null
-            ) {
-                throw new ValidationError(`Missing: ${requiredKey}`);
-            }
-        }
-        // for all keys, ensure if that they are present, their types are as specified
-        for (const key in input) {
-            const val = input[key];
-            if (typeof val === "undefined" || val === null) {
-                continue;
-            } else if (!(key in validators) || !validators[key](val)) {
-                throw new ValidationError(`Invalid: ${key}`);
-            }
-        }
-        return;
-    };
 }

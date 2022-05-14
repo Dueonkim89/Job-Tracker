@@ -41,7 +41,7 @@ export class Application extends BaseValidator<AppFields> {
         super({ applicationID, companyID, jobPostingURL, position, userID, status, location, notes, datetime });
     }
 
-    validators: Validators = {
+    validators: Validators<AppFields> = {
         applicationID: (v: any) => typeof v === "number",
         companyID: (v: any) => typeof v === "number",
         jobPostingURL: (v: any) => typeof v === "string",
@@ -60,7 +60,7 @@ export class Contact extends BaseValidator<ContactFields> {
         super({ contactID, applicationID, firstName, lastName, phoneNumber, emailAddress, role });
     }
 
-    validators: Validators = {
+    validators: Validators<ContactFields> = {
         contactID: (v: any) => typeof v === "number",
         applicationID: (v: any) => typeof v === "number",
         firstName: (v: any) => typeof v === "string",
