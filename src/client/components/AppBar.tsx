@@ -26,7 +26,9 @@ export default function ProjectAppBar() {
     return (
       <Navbar bg="primary" className="proj-appbar" variant="dark">
         <Container className="me-auto">
-          <Navbar.Brand>Job Tracker</Navbar.Brand>
+          <LinkContainer to="login">
+            <Navbar.Brand>Job Tracker</Navbar.Brand>
+          </LinkContainer>
         </Container>
         <Nav className="me-auto">
           <LinkContainer to="login">
@@ -44,7 +46,9 @@ export default function ProjectAppBar() {
     return (
       <Navbar bg="primary" className="proj-appbar" variant="dark">
         <Container className="me-auto">
-          <Navbar.Brand>Job Tracker</Navbar.Brand>
+          <LinkContainer to="login">
+            <Navbar.Brand>Job Tracker</Navbar.Brand>
+          </LinkContainer>
         </Container>
         <Nav className="me-auto">
           <LinkContainer to="login">

@@ -1,4 +1,4 @@
-DELETE FROM `CompanyContacts`;
+DELETE FROM `ApplicationContacts`;
 DELETE FROM `CompanyComments`;
 DELETE FROM `UserSkills`;
 DELETE FROM `ApplicationSkills`;
@@ -27,13 +27,13 @@ VALUES
 
 -- Populate Jobs table
 INSERT INTO `Applications` 
-(`applicationID`, `companyID`, `jobPostingURL`, `position`, `userID`, `status`, `location`, `datetime`)
+(`applicationID`, `companyID`, `jobPostingURL`, `position`, `userID`, `status`, `location`, `datetime`, `notes`)
 VALUES 
-(1, 1, 'https://www.amazon.jobs/en/jobs/996246/senior-software-dev-engineer', 'Senior Software Dev Engineer', 1, 'Phone Screen', 'Seattle, WA', convert_tz('2022-01-01 00:00:00', @@session.time_zone, '+00:00')),
-(2, 1, 'https://www.amazon.jobs/en/jobs/981888/chip-design-engineer', 'Chip Design Engineer', 1, 'Applied', 'Tel Aviv, Israel', convert_tz('2022-01-02 00:00:00', @@session.time_zone, '+00:00')),
-(3, 2, 'https://careers.blackbaud.com/us/en/job/R0008354/Software-Engineer-devops', 'Software Engineer, devops', 2, 'Final Round', 'Remote', convert_tz('2022-01-03 00:00:00', @@session.time_zone, '+00:00')),
-(4, 3, 'https://cloudera.wd5.myworkdayjobs.com/External_Career/job/USA--Texas--Austin/Sr-Site-Reliability-Engineer_220266-1', 'Sr. Site Reliability Engineer', 3, 'Phone Screen', 'New York, NY', convert_tz('2022-01-04 00:00:00', @@session.time_zone, '+00:00')),
-(5, 3, 'https://cloudera.wd5.myworkdayjobs.com/External_Career/job/US-California-Santa-Clara-office-1/Senior-Staff-Engineer_220230-1', 'Senior Staff Engineer, Data Hub', 3, 'Final Round', 'Remote', convert_tz('2022-01-05 00:00:00', @@session.time_zone, '+00:00'));
+(1, 1, 'https://www.amazon.jobs/en/jobs/996246/senior-software-dev-engineer', 'Senior Software Dev Engineer', 1, 'Phone Screen', 'Seattle, WA', convert_tz('2022-01-01 00:00:00', @@session.time_zone, '+00:00'), 'here are my notes'),
+(2, 1, 'https://www.amazon.jobs/en/jobs/981888/chip-design-engineer', 'Chip Design Engineer', 1, 'Applied', 'Tel Aviv, Israel', convert_tz('2022-01-02 00:00:00', @@session.time_zone, '+00:00'), 'here are my notes'),
+(3, 2, 'https://careers.blackbaud.com/us/en/job/R0008354/Software-Engineer-devops', 'Software Engineer, devops', 2, 'Final Round', 'Remote', convert_tz('2022-01-03 00:00:00', @@session.time_zone, '+00:00'), 'here are my notes'),
+(4, 3, 'https://cloudera.wd5.myworkdayjobs.com/External_Career/job/USA--Texas--Austin/Sr-Site-Reliability-Engineer_220266-1', 'Sr. Site Reliability Engineer', 3, 'Phone Screen', 'New York, NY', convert_tz('2022-01-04 00:00:00', @@session.time_zone, '+00:00'), 'here are my notes'),
+(5, 3, 'https://cloudera.wd5.myworkdayjobs.com/External_Career/job/US-California-Santa-Clara-office-1/Senior-Staff-Engineer_220230-1', 'Senior Staff Engineer, Data Hub', 3, 'Final Round', 'Remote', convert_tz('2022-01-05 00:00:00', @@session.time_zone, '+00:00'), 'here are my notes');
 
 -- Populate Skills table
 INSERT INTO `Skills` 
@@ -86,10 +86,11 @@ VALUES
 (2, 2, 2, 'Great Company', 'Really loved my chat with the hiring manager!', convert_tz('2022-01-02 00:00:00', @@session.time_zone, '+00:00')),
 (3, 3, 3, 'Great Company', 'Really loved my chat with the hiring manager!', convert_tz('2022-01-03 00:00:00', @@session.time_zone, '+00:00'));
 
--- Populate CompanyContacts table
-INSERT INTO `CompanyContacts` 
-(`contactID`, `userID`, `companyID`, `emailAddress`, `phoneNumber`, `role`, `notes`)
+-- Populate ApplicationContacts table
+INSERT INTO `ApplicationContacts` 
+(`contactID`, `applicationID`, `firstName`, `lastName`, `emailAddress`, `phoneNumber`, `role`)
 VALUES
-(1, 1, 1, 'HiringManager@amazonemail.com', '444-444-4444', 'Hiring Manager', 'Great chat with this person'),
-(2, 2, 2, 'HiringManager@bmsemail.com', '555-555-5555', 'Hiring Manager', 'Great chat with this person'),
-(3, 3, 3, 'HiringManager@cocacolaemail.com', '666-666-6666', 'Hiring Manager', 'Great chat with this person');
+(1, 1, 'Amanda', 'Alpha', 'HiringManager@amazonemail.com', '444-444-4444', 'Hiring Manager 1'),
+(2, 1, 'Barry', 'Beta', 'HiringManager2@amazonemail.com', '444-444-5555', 'Hiring Manager 2'),
+(3, 3, 'Cassandra', 'Charlie', 'HiringManager@blackbaudemail.com', '555-555-5555', 'Hiring Manager'),
+(4, 5, 'DeAndre', 'Delta', 'HiringManager@clouderaemail.com', '666-666-6666', 'Hiring Manager');

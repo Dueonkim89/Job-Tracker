@@ -1,12 +1,13 @@
 import * as skillModel from "../skillModel";
 
-test("Get user 2 skills", async () => {
-    const result = await skillModel.getUserSkills(2);
+test("Get user 1 skills", async () => {
+    const result = await skillModel.getUserSkills(1);
     const expected = [
-        { name: "Microsoft Azure", rating: 5, skillID: 5, userID: 2 },
-        { name: "AWS", rating: 4, skillID: 6, userID: 2 },
+        { userID: 1, name: "Java", skillID: 1, rating: 5 },
+        { userID: 1, name: "C++", skillID: 2, rating: 3 },
     ];
-    expect(result).toEqual(expected);
+    expect(result).toContainEqual(expected[0]);
+    expect(result).toContainEqual(expected[1]);
 });
 
 test("Get application 1 skills", async () => {

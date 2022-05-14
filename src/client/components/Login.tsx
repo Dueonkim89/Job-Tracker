@@ -51,7 +51,6 @@ function Login() {
 
         // only make GET request when all the form field is valid
         if (usernameValid && passwordValid) {
-            console.log("Starting POST request...");
             axios
                 .post("/api/users/login", { username, password })
                 .then((res) => {

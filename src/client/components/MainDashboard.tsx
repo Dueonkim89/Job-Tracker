@@ -1,4 +1,5 @@
 import { Container, Row, Col, Form, Button, Nav, Table } from 'react-bootstrap';
+import Rating from '@mui/material/Rating';
 import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -6,7 +7,8 @@ import { UserLoggedInContext } from "../context/UserLoggedInStatus";
 import { User } from './User';
 import { Application } from './Application';
 import { Skill } from './Skill';
-import { render } from 'react-dom';
+import { setConstantValue } from 'typescript';
+import RaisedButton from 'material-ui/RaisedButton';
 
 
 export default function Dashboard() {
@@ -28,27 +30,6 @@ export default function Dashboard() {
             navigate('/login');
         }
     }, [JSON.stringify(applications)])
-
-    // the get request to get user information and navigate to main dashboard page
-    const checkToken = () => {
-        if (userData) {
-            axios
-                .get("/api/users/login", {
-                    headers: {
-                        Authorization: user.token,
-                    },
-                })
-                .then((res) => {
-                    console.log('user is logged in')
-                })
-                .catch((err) => {
-                    localStorage.removeItem('user');
-                    console.log(err);
-                });
-        } else {
-            navigate("/login");
-        }
-    };
 
     // function to get all of user applications
     // GET /api/applications?userID={userID}
@@ -94,7 +75,7 @@ export default function Dashboard() {
                 for (let i=0; i<data.data.length; i++) {
                     let current = data.data[i]
                     // create application object
-                    let skill : Skill = {"name" : current.name, "rating" : current.rating}
+                    let skill : Skill = {"skillID" : current.skillID,"name" : current.name, "rating" : current.rating}
                     temp.push(skill);
                 }
                 setSkills(temp);
@@ -145,7 +126,9 @@ export default function Dashboard() {
         return (
             <tr>
                 <td>{app.status}</td>
-                <td>{app.position}</td>
+                <td><a href={app.jobPostingURL} target="_blank" rel="noopener">
+                    {app.position}
+                </a></td>
                 <td>{app.location}</td>
                 <td>{app.companyName}</td>
             </tr>
@@ -191,13 +174,51 @@ export default function Dashboard() {
         return (
             <tr>
                 <td>{skill.name}</td>
-                <td>{skill.rating}</td>
+                <td><Rating name="simple-controlled" value={skill.rating} id={skill.skillID} onChange={(event, newValue) => {
+                    if (event.currentTarget.parentElement) {
+                        let skillID = event.currentTarget.parentElement.id;
+                        updateUserSkillRating(parseInt(skillID), parseInt(user.userID), newValue);
+                    } 
+                    }} /></td>
             </tr>
         )
     })
 
+    const updateUserSkillRating = async (skillID:number, userID:number, rating:any) => {
+        if (user) {
+            axios.patch("/api/skills/user", {userID, skillID, rating}, {
+                headers: {
+                    Authorization: user.token
+                }
+            })
+            .then((res) => {
+                // creates a temporary array to make edits
+                // then resets skills state
+                let tempSkills = skills.slice();
+                tempSkills[skillID-1].rating = rating;
+                setSkills(tempSkills);
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+        }
+    }
+
+    const navigateApplication = async (event: any) => {
+        event.preventDefault();
+        navigate('/application');
+
+    }
+
     return (
         <Container>
+            <Row>
+                <Col xs={12} md={8}>
+                    <br />
+                    <Button variant="outline-primary" size='sm' className='float-end' onClick={navigateApplication}>Add Application</Button>{' '}
+                </Col>
+                <Col xs={6} md={4}></Col>
+            </Row>
             <Row>
                 <Col xs={12} md={8}>
                 {/*  TODO: set up bottom area for website information */}
