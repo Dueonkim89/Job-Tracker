@@ -50,7 +50,7 @@ export default {
         `;
         const vals = [userID];
         const [rows, fields] = await db.promise().query(sql, vals);
-        return rows as UserSkillFields[];
+        return rows as (SkillFields & UserSkillFields)[];
     },
 
     async getApplicationSkills(applicationID: number) {
@@ -61,7 +61,7 @@ export default {
         `;
         const vals = [applicationID];
         const [rows, fields] = await db.promise().query(sql, vals);
-        return rows as ApplicationSkillFields[];
+        return rows as (SkillFields & ApplicationSkillFields)[];
     },
 
     async updateUserSkillRating(userID: number, skillID: number, rating: number) {

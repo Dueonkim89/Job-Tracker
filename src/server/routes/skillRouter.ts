@@ -108,21 +108,35 @@ router.post("/user", passport.authenticate("jwt", { session: false }), async fun
 /**
  * @description: Adds a skill to an application
  * @method: POST /api/skills/application
- * @param: JSON of {applicationID, skillID}
+ * @param: JSON of {applicationID, skillID} to add a single skillID
+ *  OR: { applicationID, skillIDs: number[] } to add the entire array of skillIDs
  * @returns: HTTP 201 and JSON of {success: true, applicationID, skillID, name}
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.post("/application", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const requestorID = req.user?.userID as number;
-    const { applicationID, skillID, name } = req.body;
+    const { applicationID, skillID, skillIDs }: { applicationID: any; skillID: any; skillIDs: any[] } = req.body;
+    const skill: Skill = new Skill({ applicationID });
+    const partialSuccess: number[] = []; // sent if error occurs midway through; skillIDs which succeeded
     try {
-        const skill: Skill = new Skill({ applicationID, skillID, name });
-        skill.validateAndAssertContains(["applicationID", "skillID"]);
+        skill.validateAndAssertContains(["applicationID"]);
         const { userID } = await appModel.getAppByID(skill.fields.applicationID);
         validateAuthorization(requestorID, userID);
-        await skillModel.createApplicationSkill(skill.fields as ApplicationSkillFields);
-        res.status(201).send({ success: true, applicationID, skillID, name });
+        if (skillID !== undefined) {
+            await skillModel.createApplicationSkill({ applicationID, skillID });
+            partialSuccess.push(skillID);
+        }
+        if (skillIDs !== undefined) {
+            for (const skillID of skillIDs) {
+                const skill: Skill = new Skill({ skillID });
+                skill.validateAndAssertContains(["skillID"]);
+                await skillModel.createApplicationSkill({ applicationID, skillID });
+                partialSuccess.push(skillID);
+            }
+        }
+        res.status(201).send({ success: true, applicationID, skillID });
     } catch (err: any) {
+        err.partialSuccess = partialSuccess;
         err.sourceMessage = `Error in creating new skill`;
         next(err);
     }

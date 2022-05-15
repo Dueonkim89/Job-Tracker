@@ -90,23 +90,40 @@ test("[Valid] Adding a new skill", async () => {
 });
 
 test("[Valid] Adding a new skill to a user", async () => {
-    const payload = { userID: 1, skillID: 7, name: "Python", rating: 5 };
+    const payload = { userID: 1, skillID: 7, rating: 5 };
     const result = await request(server).post("/api/skills/user").set("Authorization", token1).send(payload);
     expect(result.statusCode).toEqual(201);
     expect(result.body.success).toEqual(true);
 });
 
 test("[Invalid] Attempting to add a skill to another user", async () => {
-    const payload = { userID: 1, skillID: 7, name: "Python", rating: 5 };
+    const payload = { userID: 1, skillID: 7, rating: 5 };
     const result = await request(server).post("/api/skills/user").set("Authorization", token3).send(payload);
     expect(result.statusCode).toEqual(401);
 });
 
-test("[Valid] Adding a new skill to an application", async () => {
-    const payload = { applicationID: 1, skillID: 7, name: "Python" };
-    const result = await request(server).post("/api/skills/application").set("Authorization", token1).send(payload);
+test("[Valid] Adding one new skill to an application", async () => {
+    const payload = { applicationID: 2, skillID: 7 };
+    const expected = { applicationID: 2, skillID: 7, name: "Python" };
+    let result = await request(server).post("/api/skills/application").set("Authorization", token1).send(payload);
     expect(result.statusCode).toEqual(201);
     expect(result.body.success).toEqual(true);
+    result = await request(server).get("/api/skills/application?applicationID=2").set("Authorization", token1).send();
+    expect(result.statusCode).toEqual(200);
+    expect(result.body).toContainEqual(expected);
+});
+
+test("[Valid] Adding multiple new skills to an application", async () => {
+    const payload = { applicationID: 2, skillIDs: [8, 9] };
+    const expected1 = { applicationID: 2, skillID: 8, name: "Go" };
+    const expected2 = { applicationID: 2, skillID: 9, name: "Hadoop" };
+    let result = await request(server).post("/api/skills/application").set("Authorization", token1).send(payload);
+    expect(result.statusCode).toEqual(201);
+    expect(result.body.success).toEqual(true);
+    result = await request(server).get("/api/skills/application?applicationID=2").set("Authorization", token1).send();
+    expect(result.statusCode).toEqual(200);
+    expect(result.body).toContainEqual(expected1);
+    expect(result.body).toContainEqual(expected2);
 });
 
 test("[Invalid] Attempting to add a new skill to another user's application", async () => {

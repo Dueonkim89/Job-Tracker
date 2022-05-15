@@ -69,4 +69,8 @@ export abstract class BaseValidator<T> {
             }
         }
     }
+
+    validateProperty<Key extends keyof T>(key: Key, val: any): asserts key is Key {
+        if (!(key in this.validators) || !this.validators[key](val)) throw new ValidationError(`Invalid input: ${key}`);
+    }
 }
