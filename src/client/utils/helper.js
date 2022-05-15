@@ -24,16 +24,16 @@ export function checkIfTokenExists() {
     } return true;
 }
 
-export function companyNameAlreadyRecorded(companyList, newCompanyName) {
-    /*  INPUT: list of companies and new company name
-        OUTPUT: boolean value of company already recorded in database
+export function dataAlreadyRecorded(dataList, newName) {
+    /*  INPUT: list of companies/skill and new company/skill name
+        OUTPUT: boolean value of company/skill already recorded in database
     */
 
-    let lowerCase = newCompanyName.toLowerCase();
+    let lowerCase = newName.toLowerCase();
 
     // keyword of is used to get the object at each iteration
-    for (const company of companyList) {
-        if (company.name.toLowerCase() === lowerCase) {
+    for (const data of dataList) {
+        if (data.name.toLowerCase() === lowerCase) {
             return true;
         }
     }
@@ -89,7 +89,6 @@ export function registerNewUser(userField) {
         }
         return Promise.reject({"success": false});
     });
-
 }
 
 export function getListOfAllCompanies(jwt) {
@@ -185,4 +184,17 @@ export function scrapeJobURL(jobURL) {
         return Promise.reject(error.response.data);
     });
 
+}
+
+export function postSkill(jobSkill) {
+    // POST new job skill into data base
+    // Input: string type for jobSkill
+    // OUTPUT: Promise of {skillID, name}
+
+    return axios.post("/api/skills", {"name": titleCase(jobSkill)}).then(function (response) {
+        // send promise.resolve. Include token, userId and success value
+        return Promise.resolve(response.data);
+    }).catch(function (error) {
+        return Promise.reject(error.response);
+    });
 }

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Container, Row, Form, Button, Col } from 'react-bootstrap';
-import {getListOfAllCompanies, getUserToken, getAllSkills, scrapeJobURL, companyNameAlreadyRecorded} from '../utils/helper';
+import {getListOfAllCompanies, getUserToken, getAllSkills, scrapeJobURL, dataAlreadyRecorded, postSkill} from '../utils/helper';
 import {validStringData} from '../utils/formValidation';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
 import { Navigate, useNavigate, Link,  useLocation } from "react-router-dom"
@@ -122,7 +122,7 @@ class NewJobApplication extends React.Component {
                 const {company, location, title} = result;
 
                 // if company name in list, 
-                if (companyNameAlreadyRecorded(this.state.companyList, company)) {
+                if (dataAlreadyRecorded(this.state.companyList, company)) {
                     // update companyName
                     this.setState({urlValid: true, companyName: company});
                 } 
@@ -144,11 +144,27 @@ class NewJobApplication extends React.Component {
     addSkillToRequiredList() {
         // update state of applicationSkillList
         // reset state of skill to empty string
-        const {skill} = this.state;
+        let {skill, skillListFromServer} = this.state;
+        skill = skill.trim();
+
         if (validStringData(skill)) {
-            this.setState(prevState => ({
-                applicationSkillList: [...prevState.applicationSkillList, skill]
-            }));
+            // make POST request if skill not in list
+            if (!dataAlreadyRecorded(skillListFromServer, skill)) {
+                postSkill(skill).then(
+                    (result) => {
+                        this.setState(prevState => ({
+                            applicationSkillList: [...prevState.applicationSkillList, skill],
+                            skillListFromServer: [...prevState.skillListFromServer, result]
+                        }));          
+                }).catch((error) => {
+                    alert("Could not add job skill. Please try again!");                
+                });
+            } else {
+                this.setState(prevState => ({
+                    applicationSkillList: [...prevState.applicationSkillList, skill]
+                }));
+            }
+
             this.setState({skill: ""});
         }
     }
@@ -304,7 +320,7 @@ class NewJobApplication extends React.Component {
     }
 
     render() {
-        console.log(this.state.applicationSkillList);
+        console.log(this.state.applicationSkillList, this.state.skillListFromServer);
         // redirect to login if user is not logged in
         const ApplicationFormBorder = "3px solid #0a2a66";
         return (
