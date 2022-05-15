@@ -1,20 +1,20 @@
-import { BaseValidator, Validators } from "./validators";
+import { BaseValidator, ValidationError, Validators } from "./validators";
 
-export interface SkillFields {
+export type SkillFields = {
     skillID?: number;
     name: string;
-}
+};
 
-export interface UserSkillFields extends SkillFields {
+export type UserSkillFields = {
     skillID: number;
     userID: number;
     rating: number;
-}
+};
 
-export interface ApplicationSkillFields extends SkillFields {
+export type ApplicationSkillFields = {
     skillID: number;
     applicationID: number;
-}
+};
 
 export class Skill extends BaseValidator<SkillFields & UserSkillFields & ApplicationSkillFields> {
     constructor(input: any) {
