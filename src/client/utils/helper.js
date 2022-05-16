@@ -226,7 +226,6 @@ export function postApplication(appDetails) {
     //         Fail: Promise rejection: Error
 
     const jwt = getUserToken();
-
     return axios.post("/api/applications", appDetails, {
         headers: {
             'Authorization': jwt
@@ -245,16 +244,14 @@ export function postSkillToApplication(skills) {
     //          Fail:   Promise rejection: Error
 
     const jwt = getUserToken();
-    axios.post("/api/skills/application", skills, {
+    return axios.post("/api/skills/application", skills, {
         headers: {
             'Authorization': jwt
         }
     }).then(function (response) {
-        console.log(response);
-        //return Promise.resolve(response.data);
+        return Promise.resolve(response.data);
     }).catch(function (error) {
-        console.log(error.response);
-        //return Promise.reject(error.response);
+        return Promise.reject(error.response);
     });
 
 }
