@@ -1,8 +1,9 @@
 import express from "express";
 import * as bcrypt from "bcrypt";
-import * as userModel from "../models/userModel";
+import userModel from "../models/userModel";
 import * as jwt from "jsonwebtoken";
 import passport from "passport";
+import { User } from "../types/user";
 const router = express.Router();
 const saltRounds = 10;
 
@@ -18,14 +19,9 @@ router.post("/", async function (req, res, next) {
     const { firstName, lastName, username, phoneNumber, emailAddress, password } = req.body;
     try {
         const passwordHash = await bcrypt.hash(password, saltRounds);
-        const userID = await userModel.createUser({
-            firstName,
-            lastName,
-            username,
-            phoneNumber,
-            emailAddress,
-            passwordHash,
-        });
+        const user: User = new User({ firstName, lastName, username, phoneNumber, emailAddress, passwordHash });
+        user.validateAndAssertContains(["firstName", "lastName", "username", "emailAddress", "passwordHash"]);
+        const userID = await userModel.createUser(user.fields);
         if (!userID || typeof userID !== "number") {
             throw Error("Invalid user creation: create user did not return userID");
         }
@@ -43,8 +39,7 @@ router.post("/", async function (req, res, next) {
         if (err?.code === "ER_DUP_ENTRY" && err?.sqlMessage?.includes("username")) {
             return res.status(400).json({ success: false, reason: "duplicate", field: "username" });
         }
-        console.error(`Error in creating user:`);
-        console.error({ firstName, lastName, username, phoneNumber, emailAddress }); // purposely excluding password
+        err.sourceMessage = `Error in creating user`;
         next(err);
     }
 });
@@ -60,28 +55,23 @@ router.post("/login", async function (req, res, next) {
     try {
         const user = await userModel.getUserByUsername(username);
         if (!user) {
-            res.status(400).json({ success: false, message: "Didn't find a user matching that username." });
-            return;
+            return res.status(400).json({ success: false, message: "Didn't find a user matching that username." });
         }
         const isValidPassword = await bcrypt.compare(password, user.passwordHash);
-        if (isValidPassword) {
-            const accessToken = jwt.sign({ id: user.userID }, process.env.JWT_SECRET as jwt.Secret, {
-                expiresIn: "1h",
-            });
-            res.status(200).json({
-                success: true,
-                userID: user.userID,
-                message: "login sucessfully",
-                token: "Bearer " + accessToken,
-            });
-            return;
-        } else {
-            res.status(400).json({ success: false, message: "Invalid Password or Username" });
-            return;
+        if (!isValidPassword) {
+            return res.status(400).json({ success: false, message: "Invalid Password or Username" });
         }
-    } catch (err) {
-        console.error(`Error in logging in user:`);
-        console.error({ username }); // purposely excluding password
+        const accessToken = jwt.sign({ id: user.userID }, process.env.JWT_SECRET as jwt.Secret, {
+            expiresIn: "1h",
+        });
+        return res.status(200).json({
+            success: true,
+            userID: user.userID,
+            message: "login sucessfully",
+            token: "Bearer " + accessToken,
+        });
+    } catch (err: any) {
+        err.sourceMessage = `Error in logging in user`;
         next(err);
     }
 });

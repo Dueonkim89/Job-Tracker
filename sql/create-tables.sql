@@ -27,9 +27,9 @@ CREATE TABLE `CompanyComments`(
     `commentID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `userID` INT NOT NULL,
     `companyID` INT NOT NULL,
-    `title` VARCHAR(255),
-    `text` TEXT,
-    `datetime` DATETIME,
+    `title` VARCHAR(255) NOT NULL,
+    `text` TEXT NOT NULL,
+    `datetime` DATETIME NOT NULL,
     FOREIGN KEY(`userID`) REFERENCES `Users`(`userID`),
     FOREIGN KEY(`companyID`) REFERENCES `Companies`(`companyID`)
 );
@@ -41,7 +41,7 @@ CREATE TABLE `Applications`(
     `jobPostingURL` VARCHAR(300) NOT NULL,
     `position` VARCHAR(255) NOT NULL,
     `userID` INT NOT NULL,
-    `status` VARCHAR(255),
+    `status` VARCHAR(255) NOT NULL,
     `location` VARCHAR(255),
     `datetime` DATETIME,
     `notes` TEXT,

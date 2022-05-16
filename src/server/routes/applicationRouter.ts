@@ -1,6 +1,8 @@
 import express from "express";
 import passport from "passport";
-import * as appModel from "../models/applicationModel";
+import appModel from "../models/applicationModel";
+import { Application, Contact } from "../types/application";
+import { validateAuthorization, validateAndParseStringID } from "../types/validators";
 const router = express.Router();
 
 /**
@@ -8,23 +10,16 @@ const router = express.Router();
  * @method: GET /api/applications?userID={userID}
  * @returns: HTTP 200 and all fields from Applications tables, companyName, and contacts
  * NOTE: contacts will be an array OR null if no contacts exist
- * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.get("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
-    const { userID } = req.query;
+    const requestorID = req.user?.userID as number;
     try {
-        if (typeof userID !== "string") {
-            return res.status(400).json({ success: false, message: "Invalid User ID" });
-        }
-        const parsedUserID = parseInt(userID);
-        if (isNaN(parsedUserID)) {
-            return res.status(400).json({ success: false, message: "Invalid User ID" });
-        }
-        const rows = await appModel.getUserApps(parsedUserID);
+        const userID = validateAndParseStringID(req.query.userID);
+        validateAuthorization(requestorID, userID);
+        const rows = await appModel.getUserApps(userID);
         res.status(200).json(rows);
-    } catch (err) {
-        console.error(`Error in getting user applications:`);
-        console.error({ userID });
+    } catch (err: any) {
+        err.sourceMessage = `Error in getting user applications`;
         next(err);
     }
 });
@@ -33,32 +28,58 @@ router.get("/", passport.authenticate("jwt", { session: false }), async function
  * @description: Adds a user's job application to the database
  * @method: POST /api/applications
  * @param: JSON of {companyID, jobPostingURL, position, userID, status, location, notes}
- * @returns: HTTP 201 and JSON of {success: true, applicationID}
- * or HTTP 400 and JSON of {success: false, message: "reason for error"}
+ * @returns: HTTP 201 and JSON of {success: true, applicationID, datetime}
  */
 router.post("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
-    const { companyID, jobPostingURL, position, userID, status, location, notes } = req.body;
-    // TODO - input validation
-    const datetime = new Date();
+    const app: Application = new Application(req.body);
     try {
-        const applicationID = await appModel.createApp({
-            companyID,
-            jobPostingURL,
-            position,
-            userID,
-            status,
-            location,
-            notes,
-            datetime,
-        });
-        const response = {
-            success: true,
-            applicationID,
-        };
+        app.validateAndAssertContains(["companyID", "userID", "position", "jobPostingURL", "status", "datetime"]);
+        const applicationID = await appModel.createApp(app.fields);
+        const response = { success: true, applicationID, datetime: app.fields.datetime };
         return res.status(201).json(response);
-    } catch (err) {
-        console.error(`Error in creating new application:`);
-        console.error({ companyID, jobPostingURL, position, userID, status, location, notes, datetime });
+    } catch (err: any) {
+        err.sourceMessage = `Error in creating new application`;
+        next(err);
+    }
+});
+
+/**
+ * @description: Deletes a user's job application
+ * @method: PATCH /api/applications?applicationID={applicationID}
+ * @returns: HTTP 201 and JSON of {success: true, applicationID}
+ */
+router.delete("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
+    const requestorID = req.user?.userID as number;
+    try {
+        const applicationID = validateAndParseStringID(req.query.applicationID);
+        const { userID } = await appModel.getAppByID(applicationID);
+        validateAuthorization(requestorID, userID);
+        await appModel.deleteApp(applicationID);
+        return res.status(201).json({ success: true, applicationID });
+    } catch (err: any) {
+        err.sourceMessage = `Error in deleting application`;
+        next(err);
+    }
+});
+
+/**
+ * @description: Updates a user's job application with certain fields
+ * @method: PATCH /api/applications
+ * @param: JSON of {applicationID, companyID, jobPostingURL, position, userID, status, location, notes}
+ *   NOTE: applicationID is mandatory, all other fields are optional
+ * @returns: HTTP 201 and JSON of {success: true, applicationID}
+ */
+router.patch("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
+    const requestorID = req.user?.userID as number;
+    const app: Application = new Application(req.body);
+    try {
+        app.validateAndAssertContains(["applicationID"]);
+        const { userID } = await appModel.getAppByID(app.fields.applicationID);
+        validateAuthorization(requestorID, userID);
+        await appModel.updateApp(app.fields);
+        return res.status(201).json({ success: true, applicationID: app.fields.applicationID });
+    } catch (err: any) {
+        err.sourceMessage = `Error in updating application`;
         next(err);
     }
 });
@@ -68,28 +89,18 @@ router.post("/", passport.authenticate("jwt", { session: false }), async functio
  * @method: POST /api/applications/contact
  * @param: JSON of {applicationID, firstName, lastName, emailAddress, phoneNumber, role}
  * @returns: HTTP 201 and JSON of {success: true, contactID}
- * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.post("/contact", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
-    const { applicationID, firstName, lastName, emailAddress, phoneNumber, role } = req.body;
-    // TODO - input validation
+    const requestorID = req.user?.userID as number;
+    const contact: Contact = new Contact(req.body);
     try {
-        const contactID = await appModel.createContact({
-            applicationID,
-            firstName,
-            lastName,
-            emailAddress,
-            phoneNumber,
-            role,
-        });
-        const response = {
-            success: true,
-            contactID,
-        };
-        return res.status(201).json(response);
-    } catch (err) {
-        console.error(`Error in creating new application contact:`);
-        console.error({ applicationID, firstName, lastName, emailAddress, phoneNumber, role });
+        contact.validateAndAssertContains(["applicationID", "firstName", "lastName"]);
+        const { userID } = await appModel.getAppByID(contact.fields.applicationID);
+        validateAuthorization(requestorID, userID);
+        const contactID = await appModel.createContact(contact.fields);
+        return res.status(201).json({ success: true, contactID });
+    } catch (err: any) {
+        err.sourceMessage = `Error in creating new application contact`;
         next(err);
     }
 });
@@ -100,28 +111,18 @@ router.post("/contact", passport.authenticate("jwt", { session: false }), async 
  * @param: JSON of {contactID, applicationID, firstName, lastName, emailAddress, phoneNumber, role}
  *   NOTE: contactID is mandatory, all other fields are optional
  * @returns: HTTP 200 and JSON of {success: true, contactID}
- * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
-router.put("/contact", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
-    const { contactID, applicationID, firstName, lastName, emailAddress, phoneNumber, role } = req.body;
-    // TODO - input validation
+router.patch("/contact", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
+    const requestorID = req.user?.userID as number;
+    const contact: Contact = new Contact(req.body);
     try {
-        if (!contactID || typeof contactID !== "number") {
-            return res.status(400).json({ success: false, message: "Invalid Contact ID" });
-        }
-        await appModel.updateContact({
-            contactID,
-            applicationID,
-            firstName,
-            lastName,
-            emailAddress,
-            phoneNumber,
-            role,
-        });
-        return res.status(201).json({ success: true, contactID });
-    } catch (err) {
-        console.error(`Error in updating application contact:`);
-        console.error({ contactID, applicationID, firstName, lastName, emailAddress, phoneNumber, role });
+        contact.validateAndAssertContains(["contactID"]);
+        const { userID } = await appModel.getContactAndAppByID(contact.fields.contactID);
+        validateAuthorization(requestorID, userID);
+        await appModel.updateContact(contact.fields);
+        return res.status(201).json({ success: true, contactID: contact.fields.contactID });
+    } catch (err: any) {
+        err.sourceMessage = `Error in updating application contact:`;
         next(err);
     }
 });
@@ -130,98 +131,37 @@ router.put("/contact", passport.authenticate("jwt", { session: false }), async f
  * @description: Delete an application contact
  * @method: DELETE /api/applications/contact?contactID={contactID}
  * @returns: HTTP 200 and JSON of {success: true, contactID}
- * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.delete("/contact", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
+    const requestorID = req.user?.userID as number;
     const { contactID } = req.query;
-    // TODO - input validation
     try {
-        if (typeof contactID !== "string") {
-            return res.status(400).json({ success: false, message: "Invalid Contact ID" });
-        }
-        const parsedcontactID = parseInt(contactID);
+        const parsedcontactID = validateAndParseStringID(contactID);
+        const { userID } = await appModel.getContactAndAppByID(parsedcontactID);
+        validateAuthorization(requestorID, userID);
         await appModel.deleteContact(parsedcontactID);
         return res.status(200).json({ success: true, contactID });
-    } catch (err) {
-        console.error(`Error in deleting application contact:`);
-        console.error({ contactID });
+    } catch (err: any) {
+        err.sourceMessage = `Error in deleting application contact`;
         next(err);
     }
 });
 
 /**
- * @description: Delete an application contact
+ * @description: Get an application contact
  * @method: GET /api/applications/contact?contactID={contactID}
  * @returns: HTTP 200 and JSON of all fields from contact table
- * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.get("/contact", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
-    const { contactID } = req.query;
-    // TODO - input validation
+    const requestorID = req.user?.userID as number;
     try {
-        if (typeof contactID !== "string") {
-            return res.status(400).json({ success: false, message: "Invalid Contact ID" });
-        }
-        const parsedcontactID = parseInt(contactID);
-        const result = await appModel.getContactByID(parsedcontactID);
+        const contactID = validateAndParseStringID(req.query.contactID);
+        const { userID } = await appModel.getContactAndAppByID(contactID);
+        validateAuthorization(requestorID, userID);
+        const result = await appModel.getContactByID(contactID);
         return res.status(200).json(result);
-    } catch (err) {
-        console.error(`Error in getting application contact:`);
-        console.error({ contactID });
-        next(err);
-    }
-});
-
-/**
- * @description: Updates the notes of a user's job application
- * @method: PUT /api/applications/notes
- * @param: JSON of {applicationID, status}
- * @returns: HTTP 201 and JSON of {success: true, applicationID, notes}
- * or HTTP 400 and JSON of {success: false, message: "reason for error"}
- */
-router.put("/notes", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
-    const { applicationID, notes } = req.body;
-    // TODO - input validation
-    try {
-        if (typeof applicationID !== "number") {
-            return res.status(400).json({ success: false, message: "Application ID is not a number" });
-        }
-        const didUpdate = await appModel.updateAppStatus(applicationID, notes);
-        if (didUpdate) {
-            return res.status(201).json({ success: true, applicationID, notes });
-        } else {
-            return res.status(400).json({ success: false, message: "Invalid Application ID." });
-        }
-    } catch (err) {
-        console.error(`Error in updating application notes:`);
-        console.error({ applicationID, notes });
-        next(err);
-    }
-});
-
-/**
- * @description: Updates the status of a user's job application
- * @method: PUT /api/applications/status
- * @param: JSON of {applicationID, status}
- * @returns: HTTP 201 and JSON of {success: true, applicationID, status}
- * or HTTP 400 and JSON of {success: false, message: "reason for error"}
- */
-router.put("/status", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
-    const { applicationID, status } = req.body;
-    // TODO - input validation
-    try {
-        if (typeof applicationID !== "number") {
-            return res.status(400).json({ success: false, message: "Application ID is not a number" });
-        }
-        const didUpdate = await appModel.updateAppStatus(applicationID, status);
-        if (didUpdate) {
-            return res.status(201).json({ success: true, applicationID, status });
-        } else {
-            return res.status(400).json({ success: false, message: "Invalid Application ID." });
-        }
-    } catch (err) {
-        console.error(`Error in updating application status:`);
-        console.error({ applicationID, status });
+    } catch (err: any) {
+        err.sourceMessage = `Error in getting application contact`;
         next(err);
     }
 });
