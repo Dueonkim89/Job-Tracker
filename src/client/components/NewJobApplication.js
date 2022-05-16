@@ -103,8 +103,7 @@ class NewJobApplication extends React.Component {
             appSkillsValid: applicationSkillList.length > 0 ? true : false
         });
 
-
-        // only make POST request when all the form field is valid
+        // only make POST request when all the form fields are valid
         if (validStringData(companyName) && validStringData(url) && validStringData(title) 
             && validStringData(location) && applicationSkillList.length > 0 && validStringData(status)) {
 
@@ -122,31 +121,45 @@ class NewJobApplication extends React.Component {
                 const mapOfSkillsFromServer = arrayOfSkillsToMap(skillListFromServer);
                 const uniqueMapOfAppSkills = appSkillToMap(applicationSkillList, mapOfSkillsFromServer);
 
-                postSkillToApplication({applicationID, 'skillIDs': Object.values(uniqueMapOfAppSkills)});
-                /*for (const skillName in uniqueMapOfAppSkills) {
-                    postSkillToApplication({applicationID, 'skillID': uniqueMapOfAppSkills[skillName]});
-                }*/
-
+                await postSkillToApplication({applicationID, 'skillIDs': Object.values(uniqueMapOfAppSkills)});
+  
                 // send message that app was succesfully submitted and reset form fields
-
+                alert("Application has been successfully submitted.");
+                this.resetFormFields();
             }
             catch (error) {
-                if (error.sourceMessage === 'Error in creating new application') {
+                if (error.sourceMessage === "Error in creating new application") {
                     alert("Unable to submit application. Please try again!");
                     return;
                 }
                 // application was posted, but skill was not.
-                // send message and reroute to dashboard.
+                // send message and reset all form fields
                 alert("Unable to add job skills to your application.");
-                this.props.navigate('/main');
+                this.resetFormFields();
                 return;
             }
-            
-
         }
+    }
 
-
-
+    resetFormFields() {
+        // reset all form fields to default state
+        this.setState({
+            companyName: "", 
+            url: '', 
+            title: "",
+            location: "",
+            applicationSkillList: [],
+            skill: "",
+            status: "",
+            notes: "",
+            disableScrapeButton: false,
+            urlValid: true,
+            companyNameValid: true,
+            titleValid: true,
+            locationValid: true,
+            statusValid: true,
+            appSkillsValid: true,
+        });
     }
 
     scrapeData() {
@@ -363,7 +376,6 @@ class NewJobApplication extends React.Component {
     }
 
     render() {
-        console.log(this.state.applicationSkillList, this.state.skillListFromServer);
         // redirect to login if user is not logged in
         const ApplicationFormBorder = "3px solid #0a2a66";
         return (
