@@ -24,6 +24,26 @@ export function checkIfTokenExists() {
     } return true;
 }
 
+export function getUserID() {
+    /*  INPUT: none
+        OUTPUT: userID
+     */
+    const user = localStorage.getItem("user");
+    return JSON.parse(user).userID;
+}
+
+export function getCompanyID(companyList, companyName) {
+    /*  INPUT: list of companies & string value of company name
+        OUTPUT: companyID
+     */
+
+    for (const company of companyList) {
+        if (company.name === companyName) {
+            return company.companyID;
+        }
+    }
+}
+
 export function dataAlreadyRecorded(dataList, newName) {
     /*  INPUT: list of companies/skill and new company/skill name
         OUTPUT: boolean value of company/skill already recorded in database
@@ -63,11 +83,11 @@ export function checkIfTokenExpired() {
         headers: {
             'Authorization': token
           }
-    }) .then(function (response) {
+    }).then(function (response) {
         return Promise.resolve(response.data.success);
-      }).catch(function (error) {
+    }).catch(function (error) {
         return Promise.reject(false);
-      });
+    });
 }
 
 export function getServerURL(nodeEnv) {
@@ -197,4 +217,63 @@ export function postSkill(jobSkill) {
     }).catch(function (error) {
         return Promise.reject(error.response);
     });
+}
+
+export function postApplication(appDetails) {
+    // POST new app into data base
+    // Input: map of {companyID, jobPostingURL, position, userID, status, location, notes}
+    // OUTPUT: Success: Promise of {success: true, applicationID, datetime}
+    //         Fail: Promise rejection: Error
+
+    const jwt = getUserToken();
+
+    return axios.post("/api/applications", appDetails, {
+        headers: {
+            'Authorization': jwt
+        }
+    }).then(function (response) {
+        return Promise.resolve(response.data);
+    }).catch(function (error) {
+        return Promise.reject(error.response);
+    });
+}
+
+export function postSkillToApplication(skills) {
+    //  POST required skills into application
+    //  INPUT: map. { applicationID (string), skillIDs: number[] }
+    //  OUTPUT: Success: Promise {success: true, applicationID, skillID, name}
+    //          Fail:   Promise rejection: Error
+
+    const jwt = getUserToken();
+    axios.post("/api/skills/application", skills, {
+        headers: {
+            'Authorization': jwt
+        }
+    }).then(function (response) {
+        console.log(response);
+        //return Promise.resolve(response.data);
+    }).catch(function (error) {
+        console.log(error.response);
+        //return Promise.reject(error.response);
+    });
+
+}
+
+export function arrayOfSkillsToMap(skillList) {
+    // input: array of maps with keys skillID and name
+    // output: map with name as keys and skillID as value
+    return skillList.reduce((accumulator, data) => {
+        const {skillID, name} = data;
+        return {...accumulator, [name.toLowerCase()]: skillID};
+    }, {});
+}
+
+export function appSkillToMap(currentAppSkill, mapOfSkillID) {
+    // input: array of skills & mapOfSkillID
+    // output: map with name as keys and skillID as value
+
+    return currentAppSkill.reduce((accumulator, skill) => {
+        skill = skill.trim().toLowerCase();
+        return {...accumulator, [skill]: mapOfSkillID[skill]};
+    }, {});
 }
