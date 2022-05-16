@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { Container, Row, Form, Button, Col } from 'react-bootstrap';
-import {getListOfAllCompanies, getUserToken, getAllSkills, scrapeJobURL, dataAlreadyRecorded, postSkill} from '../utils/helper';
+import {getListOfAllCompanies, getUserToken, getAllSkills, scrapeJobURL, 
+        dataAlreadyRecorded, postSkill, arrayOfSkillsToMap, getUserID, 
+        getCompanyID, postApplication, appSkillToMap, postSkillToApplication} from '../utils/helper';
 import {validStringData} from '../utils/formValidation';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
 import { Navigate, useNavigate, Link,  useLocation } from "react-router-dom"
@@ -82,13 +84,14 @@ class NewJobApplication extends React.Component {
         this.setState({ notes: event.target.value});
     }
 
-    submitApplication(event) {
+    async submitApplication(event) {
         event.preventDefault();
-        let {applicationSkillList, companyName, title, location, url, status} = this.state;
+        let {applicationSkillList, companyName, title, location, url, status, companyList, notes, skillListFromServer} = this.state;
 
         url = url.trim();
         title = title.trim();
         location = location.trim();
+        notes = notes.trim();
 
         // check if form fields are valid
         this.setState({ 
@@ -102,9 +105,48 @@ class NewJobApplication extends React.Component {
 
 
         // only make POST request when all the form field is valid
+        if (validStringData(companyName) && validStringData(url) && validStringData(title) 
+            && validStringData(location) && applicationSkillList.length > 0 && validStringData(status)) {
+
+            const userID = getUserID();
+            const companyID = getCompanyID(companyList, companyName);
+            const userNotes = notes || "No notes provided";
+
+            const appDetails = {companyID, 'jobPostingURL': url, 'position': title, userID, status, location, 'notes': userNotes};
+
+            try {
+                const appSubmit = await postApplication(appDetails);
+                const {applicationID} = appSubmit;
+
+                // once application is submitted, POST the skills
+                const mapOfSkillsFromServer = arrayOfSkillsToMap(skillListFromServer);
+                const uniqueMapOfAppSkills = appSkillToMap(applicationSkillList, mapOfSkillsFromServer);
+
+                postSkillToApplication({applicationID, 'skillIDs': Object.values(uniqueMapOfAppSkills)});
+                /*for (const skillName in uniqueMapOfAppSkills) {
+                    postSkillToApplication({applicationID, 'skillID': uniqueMapOfAppSkills[skillName]});
+                }*/
+
+                // send message that app was succesfully submitted and reset form fields
+
+            }
+            catch (error) {
+                if (error.sourceMessage === 'Error in creating new application') {
+                    alert("Unable to submit application. Please try again!");
+                    return;
+                }
+                // application was posted, but skill was not.
+                // send message and reroute to dashboard.
+                alert("Unable to add job skills to your application.");
+                this.props.navigate('/main');
+                return;
+            }
+            
+
+        }
 
 
-        console.log("submitting")
+
     }
 
     scrapeData() {
@@ -113,7 +155,7 @@ class NewJobApplication extends React.Component {
 
         if (validStringData(url)) {
             // disable button to prevent server congestion
-            this.setState({disableScrapeButton: true});
+            this.setState({disableScrapeButton: true, urlValid: true});
 
             // make API request to scrape available data
             scrapeJobURL(url).then((result) => { 
@@ -124,10 +166,10 @@ class NewJobApplication extends React.Component {
                 // if company name in list, 
                 if (dataAlreadyRecorded(this.state.companyList, company)) {
                     // update companyName
-                    this.setState({urlValid: true, companyName: company});
+                    this.setState({companyName: company, companyNameValid: true});
                 } 
                 // update title, location, disableScrapeButton
-                this.setState({location, title, disableScrapeButton: false});
+                this.setState({location, title, disableScrapeButton: false, titleValid: true, locationValid: true});
                 
             }).catch((error) => {
                 // let user know data could not be scraped
@@ -165,7 +207,7 @@ class NewJobApplication extends React.Component {
                 }));
             }
 
-            this.setState({skill: ""});
+            this.setState({skill: "", appSkillsValid: true});
         }
     }
 
@@ -174,6 +216,7 @@ class NewJobApplication extends React.Component {
         // set company value to props if passed in
         if (this.globalLoggedInState) {
             const token = getUserToken();
+
             getListOfAllCompanies(token).then(
                 (result) => { 
                     this.setState({companyList: result});
