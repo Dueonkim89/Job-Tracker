@@ -1,6 +1,8 @@
 import express from "express";
 import passport from "passport";
-import * as commentModel from "../models/commentModel";
+import commentModel from "../models/commentModel";
+import { CompanyComment } from "../types/comment";
+import { validateAndParseStringID } from "../types/validators";
 const router = express.Router();
 
 export default router;
@@ -14,18 +16,11 @@ export default router;
 router.get("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { companyID } = req.query;
     try {
-        if (typeof companyID !== "string") {
-            return res.status(400).json({ success: false, message: "Invalid Company ID" });
-        }
-        const parsedCompanyID = parseInt(companyID);
-        if (isNaN(parsedCompanyID)) {
-            return res.status(400).json({ success: false, message: "Invalid Company ID" });
-        }
+        const parsedCompanyID = validateAndParseStringID(companyID);
         const rows = await commentModel.getCompanyComments(parsedCompanyID);
         res.status(200).json(rows);
-    } catch (err) {
-        console.error(`Error in getting company comments:`);
-        console.error({ companyID });
+    } catch (err: any) {
+        err.sourceMessage = `Error in getting company comments`;
         next(err);
     }
 });
@@ -34,20 +29,20 @@ router.get("/", passport.authenticate("jwt", { session: false }), async function
  * @description: Adds a user's company comment to the database
  * @method: POST /api/comments
  * @param: JSON of {userID, companyID, title, text}
- * @returns: HTTP 201 and JSON of {success: true, commentID, userID, companyID, title, text, datetime}
+ * @returns: HTTP 201 and JSON of {success: true, commentID, datetime}
  * or HTTP 400 and JSON of {success: false, message: "reason for error"}
  */
 router.post("/", passport.authenticate("jwt", { session: false }), async function (req, res, next) {
     const { userID, companyID, title, text } = req.body;
-    const datetime = new Date();
     try {
-        const payload = { userID, companyID, title, text, datetime };
-        const commentID = await commentModel.createComment(payload);
-        const response = { success: true, commentID, ...payload };
+        const datetime = new Date();
+        const comment: CompanyComment = new CompanyComment({ userID, companyID, title, text, datetime });
+        comment.validateAndAssertContains(["userID", "companyID", "title", "text", "datetime"]);
+        const commentID = await commentModel.createComment(comment.fields);
+        const response = { success: true, commentID, datetime };
         return res.status(201).json(response);
-    } catch (err) {
-        console.error(`Error in creating new company comment:`);
-        console.error({ userID, companyID, title, text, datetime });
+    } catch (err: any) {
+        err.sourceMessage = `Error in creating new company comment`;
         next(err);
     }
 });

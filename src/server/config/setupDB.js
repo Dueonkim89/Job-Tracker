@@ -1,4 +1,4 @@
-const { chosenDBConfig } = require("../models/db");
+const { chosenDBConfig } = require("./db");
 const mysql = require("mysql2");
 const path = require("path");
 const fs = require("fs");

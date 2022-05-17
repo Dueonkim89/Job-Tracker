@@ -1,4 +1,4 @@
-import * as appModel from "../applicationModel";
+import appModel from "../applicationModel";
 
 test("Get user 1 apps", async () => {
     const result = await appModel.getUserApps(1);
@@ -69,16 +69,6 @@ test("Create new user app", async () => {
     };
     const result = await appModel.createApp(payload);
     expect(result).toBeGreaterThan(5);
-});
-
-test("Update valid user app status", async () => {
-    const result = await appModel.updateAppStatus(4, "Interview");
-    expect(result).toBe(true);
-});
-
-test("Update non-existant user app status", async () => {
-    const result = await appModel.updateAppStatus(100, "Interview");
-    expect(result).toBe(false);
 });
 
 test("Create new app contact", async () => {

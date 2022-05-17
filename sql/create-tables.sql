@@ -19,7 +19,7 @@ CREATE TABLE `Companies`(
     `companyID` INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `name` VARCHAR(255) NOT NULL UNIQUE,
     `industry` VARCHAR(255),
-    `websiteURL` VARCHAR(255)
+    `websiteURL` TEXT
 );
 -- Creating Company Comments Table
 DROP TABLE IF EXISTS CompanyComments;
@@ -27,9 +27,9 @@ CREATE TABLE `CompanyComments`(
     `commentID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `userID` INT NOT NULL,
     `companyID` INT NOT NULL,
-    `title` VARCHAR(255),
-    `text` TEXT,
-    `datetime` DATETIME,
+    `title` VARCHAR(255) NOT NULL,
+    `text` TEXT NOT NULL,
+    `datetime` DATETIME NOT NULL,
     FOREIGN KEY(`userID`) REFERENCES `Users`(`userID`),
     FOREIGN KEY(`companyID`) REFERENCES `Companies`(`companyID`)
 );
@@ -38,10 +38,10 @@ DROP TABLE IF EXISTS Applications;
 CREATE TABLE `Applications`(
     `applicationID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `companyID` INT NOT NULL,
-    `jobPostingURL` VARCHAR(300) NOT NULL,
+    `jobPostingURL` TEXT NOT NULL,
     `position` VARCHAR(255) NOT NULL,
     `userID` INT NOT NULL,
-    `status` VARCHAR(255),
+    `status` VARCHAR(255) NOT NULL,
     `location` VARCHAR(255),
     `datetime` DATETIME,
     `notes` TEXT,

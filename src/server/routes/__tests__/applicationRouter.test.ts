@@ -1,14 +1,17 @@
 // Boilerplate code
 import http from "http";
 import request from "supertest";
+import { app } from "../../index";
 
 let server: http.Server;
-let token: string;
+let token1: string;
+let token2: string;
+let token3: string;
 
-const logInGetToken = async () => {
+const logInGetToken = async (username: string) => {
     const body = {
-        username: "ally1",
-        password: "ally1",
+        username: username,
+        password: username,
     };
     const result = await request(server).post("/api/users/login").send(body);
     if (!result.body.success) {
@@ -18,9 +21,13 @@ const logInGetToken = async () => {
 };
 
 beforeAll((done) => {
-    const { app } = require("../../index");
     server = app.listen(async () => {
-        token = await logInGetToken();
+        const token1_promise = logInGetToken("ally1");
+        const token2_promise = logInGetToken("bryson2");
+        const token3_promise = logInGetToken("carlos3");
+        token1 = await token1_promise;
+        token2 = await token2_promise;
+        token3 = await token3_promise;
         return done();
     });
 });
@@ -76,15 +83,14 @@ test("[Valid] Getting user applications", async () => {
             contacts: null,
         },
     ];
-    const result = await request(server).get("/api/applications?userID=1").set("Authorization", token).send();
+    const result = await request(server).get("/api/applications?userID=1").set("Authorization", token1).send();
     expect(result.statusCode).toEqual(200);
     expect(result.body).toEqual(expected);
 });
 
-test("[Empty] Getting user applications", async () => {
-    const result = await request(server).get("/api/applications?userID=200").set("Authorization", token).send();
-    expect(result.statusCode).toEqual(200);
-    expect(result.body).toEqual([]);
+test("[Invalid] Getting user apps other than self", async () => {
+    const result = await request(server).get("/api/applications?userID=2").set("Authorization", token1).send();
+    expect(result.statusCode).toEqual(401);
 });
 
 test("[Valid] Adding a user application", async () => {
@@ -96,7 +102,7 @@ test("[Valid] Adding a user application", async () => {
         status: "pending",
         location: "remote",
     };
-    const result = await request(server).post("/api/applications").set("Authorization", token).send(payload);
+    const result = await request(server).post("/api/applications").set("Authorization", token2).send(payload);
     expect(result.statusCode).toEqual(201);
     expect(result.body.applicationID).toBeGreaterThan(5);
     expect(result.body.success).toEqual(true);
@@ -111,7 +117,7 @@ test("[Valid] Adding an app contact", async () => {
         phoneNumber: "111-111-1295",
         role: "testrole",
     };
-    const result = await request(server).post("/api/applications/contact").set("Authorization", token).send(payload);
+    const result = await request(server).post("/api/applications/contact").set("Authorization", token3).send(payload);
     expect(result.statusCode).toEqual(201);
     expect(result.body.success).toEqual(true);
     expect(result.body.contactID).toBeGreaterThan(4);
@@ -120,7 +126,7 @@ test("[Valid] Adding an app contact", async () => {
 test("[Valid] Deleting an app contact", async () => {
     const result = await request(server)
         .delete("/api/applications/contact?contactID=3")
-        .set("Authorization", token)
+        .set("Authorization", token2)
         .send();
     expect(result.statusCode).toEqual(200);
     expect(result.body.success).toEqual(true);
@@ -137,12 +143,12 @@ test("[Valid] Updating an app contact #1", async () => {
         phoneNumber: "666-666-6666",
         role: "Hiring Manager",
     };
-    const result = await request(server).put("/api/applications/contact").set("Authorization", token).send(payload);
+    const result = await request(server).patch("/api/applications/contact").set("Authorization", token3).send(payload);
     expect(result.statusCode).toEqual(201);
     expect(result.body.success).toEqual(true);
     const updatedResult = await request(server)
         .get("/api/applications/contact?contactID=4")
-        .set("Authorization", token)
+        .set("Authorization", token3)
         .send();
     expect(updatedResult.statusCode).toEqual(200);
     expect(updatedResult.body).toEqual(expected);
@@ -153,9 +159,13 @@ test("[Valid] Updating an app status", async () => {
         applicationID: 5,
         status: "Interview Again",
     };
-    const result = await request(server).put("/api/applications/status").set("Authorization", token).send(payload);
+    let result = await request(server).patch("/api/applications").set("Authorization", token3).send(payload);
     expect(result.statusCode).toEqual(201);
     expect(result.body.success).toEqual(true);
+    result = await request(server).get("/api/applications?userID=3").set("Authorization", token3).send(payload);
+    expect(result.statusCode).toEqual(200);
+    expect(result.body[1].status).toEqual("Interview Again");
+    expect(result.body[1].location).toEqual("Remote");
 });
 
 test("[Valid] Updating an app notes", async () => {
@@ -163,7 +173,11 @@ test("[Valid] Updating an app notes", async () => {
         applicationID: 5,
         notes: "Great stuff",
     };
-    const result = await request(server).put("/api/applications/notes").set("Authorization", token).send(payload);
+    let result = await request(server).patch("/api/applications").set("Authorization", token3).send(payload);
     expect(result.statusCode).toEqual(201);
     expect(result.body.success).toEqual(true);
+    result = await request(server).get("/api/applications?userID=3").set("Authorization", token3).send(payload);
+    expect(result.statusCode).toEqual(200);
+    expect(result.body[1].notes).toEqual("Great stuff");
+    expect(result.body[1].location).toEqual("Remote");
 });

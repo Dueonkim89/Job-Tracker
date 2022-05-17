@@ -1,6 +1,7 @@
 // Boilerplate code
 import http from "http";
 import request from "supertest";
+import { app } from "../../index";
 
 let server: http.Server;
 let token: string;
@@ -18,7 +19,6 @@ const logInGetToken = async () => {
 };
 
 beforeAll((done) => {
-    const { app } = require("../../index");
     server = app.listen(async () => {
         token = await logInGetToken();
         return done();
