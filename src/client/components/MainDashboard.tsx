@@ -1,4 +1,4 @@
-import { Container, Row, Col, Form, Button, Nav, Table, DropdownButton, Dropdown } from 'react-bootstrap';
+import { Container, Row, Col, Modal, Button, Nav, Table, DropdownButton, Dropdown } from 'react-bootstrap';
 import Rating from '@mui/material/Rating';
 import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -28,6 +28,9 @@ export default function Dashboard() {
     const statuslist={
         myarray:["Applied","Online Assessment","Phone Interview","Technical Interview","Accepted","Rejected"]
     }
+
+    // Showing modal useState
+    const [modalShow, setModalShow] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -156,7 +159,8 @@ export default function Dashboard() {
                 <td><a href={window.origin + "/applied_company/" + app.companyName} target="_blank" rel="noopener">
                     {app.companyName}
                 </a></td>
-                <td>{app.notes}</td>
+                <td onClick={() => setModalShow(true)}>{app.notes}</td>
+                
             </tr>
         )
     })
@@ -164,7 +168,7 @@ export default function Dashboard() {
     // sends a post request to change the application status
     const updateAppStatus = (applicationID : number, status : string) => {
         if (user) {
-            axios.put("/api/applications/status", {applicationID, status}, {
+            axios.patch("/api/applications", {applicationID, status}, {
                 headers: {
                     Authorization: user.token
                 }
@@ -249,6 +253,35 @@ export default function Dashboard() {
                 console.log(err);
             })
         }
+    }
+
+    // Centered Modal for Notes
+    const CenteredModal = () : JSX.Element => {
+        return (
+            <Modal
+                //{...props}
+                size="lg"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+                >
+                <Modal.Header closeButton>
+                    <Modal.Title id="contained-modal-title-vcenter">
+                    Modal heading
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <h4>Centered Modal</h4>
+                    <p>
+                    Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
+                    dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta ac
+                    consectetur ac, vestibulum at eros.
+                    </p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button >Close</Button>
+                </Modal.Footer>
+            </Modal>
+        );
     }
 
     const navigateApplication = async (event: any) => {
