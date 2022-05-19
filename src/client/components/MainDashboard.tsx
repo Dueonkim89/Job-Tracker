@@ -1,4 +1,4 @@
-import { Container, Row, Col, Modal, Button, Nav, Table, DropdownButton, Dropdown } from 'react-bootstrap';
+import { Container, Row, Col, Modal, Button, InputGroup, FormControl, Table, DropdownButton, Dropdown } from 'react-bootstrap';
 import Rating from '@mui/material/Rating';
 import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -30,7 +30,14 @@ export default function Dashboard() {
     }
 
     // Showing modal useState
-    const [modalShow, setModalShow] = useState(false);
+    const [show, setShow] = useState(false);
+    const handleClose = () => {
+        setShow(false);
+    }
+    const handleShow = () => setShow(true);
+
+    // Note state to update
+    const [currentNote, setCurrentNote] = useState('');
 
     useEffect(() => {
         if (user) {
@@ -134,6 +141,65 @@ export default function Dashboard() {
         )
     }
 
+    const ShowModal = (props : any) : JSX.Element => {
+        return (
+            <div>
+                <Button variant="" onClick={handleShow}>
+                    {props.data.notes}
+                </Button>
+
+                <Modal
+                    show={show}
+                    onHide={handleClose}
+                    backdrop="static"
+                    keyboard={false}
+                >
+                    <Modal.Header closeButton>
+                    <Modal.Title>Notes</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                    <InputGroup>
+                        <FormControl as="input" aria-label="With textarea" defaultValue={props.data.notes} onChange={(e) => {
+                            props.data.notes = e.target.value;
+                            console.log(props.data.notes);
+                        }} />
+                    </InputGroup>
+                    </Modal.Body>
+                    <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={() => {
+                        console.log(currentNote);
+                        //updateNotes(props.data.applicationID, currentNote);
+                    }}>Update</Button>
+                    </Modal.Footer>
+                </Modal>
+            </div>
+            
+        );
+    }
+
+    const updateNotes = (applicationID : number, notes : string) => {
+        if (user) {
+            axios.patch("/api/applications", {applicationID, notes}, {
+                headers: {
+                    Authorization: user.token
+                }
+            })
+            .then((res) => {
+                // creates a temporary array to make edits
+                // then resets skills state
+                let tempApplications = applications.slice();
+                tempApplications[applicationID-1].notes = notes;
+                setApplications(tempApplications);
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+        }
+    }
+
     const tableAppRow = applications.map((app) => {
         return (
             <tr>
@@ -159,8 +225,7 @@ export default function Dashboard() {
                 <td><a href={window.origin + "/applied_company/" + app.companyName} target="_blank" rel="noopener">
                     {app.companyName}
                 </a></td>
-                <td onClick={() => setModalShow(true)}>{app.notes}</td>
-                
+                <ShowModal data={{notes: app.notes, applicationID: app.applicationID}}/>
             </tr>
         )
     })
@@ -253,35 +318,6 @@ export default function Dashboard() {
                 console.log(err);
             })
         }
-    }
-
-    // Centered Modal for Notes
-    const CenteredModal = () : JSX.Element => {
-        return (
-            <Modal
-                //{...props}
-                size="lg"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-                >
-                <Modal.Header closeButton>
-                    <Modal.Title id="contained-modal-title-vcenter">
-                    Modal heading
-                    </Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <h4>Centered Modal</h4>
-                    <p>
-                    Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
-                    dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta ac
-                    consectetur ac, vestibulum at eros.
-                    </p>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button >Close</Button>
-                </Modal.Footer>
-            </Modal>
-        );
     }
 
     const navigateApplication = async (event: any) => {
