@@ -24,13 +24,36 @@ export function checkIfTokenExists() {
     } return true;
 }
 
-export function companyNameAlreadyRecorded(companyList, newCompanyName) {
-    /*  INPUT: list of companies and new company name
-        OUTPUT: boolean value of company already recorded in database
-    */
-    // keyword of is used to get the object at each iteration
+export function getUserID() {
+    /*  INPUT: none
+        OUTPUT: userID
+     */
+    const user = localStorage.getItem("user");
+    return JSON.parse(user).userID;
+}
+
+export function getCompanyID(companyList, companyName) {
+    /*  INPUT: list of companies & string value of company name
+        OUTPUT: companyID
+     */
+
     for (const company of companyList) {
-        if (company.name.toLowerCase() === newCompanyName.toLowerCase()) {
+        if (company.name === companyName) {
+            return company.companyID;
+        }
+    }
+}
+
+export function dataAlreadyRecorded(dataList, newName) {
+    /*  INPUT: list of companies/skill and new company/skill name
+        OUTPUT: boolean value of company/skill already recorded in database
+    */
+
+    let lowerCase = newName.toLowerCase();
+
+    // keyword of is used to get the object at each iteration
+    for (const data of dataList) {
+        if (data.name.toLowerCase() === lowerCase) {
             return true;
         }
     }
@@ -60,11 +83,11 @@ export function checkIfTokenExpired() {
         headers: {
             'Authorization': token
           }
-    }) .then(function (response) {
+    }).then(function (response) {
         return Promise.resolve(response.data.success);
-      }).catch(function (error) {
+    }).catch(function (error) {
         return Promise.reject(false);
-      });
+    });
 }
 
 export function getServerURL(nodeEnv) {
@@ -86,7 +109,6 @@ export function registerNewUser(userField) {
         }
         return Promise.reject({"success": false});
     });
-
 }
 
 export function getListOfAllCompanies(jwt) {
@@ -160,5 +182,95 @@ export function getAllSkills() {
         return Promise.resolve(response.data);
     }).catch(function (error) {
         return Promise.reject(error.response);
-    });;
+    });
+}
+
+export function scrapeJobURL(jobURL) {
+    // INPUT: url of job application
+    // OUTPUT: map with company location, title and success - true if succesful.
+    //         map with succes - false if unable to scrape
+    const jwt = getUserToken();
+    const apiURL = '/api/scrape?url=' + jobURL;
+
+    return axios.get(apiURL, {
+        headers: {
+            'Authorization': jwt
+          }
+    }).then(function (response) {
+        // payload contains: location, company, success and title
+        return Promise.resolve(response.data);
+    }).catch(function (error) {
+        // send back error
+        return Promise.reject(error.response.data);
+    });
+
+}
+
+export function postSkill(jobSkill) {
+    // POST new job skill into data base
+    // Input: string type for jobSkill
+    // OUTPUT: Promise of {skillID, name}
+
+    return axios.post("/api/skills", {"name": titleCase(jobSkill)}).then(function (response) {
+        // send promise.resolve. Include token, userId and success value
+        return Promise.resolve(response.data);
+    }).catch(function (error) {
+        return Promise.reject(error.response);
+    });
+}
+
+export function postApplication(appDetails) {
+    // POST new app into data base
+    // Input: map of {companyID, jobPostingURL, position, userID, status, location, notes}
+    // OUTPUT: Success: Promise of {success: true, applicationID, datetime}
+    //         Fail: Promise rejection: Error
+
+    const jwt = getUserToken();
+    return axios.post("/api/applications", appDetails, {
+        headers: {
+            'Authorization': jwt
+        }
+    }).then(function (response) {
+        return Promise.resolve(response.data);
+    }).catch(function (error) {
+        return Promise.reject(error.response);
+    });
+}
+
+export function postSkillToApplication(skills) {
+    //  POST required skills into application
+    //  INPUT: map. { applicationID (string), skillIDs: number[] }
+    //  OUTPUT: Success: Promise {success: true, applicationID, skillID, name}
+    //          Fail:   Promise rejection: Error
+
+    const jwt = getUserToken();
+    return axios.post("/api/skills/application", skills, {
+        headers: {
+            'Authorization': jwt
+        }
+    }).then(function (response) {
+        return Promise.resolve(response.data);
+    }).catch(function (error) {
+        return Promise.reject(error.response);
+    });
+
+}
+
+export function arrayOfSkillsToMap(skillList) {
+    // input: array of maps with keys skillID and name
+    // output: map with name as keys and skillID as value
+    return skillList.reduce((accumulator, data) => {
+        const {skillID, name} = data;
+        return {...accumulator, [name.toLowerCase()]: skillID};
+    }, {});
+}
+
+export function appSkillToMap(currentAppSkill, mapOfSkillID) {
+    // input: array of skills & mapOfSkillID
+    // output: map with name as keys and skillID as value
+
+    return currentAppSkill.reduce((accumulator, skill) => {
+        skill = skill.trim().toLowerCase();
+        return {...accumulator, [skill]: mapOfSkillID[skill]};
+    }, {});
 }

@@ -222,10 +222,14 @@ export default function Dashboard() {
                     {app.position}
                 </a></td>
                 <td>{app.location}</td>
+<<<<<<< HEAD
                 <td><a href={window.origin + "/applied_company/" + app.companyName} target="_blank" rel="noopener">
                     {app.companyName}
                 </a></td>
                 <ShowModal data={{notes: app.notes, applicationID: app.applicationID}}/>
+=======
+                <td><Link to={`/applied_company/${app.companyName}`} state={{name: app.companyName}}>{app.companyName}</Link></td>
+>>>>>>> b3c74f8d76a112a775d9b7e7a23f46ef723acda6
             </tr>
         )
     })
