@@ -37,7 +37,8 @@ export default function Dashboard() {
     const handleShow = () => setShow(true);
 
     // Note state to update
-    const [currentNote, setCurrentNote] = useState('');
+    const [currentApp, setCurrentApp] = useState({notes: '', applicationID: ''});
+    let currentNote : string = '';
 
     useEffect(() => {
         if (user) {
@@ -141,46 +142,38 @@ export default function Dashboard() {
         )
     }
 
-    const ShowModal = (props : any) : JSX.Element => {
+    const ShowModal = () : JSX.Element => {
         return (
-            <div>
-                <Button variant="" onClick={handleShow}>
-                    {props.data.notes}
+            <Modal
+                show={show}
+                onHide={handleClose}
+                backdrop="static"
+                keyboard={false}
+            >
+                <Modal.Header closeButton>
+                <Modal.Title>Notes</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                <InputGroup>
+                    <FormControl as="input" aria-label="With textarea" defaultValue={currentApp.notes} onChange={(e) => {
+                        currentNote = e.target.value;
+                    }} />
+                </InputGroup>
+                </Modal.Body>
+                <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                    Close
                 </Button>
-
-                <Modal
-                    show={show}
-                    onHide={handleClose}
-                    backdrop="static"
-                    keyboard={false}
-                >
-                    <Modal.Header closeButton>
-                    <Modal.Title>Notes</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                    <InputGroup>
-                        <FormControl as="input" aria-label="With textarea" defaultValue={props.data.notes} onChange={(e) => {
-                            props.data.notes = e.target.value;
-                            console.log(props.data.notes);
-                        }} />
-                    </InputGroup>
-                    </Modal.Body>
-                    <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                    <Button variant="primary" onClick={() => {
-                        console.log(currentNote);
-                        //updateNotes(props.data.applicationID, currentNote);
-                    }}>Update</Button>
-                    </Modal.Footer>
-                </Modal>
-            </div>
-            
+                <Button variant="primary" onClick={() => {
+                    updateNotes(Number(currentApp.applicationID), currentNote)
+                    .then(handleClose);
+                }}>Update</Button>
+                </Modal.Footer>
+            </Modal>
         );
     }
 
-    const updateNotes = (applicationID : number, notes : string) => {
+    const updateNotes = async (applicationID : number, notes : string) => {
         if (user) {
             axios.patch("/api/applications", {applicationID, notes}, {
                 headers: {
@@ -222,14 +215,18 @@ export default function Dashboard() {
                     {app.position}
                 </a></td>
                 <td>{app.location}</td>
-<<<<<<< HEAD
                 <td><a href={window.origin + "/applied_company/" + app.companyName} target="_blank" rel="noopener">
                     {app.companyName}
                 </a></td>
-                <ShowModal data={{notes: app.notes, applicationID: app.applicationID}}/>
-=======
-                <td><Link to={`/applied_company/${app.companyName}`} state={{name: app.companyName}}>{app.companyName}</Link></td>
->>>>>>> b3c74f8d76a112a775d9b7e7a23f46ef723acda6
+                <td>
+                    <Button variant="" onClick={() => {
+                        handleShow();
+                        setCurrentApp({notes: app.notes, applicationID: app.applicationID})
+                        }}>
+                        {app.notes}
+                    </Button>
+                    <ShowModal />
+                </td>
             </tr>
         )
     })
