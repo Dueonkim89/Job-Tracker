@@ -130,7 +130,7 @@ export default function Dashboard() {
                     {app.position}
                 </a></td>
                 <td>{app.location}</td>
-                <td>{app.companyName}</td>
+                <td><Link to={`/applied_company/${app.companyName}`} state={{name: app.companyName}}>{app.companyName}</Link></td>
             </tr>
         )
     })
