@@ -224,13 +224,15 @@ export default function Dashboard() {
                     {app.companyName}
                 </a></td>
                 <td>
-                    <Button variant="" onClick={() => {
-                        handleShow();
-                        setCurrentApp({notes: app.notes, applicationID: app.applicationID})
-                        }}>
-                        {app.notes}
-                    </Button>
-                    <ShowModal />
+                    <div className="d-grid">
+                        <Button variant="" onClick={() => {
+                            handleShow();
+                            setCurrentApp({notes: app.notes, applicationID: app.applicationID})
+                            }}>
+                            {app.notes || <div style={{color: "grey"}}>[Click to Add Notes]</div>}
+                        </Button>
+                        <ShowModal />
+                    </div>
                 </td>
             </tr>
         )
