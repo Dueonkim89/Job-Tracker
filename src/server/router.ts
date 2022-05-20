@@ -16,4 +16,4 @@ router.use("/companies", companyRouter);
 router.use("/skills", skillRouter);
 router.use("/comments", commentRouter);
 router.use("/scrape", scrapeRouter);
-router.use("/pwreset", pwResetRouter);
+router.use("/pw-reset", pwResetRouter);
