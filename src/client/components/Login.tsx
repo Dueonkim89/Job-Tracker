@@ -20,7 +20,6 @@ function Login() {
     // checks if the token in the local storage matches the one created when the user logged in.
     // if it is the user is directed to main dashboard page
     useEffect(() => {
-        console.log(loggedInStatus);
         if (userData) {
             user = JSON.parse(userData);
             setLoggedInStatus(true);

@@ -1,4 +1,4 @@
-import { Container, Row, Col, Form, Button, Nav, Table } from 'react-bootstrap';
+import { Container, Row, Col, Modal, Button, InputGroup, FormControl, Table, DropdownButton, Dropdown } from 'react-bootstrap';
 import Rating from '@mui/material/Rating';
 import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -9,6 +9,9 @@ import { Application } from './Application';
 import { Skill } from './Skill';
 import { setConstantValue } from 'typescript';
 import RaisedButton from 'material-ui/RaisedButton';
+import { application } from 'express';
+import { EventEmitter } from 'stream';
+import { constants } from 'buffer';
 
 
 export default function Dashboard() {
@@ -21,6 +24,21 @@ export default function Dashboard() {
     //let applications : Array<Application> = [];
     const [applications, setApplications] = useState<Application[]>([]);
     const [skills, setSkills] = useState<Skill[]>([]);
+
+    const statuslist={
+        myarray:["Applied","Online Assessment","Phone Interview","Technical Interview","Accepted","Rejected"]
+    }
+
+    // Showing modal useState
+    const [show, setShow] = useState(false);
+    const handleClose = () => {
+        setShow(false);
+    }
+    const handleShow = () => setShow(true);
+
+    // Note state to update
+    const [currentApp, setCurrentApp] = useState({notes: '', applicationID: ''});
+    let currentNote : string = '';
 
     useEffect(() => {
         if (user) {
@@ -43,7 +61,7 @@ export default function Dashboard() {
                 let temp : Array<Application> = [];
                 // Go through all applications and create a new map
                 for (let i=0; i<data.data.length; i++) {
-                    let current = data.data[i]
+                    let current = data.data[i];
                     // create application object
                     let application : Application = {"applicationID" : current.applicationID,
                                                      "companyName" : current.companyName,
@@ -51,7 +69,8 @@ export default function Dashboard() {
                                                      "jobPostingURL" : current.jobPostingURL,
                                                      "location" : current.location,
                                                      "position" : current.position,
-                                                     "status" : current.status}
+                                                     "status" : current.status,
+                                                     "notes" : current.notes}
                     temp.push(application);
                 }
                 setApplications(temp);
@@ -117,23 +136,121 @@ export default function Dashboard() {
                 <th>Title</th>
                 <th>Location</th>
                 <th>Company</th>
+                <th>Notes</th>
                 </tr>
             </thead>
         )
     }
 
+    const ShowModal = () : JSX.Element => {
+        return (
+            <Modal
+                show={show}
+                onHide={handleClose}
+                backdrop="static"
+                keyboard={false}
+            >
+                <Modal.Header closeButton>
+                <Modal.Title>Notes</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                <InputGroup>
+                    <FormControl as="input" aria-label="With textarea" defaultValue={currentApp.notes} onChange={(e) => {
+                        currentNote = e.target.value;
+                    }} />
+                </InputGroup>
+                </Modal.Body>
+                <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                    Close
+                </Button>
+                <Button variant="primary" onClick={() => {
+                    updateNotes(Number(currentApp.applicationID), currentNote)
+                    .then(handleClose);
+                }}>Update</Button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+
+    const updateNotes = async (applicationID : number, notes : string) => {
+        if (user) {
+            axios.patch("/api/applications", {applicationID, notes}, {
+                headers: {
+                    Authorization: user.token
+                }
+            })
+            .then((res) => {
+                // creates a temporary array to make edits
+                // then resets skills state
+                let tempApplications = applications.slice();
+                tempApplications[applicationID-1].notes = notes;
+                setApplications(tempApplications);
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+        }
+    }
+
     const tableAppRow = applications.map((app) => {
         return (
             <tr>
-                <td>{app.status}</td>
+                <td>
+                    <div>
+                        <DropdownButton align="end" title={app.status} variant="" onSelect={value=>{
+                            if (value === null) {
+                                value = app.status;
+                            }
+                            updateAppStatus(Number(app.applicationID), value)
+                        }}>
+                            {statuslist.myarray.map(data=>(
+                                <Dropdown.Item eventKey={data}>{data}</Dropdown.Item>
+                            ))}
+                        </DropdownButton>
+                    </div>
+                    
+                </td>
                 <td><a href={app.jobPostingURL} target="_blank" rel="noopener">
                     {app.position}
                 </a></td>
                 <td>{app.location}</td>
-                <td><Link to={`/applied_company/${app.companyName}`} state={{name: app.companyName}}>{app.companyName}</Link></td>
+                <td><a href={window.origin + "/applied_company/" + app.companyName} target="_blank" rel="noopener">
+                    {app.companyName}
+                </a></td>
+                <td>
+                    <Button variant="" onClick={() => {
+                        handleShow();
+                        setCurrentApp({notes: app.notes, applicationID: app.applicationID})
+                        }}>
+                        {app.notes}
+                    </Button>
+                    <ShowModal />
+                </td>
             </tr>
         )
     })
+
+    // sends a post request to change the application status
+    const updateAppStatus = (applicationID : number, status : string) => {
+        if (user) {
+            axios.patch("/api/applications", {applicationID, status}, {
+                headers: {
+                    Authorization: user.token
+                }
+            })
+            .then((res) => {
+                // creates a temporary array to make edits
+                // then resets skills state
+                let tempApplications = applications.slice();
+                tempApplications[applicationID-1].status = status;
+                setApplications(tempApplications);
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+        }
+    }
 
     /* 
     Generates the main skills dashboard table

@@ -6,5 +6,6 @@ export interface Application {
     location: string;
     position: string;
     status: string;
+    notes: string;
 }
 
