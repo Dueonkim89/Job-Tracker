@@ -11,7 +11,6 @@ function init() {
     };
 
     const strategy = new Strategy(jwtOptions, async function (jwt_payload, next) {
-        if (process.env.NODE_ENV !== "test") console.log("payload received", jwt_payload);
         const user = await userModel.getUserByID(jwt_payload.id);
         if (user) {
             next(null, user);

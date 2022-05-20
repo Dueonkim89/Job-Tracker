@@ -181,11 +181,16 @@ export default function Dashboard() {
                 }
             })
             .then((res) => {
-                // creates a temporary array to make edits
-                // then resets skills state
-                let tempApplications = applications.slice();
-                tempApplications[applicationID-1].notes = notes;
-                setApplications(tempApplications);
+                setApplications((apps: Application[]) => {
+                    // remove update given application's notes; return the new array
+                    const newApps = apps.slice();
+                    const index = newApps.findIndex((app) => Number(app.applicationID) === applicationID);
+                    const newApp = { ...apps[index] };
+                    newApp.notes = notes;
+                    newApps.splice(index, 1, newApp);
+                    return newApps;
+                });
+
             })
             .catch((err) => {
                 console.log(err);
