@@ -1,6 +1,10 @@
 import axios from "axios";
 import { titleCase } from "title-case";
 import * as cheerio from "cheerio";
+import fs from "fs";
+
+// use this for debugging the html response:
+// fs.writeFileSync("temp.html", response.data)
 
 interface ScrapedAppInfo {
     success: boolean;
@@ -65,6 +69,10 @@ async function linkedin(url: URL) {
     // get and parse the HTML
     const response = await axios.get(url.toString(), { responseType: "text" });
     const $ = cheerio.load(response.data);
+    // once job posting expires, the data can no longer be scraped without authentication
+    const isRedirect = $("meta[name=pageKey]").attr("content") === "d_jobs_guest_search";
+    if (isRedirect) throw new Error("LinkedIn job posting expired.");
+    // otherwise the twitter meta data has the necessary information
     const tagline = $("meta[name=twitter:title]").attr("content");
     if (typeof tagline === "string") {
         return makeAppInfo(parseTagline(tagline));
