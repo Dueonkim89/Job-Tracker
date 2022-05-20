@@ -29,10 +29,10 @@ VALUES
 INSERT INTO `Applications` 
 (`applicationID`, `companyID`, `jobPostingURL`, `position`, `userID`, `status`, `location`, `datetime`, `notes`)
 VALUES 
-(1, 1, 'https://www.amazon.jobs/en/jobs/996246/senior-software-dev-engineer', 'Senior Software Dev Engineer', 1, 'Phone Screen', 'Seattle, WA', convert_tz('2022-01-01 00:00:00', @@session.time_zone, '+00:00'), 'here are my notes'),
+(1, 1, 'https://www.amazon.jobs/en/jobs/996246/senior-software-dev-engineer', 'Senior Software Dev Engineer', 1, 'Phone Interview', 'Seattle, WA', convert_tz('2022-01-01 00:00:00', @@session.time_zone, '+00:00'), 'here are my notes'),
 (2, 1, 'https://www.amazon.jobs/en/jobs/981888/chip-design-engineer', 'Chip Design Engineer', 1, 'Applied', 'Tel Aviv, Israel', convert_tz('2022-01-02 00:00:00', @@session.time_zone, '+00:00'), 'here are my notes'),
 (3, 2, 'https://careers.blackbaud.com/us/en/job/R0008354/Software-Engineer-devops', 'Software Engineer, devops', 2, 'Final Round', 'Remote', convert_tz('2022-01-03 00:00:00', @@session.time_zone, '+00:00'), 'here are my notes'),
-(4, 3, 'https://cloudera.wd5.myworkdayjobs.com/External_Career/job/USA--Texas--Austin/Sr-Site-Reliability-Engineer_220266-1', 'Sr. Site Reliability Engineer', 3, 'Phone Screen', 'New York, NY', convert_tz('2022-01-04 00:00:00', @@session.time_zone, '+00:00'), 'here are my notes'),
+(4, 3, 'https://cloudera.wd5.myworkdayjobs.com/External_Career/job/USA--Texas--Austin/Sr-Site-Reliability-Engineer_220266-1', 'Sr. Site Reliability Engineer', 3, 'Phone Interview', 'New York, NY', convert_tz('2022-01-04 00:00:00', @@session.time_zone, '+00:00'), 'here are my notes'),
 (5, 3, 'https://cloudera.wd5.myworkdayjobs.com/External_Career/job/US-California-Santa-Clara-office-1/Senior-Staff-Engineer_220230-1', 'Senior Staff Engineer, Data Hub', 3, 'Final Round', 'Remote', convert_tz('2022-01-05 00:00:00', @@session.time_zone, '+00:00'), 'here are my notes');
 
 -- Populate Skills table
