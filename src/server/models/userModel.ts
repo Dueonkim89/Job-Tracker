@@ -39,4 +39,10 @@ export default {
         const [rows, fields] = await db.promise().query(sql, [username]);
         return userOrNull(rows as RowDataPacket[]);
     },
+
+    async getUserByEmailAddress(emailAddress: string) {
+        const sql = "SELECT * FROM `Users` WHERE emailAddress = ?";
+        const [rows, fields] = await db.promise().query(sql, [emailAddress]);
+        return userOrNull(rows as RowDataPacket[]);
+    },
 };
