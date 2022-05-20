@@ -274,3 +274,13 @@ export function appSkillToMap(currentAppSkill, mapOfSkillID) {
         return {...accumulator, [skill]: mapOfSkillID[skill]};
     }, {});
 }
+
+export function getCompanyName(url) {
+    // input: url of current page
+    // output: company name in page
+    for (let i = url.length - 1; i >= 0; i--) {
+        if (url[i] === "/") {
+            return url.slice(i + 1, url.length);
+        }
+    }
+}
