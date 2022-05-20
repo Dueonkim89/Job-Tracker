@@ -21,7 +21,7 @@ router.get("/", passport.authenticate("jwt", { session: false }), async function
         if (result.success) {
             return res.status(200).json(result);
         }
-        return res.status(400).json({ success: false, message: "Scraping not available." });
+        return res.status(404).json({ success: false, message: "Scraping not available." });
     } catch (err: any) {
         err.sourceMessage = `Other error in scraping url`;
         next(err);
