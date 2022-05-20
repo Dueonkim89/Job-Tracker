@@ -6,6 +6,7 @@ import {getListOfAllCompanies, getUserToken, getAllSkills, scrapeJobURL,
 import {validStringData} from '../utils/formValidation';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
 import { Navigate, useNavigate, Link,  useLocation } from "react-router-dom"
+import {APP_STATUSES} from "../../global/constants"
 
 const formPadding = ".75rem";
 const labelFontSize = "1.2rem";
@@ -112,7 +113,7 @@ class NewJobApplication extends React.Component {
             const companyID = getCompanyID(companyList, companyName);
             const userNotes = notes;
 
-            const appDetails = {companyID, 'jobPostingURL': url, 'position': title, userID, status, location, 'notes': userNotes};
+            const appDetails = {companyID, 'jobPostingURL': url, 'position': title, userID, status: APP_STATUSES[status], location, 'notes': userNotes};
 
             try {
                 const appSubmit = await postApplication(appDetails);
@@ -313,12 +314,9 @@ class NewJobApplication extends React.Component {
         return (
             <Form.Select style={{ border: !this.state.statusValid ? invalidStyle: ''}} value={this.state.status} onChange={this.pickAppStatus} aria-label="Choose application status from dropdown menu" id="status">
                 <option value="">Pick application status</option>
-                <option value="applied">Applied</option>
-                <option value="online_assessment">Online Assessment</option>
-                <option value="phone_interview">Phone Interview</option>
-                <option value="technical_interview">Technical Interview</option>
-                <option value="accepted">Accepted</option>
-                <option value="rejected">Rejected</option>
+                {Object.entries(APP_STATUSES).map(([key, name]) => {
+                    return (<option value={key}>{name}</option>)
+                })}
             </Form.Select>
         );
     }

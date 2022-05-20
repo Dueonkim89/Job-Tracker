@@ -12,6 +12,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import { application } from 'express';
 import { EventEmitter } from 'stream';
 import { constants } from 'buffer';
+import {APP_STATUSES} from "../../global/constants"
 
 
 export default function Dashboard() {
@@ -184,13 +185,10 @@ export default function Dashboard() {
                 setApplications((apps: Application[]) => {
                     // remove update given application's notes; return the new array
                     const newApps = apps.slice();
-                    const index = newApps.findIndex((app) => Number(app.applicationID) === applicationID);
-                    const newApp = { ...apps[index] };
-                    newApp.notes = notes;
-                    newApps.splice(index, 1, newApp);
+                    const appToUpdate = newApps.find((app) => Number(app.applicationID) === applicationID);
+                    if(appToUpdate) appToUpdate.notes = notes;
                     return newApps;
                 });
-
             })
             .catch((err) => {
                 console.log(err);
@@ -209,8 +207,8 @@ export default function Dashboard() {
                             }
                             updateAppStatus(Number(app.applicationID), value)
                         }}>
-                            {statuslist.myarray.map(data=>(
-                                <Dropdown.Item eventKey={data}>{data}</Dropdown.Item>
+                            {Object.entries(APP_STATUSES).map(([key, name])=>(
+                                <Dropdown.Item eventKey={name}>{name}</Dropdown.Item>
                             ))}
                         </DropdownButton>
                     </div>
@@ -246,12 +244,14 @@ export default function Dashboard() {
                     Authorization: user.token
                 }
             })
+            // update the app status with given applicationID
             .then((res) => {
-                // creates a temporary array to make edits
-                // then resets skills state
-                let tempApplications = applications.slice();
-                tempApplications[applicationID-1].status = status;
-                setApplications(tempApplications);
+                setApplications((apps: Application[]) => {
+                    const newApps = apps.slice();
+                    const appToUpdate = newApps.find((app) => Number(app.applicationID) === applicationID);
+                    if(appToUpdate) appToUpdate.status = status;
+                    return newApps;
+                });
             })
             .catch((err) => {
                 console.log(err);
@@ -315,12 +315,14 @@ export default function Dashboard() {
                     Authorization: user.token
                 }
             })
+            // update the skill rating with the given skillID
             .then((res) => {
-                // creates a temporary array to make edits
-                // then resets skills state
-                let tempSkills = skills.slice();
-                tempSkills[skillID-1].rating = rating;
-                setSkills(tempSkills);
+                setSkills((skills: Skill[]) => {
+                    const newSkills = skills.slice();
+                    const skillToUpdate = newSkills.find((skill) => Number(skill.skillID) === skillID);
+                    if(skillToUpdate) skillToUpdate.rating = rating;
+                    return newSkills;
+                });
             })
             .catch((err) => {
                 console.log(err);
