@@ -33,6 +33,7 @@ class NewJobApplication extends React.Component {
            locationValid: true,
            statusValid: true,
            appSkillsValid: true,
+           redirect: {shouldRedirect: false, location: ""}
         };
 
         // this.enterFirstName = this.enterFirstName.bind(this);enterLocationaa
@@ -109,7 +110,7 @@ class NewJobApplication extends React.Component {
 
             const userID = getUserID();
             const companyID = getCompanyID(companyList, companyName);
-            const userNotes = notes || "No notes provided";
+            const userNotes = notes;
 
             const appDetails = {companyID, 'jobPostingURL': url, 'position': title, userID, status, location, 'notes': userNotes};
 
@@ -126,6 +127,8 @@ class NewJobApplication extends React.Component {
                 // send message that app was succesfully submitted and reset form fields
                 alert("Application has been successfully submitted.");
                 this.resetFormFields();
+                // redirect user to main dashboard
+                this.setState({redirect: {shouldRedirect: true, location: "/main"}})
             }
             catch (error) {
                 if (error.sourceMessage === "Error in creating new application") {
@@ -378,6 +381,10 @@ class NewJobApplication extends React.Component {
     render() {
         // redirect to login if user is not logged in
         const ApplicationFormBorder = "3px solid #0a2a66";
+        // https://stackoverflow.com/questions/43230194/how-to-use-redirect-in-version-5-of-react-router-dom-of-reactjs
+        if(this.state.redirect.shouldRedirect) {
+            return <Navigate to={this.state.redirect.location}/>
+        }
         return (
             <UserLoggedInContext.Consumer>
                 {({loggedInStatus}) => (
