@@ -131,7 +131,7 @@ function Login() {
                     />
                 </Form.Group>
                 <Form.Group>
-                    <Link to="../registration">Forgot password?</Link>
+                    <Link to="../forgot_password">Forgot password?</Link>
                 </Form.Group>
                 <br />
                 <Button type="submit" className="login-button">
