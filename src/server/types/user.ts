@@ -1,4 +1,5 @@
 import { BaseValidator, Validators } from "./validators";
+import { isValidEmail, isValidPhone } from "../../global/inputValidators";
 
 export interface UserFields {
     userID?: number;
@@ -26,8 +27,8 @@ export class User extends BaseValidator<UserFields> {
         firstName: (v: any) => typeof v === "string",
         lastName: (v: any) => typeof v === "string",
         username: (v: any) => typeof v === "string",
-        phoneNumber: (v: any) => typeof v === "string",
-        emailAddress: (v: any) => typeof v === "string",
+        phoneNumber: (v: any) => typeof v === "string" && isValidPhone(v),
+        emailAddress: (v: any) => typeof v === "string" && isValidEmail(v),
         passwordHash: (v: any) => typeof v === "string",
     };
 }
