@@ -55,11 +55,11 @@ router.post("/login", async function (req, res, next) {
     try {
         const user = await userModel.getUserByUsername(username);
         if (!user) {
-            return res.status(400).json({ success: false, message: "Didn't find a user matching that username." });
+            return res.status(400).json({ success: false, field: "username", message: "Invalid username." });
         }
         const isValidPassword = await bcrypt.compare(password, user.passwordHash);
         if (!isValidPassword) {
-            return res.status(400).json({ success: false, message: "Invalid Password or Username" });
+            return res.status(400).json({ success: false, field: "password", message: "Invalid password" });
         }
         const accessToken = jwt.sign({ id: user.userID }, process.env.JWT_SECRET as jwt.Secret, {
             expiresIn: "1h",
