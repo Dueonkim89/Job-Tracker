@@ -1,6 +1,6 @@
 import { FieldPacket, OkPacket, ResultSetHeader, RowDataPacket } from "mysql2";
 import db from "../config/db";
-import { ReturnedUserFields, UserFields } from "../types/user";
+import { ReturnedUserFields, User, UserFields } from "../types/user";
 
 function userOrNull(rows: RowDataPacket[]) {
     if (Array.isArray(rows) && rows.length > 0) {
@@ -38,5 +38,18 @@ export default {
         const sql = "SELECT * FROM `Users` WHERE username = ?";
         const [rows, fields] = await db.promise().query(sql, [username]);
         return userOrNull(rows as RowDataPacket[]);
+    },
+
+    async getUserByEmailAddress(emailAddress: string) {
+        const sql = "SELECT * FROM `Users` WHERE emailAddress = ?";
+        const [rows, fields] = await db.promise().query(sql, [emailAddress]);
+        return userOrNull(rows as RowDataPacket[]);
+    },
+
+    async updateUser(userID: number, p: Partial<UserFields>) {
+        let sql = "UPDATE Users SET ? WHERE userID = ?";
+        const updates = Object.fromEntries(Object.entries(p).filter(([key, val]) => val !== undefined));
+        const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.promise().query(sql, [updates, userID]);
+        return result.affectedRows === 1;
     },
 };

@@ -63,7 +63,12 @@ function Login() {
                     window.location.reload();
                 })
                 .catch((err) => {
+                    const errField = err.response?.data?.field
+                    if(errField) alert(`Invalid ${errField}. Please try again.`)
                     console.log(err);
+                }).finally(() => {
+                    setPassword("");
+                    setUsername("");
                 });
         }
     };
@@ -126,7 +131,7 @@ function Login() {
                     />
                 </Form.Group>
                 <Form.Group>
-                    <Link to="../registration">Forgot password?</Link>
+                    <Link to="../forgot_password">Forgot password?</Link>
                 </Form.Group>
                 <br />
                 <Button type="submit" className="login-button">
