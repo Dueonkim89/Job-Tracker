@@ -10,6 +10,7 @@ module.exports = {
     target: "node",
     devtool: "inline-source-map",
     entry: entry,
+    cache: false,
     output: {
         path: path.resolve(__dirname, "build"),
         filename: "[name].js",
