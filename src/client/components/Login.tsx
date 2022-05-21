@@ -63,7 +63,12 @@ function Login() {
                     window.location.reload();
                 })
                 .catch((err) => {
+                    const errField = err.response?.data?.field
+                    if(errField) alert(`Invalid ${errField}. Please try again.`)
                     console.log(err);
+                }).finally(() => {
+                    setPassword("");
+                    setUsername("");
                 });
         }
     };
