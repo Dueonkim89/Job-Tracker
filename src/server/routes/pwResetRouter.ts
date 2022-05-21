@@ -24,7 +24,7 @@ router.post("/send-email", async function (req, res, next) {
         // ensure email is found in the database
         const user = await userModel.getUserByEmailAddress(emailAddress);
         if (!user) throw new ValidationError("Email address not found.");
-        const resetID = await saveResetRequest(emailAddress); // create and save a unique resetID for the request
+        const resetID = await saveResetRequest(user.userID, emailAddress); // create and save a unique resetID for the request
         await sendResetEmail(resetID, emailAddress); // send the email to the user
         res.status(200).send({ success: true });
     } catch (err: any) {
@@ -33,11 +33,14 @@ router.post("/send-email", async function (req, res, next) {
     }
 });
 
-async function saveResetRequest(emailAddress: string) {
+/**
+ * Saves the necessary info to the database and
+ */
+async function saveResetRequest(userID: number, emailAddress: string) {
     while (true) {
         try {
             const resetID = randomUUID();
-            await pwResetModel.saveResetID(resetID, emailAddress, new Date());
+            await pwResetModel.saveResetID(resetID, userID, emailAddress, new Date());
             return resetID;
         } catch (err: any) {
             if (err?.code === "ER_DUP_ENTRY") {
@@ -49,6 +52,9 @@ async function saveResetRequest(emailAddress: string) {
     }
 }
 
+/**
+ * Sends the password reset email to the given user
+ */
 async function sendResetEmail(resetID: string, emailAddress: string) {
     // using SendGrid Library: https://github.com/sendgrid/sendgrid-nodejs
     const resetURL = `https://jobtrackerapplication.azurewebsites.net/change-password/${resetID}`;
