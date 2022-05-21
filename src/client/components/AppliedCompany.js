@@ -42,6 +42,8 @@ class AppliedCompany extends React.Component {
             if (userApplications.length > 0) {
                 companyID = userApplications[0].companyID;
             }
+            // get comments
+
             this.setState({applications: userApplications, companyID});
         }
         catch (error) {
@@ -58,6 +60,18 @@ class AppliedCompany extends React.Component {
 
     generateAppTableBody() {
         // get from state: applications
+        return this.state.applications.map((app, idx) => {
+            return (
+                <tr key={app.applicationID}>
+                    <td>{idx + 1}</td>
+                    <td>{app.status}</td>
+                    <td>{app.position}</td>
+                    <td>{app.location}</td>
+                    <td>{formatDate(app.datetime)}</td>
+                    <td>{app.notes}</td>
+                </tr>
+            );
+        });
     }
 
     showApplications() {
@@ -77,18 +91,7 @@ class AppliedCompany extends React.Component {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                    <td>1</td>
-                    <td>Phone Interview</td>
-                    <td>Software Engineer</td>
-                    <td>Seattle, Washginton, USA</td>
-                    </tr>
-                    <tr>
-                    <td>2</td>
-                    <td>Technical Interview</td>
-                    <td>Android Engineer</td>
-                    <td>Dallas, Texas, USA</td>
-                    </tr>
+                    {this.generateAppTableBody()}
                 </tbody>
             </Table>
         );
