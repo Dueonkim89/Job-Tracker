@@ -253,7 +253,30 @@ export function postSkillToApplication(skills) {
     }).catch(function (error) {
         return Promise.reject(error.response);
     });
+}
 
+export function getUserApplications(companyName) {
+    // input: company name (string)
+    // output: array of applications that have company name
+
+    const jwt = getUserToken();
+    const userID = getUserID();
+    companyName = companyName.toLowerCase();
+
+    const apiURL = '/api/applications?userID=' + userID;
+
+    return axios.get(apiURL, {
+        headers: {
+            'Authorization': jwt
+          }
+    }).then(function (response) {
+        // filter applications by company name
+        const results = response.data.filter(app => app.companyName.toLowerCase() === companyName);
+        return Promise.resolve(results);
+    }).catch(function (error) {
+        // send back error
+        return Promise.reject(error);
+    });
 }
 
 export function arrayOfSkillsToMap(skillList) {
@@ -275,12 +298,29 @@ export function appSkillToMap(currentAppSkill, mapOfSkillID) {
     }, {});
 }
 
-export function getCompanyName(url) {
-    // input: url of current page
-    // output: company name in page
+export function getCompanyNameFromURL(url) {
+    // input: url of current page (STRING)
+    // output: company name in page (STRING)
+
+    // sanitize url link, replace encoding with white space
+    url = url.replace(/%20/g," ");
+
     for (let i = url.length - 1; i >= 0; i--) {
         if (url[i] === "/") {
             return url.slice(i + 1, url.length);
         }
     }
+}
+
+export function formatDate(dt) {
+    // input: datetime in string
+    // output: formatted date as M/DD/YYYY
+    dt = new Date(dt);
+
+    // convert month, day and year to string
+    const month = '' + dt.getMonth();
+    const day = '' + dt.getDate();
+    const year = '' + dt.getFullYear();
+
+    return month + "/" + day + "/" + year;
 }
