@@ -7,6 +7,7 @@ import Dashboard from "./components/MainDashboard";
 import NewJobApplication from "./components/NewJobApplication";
 import AddCompany from "./components/AddCompany";
 import AppliedCompany from "./components/AppliedCompany";
+import {PasswordResetEmailForm} from "./components/PasswordReset"
 import { Routes, Route } from "react-router-dom"; 
 import {UserLoggedInContext} from "./context/UserLoggedInStatus";
 import {checkIfTokenExists, checkIfTokenExpired} from "./utils/helper.js"
@@ -55,6 +56,7 @@ function setRoutes() {
         <Routes>
             <Route path="" element={<Login />} />
             <Route path="login" element={<Login />} />
+            <Route path="pw_reset_email" element={<PasswordResetEmailForm />} />
             <Route path="main" element={<Dashboard />} />
             <Route path="registration" element={<Registration />} />
             <Route path="application" element={<NewJobApplication />} />
