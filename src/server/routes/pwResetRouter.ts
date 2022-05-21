@@ -24,6 +24,8 @@ router.post("/send-email", async function (req, res, next) {
         // ensure email is found in the database
         const user = await userModel.getUserByEmailAddress(emailAddress);
         if (!user) throw new ValidationError("Email address not found.");
+        // TODO - should I SALT the resetID before saving in the database?
+        //    otherwise an attacker who gains DB access could intercept all incoming reset requests
         const resetID = await saveResetRequest(user.userID, emailAddress); // create and save a unique resetID for the request
         await sendResetEmail(resetID, emailAddress); // send the email to the user
         res.status(200).send({ success: true });
@@ -44,6 +46,7 @@ router.post("/change", async function (req, res, next) {
     try {
         // TODO - validate the inputs
         // TODO - return failure if more than [5] attempts are made within the last 15 minutes for the given emailAddress
+        // TODO - delete the database row after successful reset
         const pwReset = await pwResetModel.getResetRequest(resetID);
         if (pwReset === null) {
             return res.status(400).json({ success: false, field: "resetID", message: "Invalid resetID" });
