@@ -279,6 +279,27 @@ export function getUserApplications(companyName) {
     });
 }
 
+export function getCommentsForCompany(companyID) {
+    // INPUT: companyID (string)
+    // OUTPUT: Promise of array of companies if succesful
+    //         Else, Promise rejection
+    const jwt = getUserToken();
+    const apiURL = '/api/comments?companyID=' + companyID;
+
+    return axios.get(apiURL, {
+        headers: {
+            'Authorization': jwt
+          }
+    }).then(function (response) {
+        // send all comments
+        return Promise.resolve(response.data);
+    }).catch(function (error) {
+        // send back error
+        return Promise.reject(error);
+    });
+
+}
+
 export function arrayOfSkillsToMap(skillList) {
     // input: array of maps with keys skillID and name
     // output: map with name as keys and skillID as value
@@ -318,7 +339,7 @@ export function formatDate(dt) {
     dt = new Date(dt);
 
     // convert month, day and year to string
-    const month = '' + dt.getMonth();
+    const month = '' + (dt.getMonth() + 1);
     const day = '' + dt.getDate();
     const year = '' + dt.getFullYear();
 
