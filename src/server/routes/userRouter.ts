@@ -5,7 +5,7 @@ import * as jwt from "jsonwebtoken";
 import passport from "passport";
 import { User } from "../types/user";
 const router = express.Router();
-const saltRounds = 10;
+export const PW_SALT_ROUNDS = 10;
 
 /**
  * @description: Creates (registers) a new user
@@ -18,7 +18,7 @@ const saltRounds = 10;
 router.post("/", async function (req, res, next) {
     const { firstName, lastName, username, phoneNumber, emailAddress, password } = req.body;
     try {
-        const passwordHash = await bcrypt.hash(password, saltRounds);
+        const passwordHash = await bcrypt.hash(password, PW_SALT_ROUNDS);
         const user: User = new User({ firstName, lastName, username, phoneNumber, emailAddress, passwordHash });
         user.validateAndAssertContains(["firstName", "lastName", "username", "emailAddress", "passwordHash"]);
         const userID = await userModel.createUser(user.fields);

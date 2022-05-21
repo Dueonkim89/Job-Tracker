@@ -85,3 +85,12 @@ CREATE TABLE `ApplicationSkills`(
     FOREIGN KEY(`applicationID`) REFERENCES `Applications`(`applicationID`),
     FOREIGN KEY(`skillID`) REFERENCES `Skills`(`skillID`)
 );
+-- Creating PasswordResets Table
+DROP TABLE IF EXISTS PasswordResets;
+CREATE TABLE `PasswordResets`(
+    `resetID` VARCHAR(255) PRIMARY KEY UNIQUE NOT NULL,
+    `userID` INT,
+    `emailAddress` VARCHAR(255) NOT NULL,
+    `datetime` DATETIME NOT NULL,
+    FOREIGN KEY(`userID`) REFERENCES `Users`(`userID`)
+);
