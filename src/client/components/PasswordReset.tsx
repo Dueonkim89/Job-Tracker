@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Form, Button, Nav, Stack } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import axios, { AxiosError } from "axios";
+import { validPassword } from "../utils/formValidation";
 
 /**
  * Webpage #1: email form
@@ -73,12 +74,12 @@ export function PasswordChangeForm() {
     const [emailAddress, setEmailAddress] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [resetID, setResetID] = useState("");
+    const [isPasswordValid, setIsPasswordValid] = useState(true);
     let navigate = useNavigate();
 
     // link will be like:  /change_password?id=${resetID}
     useEffect(() => {
         const id = new URL(window.location.href).searchParams.get("id");
-        console.log(id);
         if(!id) {
             alert("There was an error with this url, please try generating another email.");
             return navigate('/forgot_password');
@@ -89,9 +90,17 @@ export function PasswordChangeForm() {
 
     const handleSubmit = async (event: any) => {
         event.preventDefault();
+        if(!validPassword(newPassword)) {
+            alert("Password must follow the stated rules. Please try a new password.");
+            setIsPasswordValid(false);
+            setNewPassword("");
+            return;
+        } else {
+            setIsPasswordValid(true);
+        }
         try {
             const response = await axios.post("/api/pw-reset/change", { resetID, emailAddress, newPassword });
-            alert("Success! You man now log in with the new password.");
+            alert("Success! You may now log in with the new password.");
             setEmailAddress("");
             setNewPassword("");
             return navigate('/login');
@@ -121,10 +130,10 @@ export function PasswordChangeForm() {
     };
 
     const generateResetForm = (): JSX.Element => {
-        // TODO - copy password rules from the login page (e.g. 8+ characters, uppercase/lowercase/number)
+        const invalidStyle = '3px solid red';
         return (
             <Form onSubmit={handleSubmit}>
-                <Stack gap={4} className="col-md-5 mx-auto">
+                <Stack gap={3} className="col-md-5 mx-auto">
                     <div>
                         <strong>Please enter your email address and desired new password</strong>
                     </div>
@@ -143,11 +152,15 @@ export function PasswordChangeForm() {
                     </Form.Label>
                     <Form.Control
                         id="newPassword"
-                        type="text"
+                        type="password"
+                        style={{ border: !isPasswordValid ? invalidStyle: ''}} 
                         value={newPassword}
                         onChange={(event) => setNewPassword(event.target.value)}
                         placeholder="Enter new password"
                     />
+                    <Form.Text style={{color: '#212529'}} id="passwordHelpBlock">
+                        Your password must be 8 - 32 characters long. Contain at least 1 uppercase letter, 1 lowercase letter and 1 number.
+                    </Form.Text>
                     <Button type="submit" className="login-button">
                         Submit
                     </Button>
