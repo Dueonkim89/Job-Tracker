@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Container, Row, Table, Button } from 'react-bootstrap';
-import {getCompanyName} from '../utils/helper';
+import {getCompanyNameFromURL, getUserApplications, formatDate} from '../utils/helper';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
 import { Navigate } from "react-router-dom"
 
@@ -11,15 +11,53 @@ const labelFontSize = "1.2rem";
 //  other available positions, comments for company
 
 class AppliedCompany extends React.Component {
-
+    constructor(props) {
+        super(props);
+        this.state = {
+           applications: [],
+           comments: [],
+           companyName: "",
+           companyID: null
+        };
+    }
 
     // cache app state as class property
     globalLoggedInState = undefined;
 
+    componentDidMount() {
+        // make call to server and get all applications and comments only if user is logged in
+        if (this.globalLoggedInState) {
+            const companyName = getCompanyNameFromURL(window.location.href);
+            this.setState({companyName});
+
+            // call async method. since life cycle cant be async.
+            this.getApplicationsAndComments(companyName);
+        }
+    }
+
+    async getApplicationsAndComments(companyName) {
+        try {
+            const userApplications = await getUserApplications(companyName);
+            let companyID = null;
+            if (userApplications.length > 0) {
+                companyID = userApplications[0].companyID;
+            }
+            this.setState({applications: userApplications, companyID});
+        }
+        catch (error) {
+            // console.log(error);
+            alert("Server error. Please try again later.");
+        }
+    }
+
     createPageHeader() {
         return (
-            <h2 style={{padding: "1.25rem", color: "#212529" }}>Google</h2>
+            <h2 style={{padding: "1.25rem", color: "#212529" }}>{this.state.companyName}</h2>
         );
+    }
+
+    generateAppTableBody() {
+        // get from state: applications
     }
 
     showApplications() {
@@ -34,6 +72,8 @@ class AppliedCompany extends React.Component {
                     <th>Status</th>
                     <th>Title</th>
                     <th>Location</th>
+                    <th>Date</th>
+                    <th>Notes</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -93,6 +133,7 @@ class AppliedCompany extends React.Component {
     }
 
     render() {
+        console.log(this.state.applications, this.state.companyID);
         const ApplicationFormBorder = "3px solid #0a2a66";
         return (
             <UserLoggedInContext.Consumer>
