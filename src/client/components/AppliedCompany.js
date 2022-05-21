@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Container, Row, Table, Button } from 'react-bootstrap';
-import {getCompanyNameFromURL, getUserApplications, formatDate} from '../utils/helper';
+import {getCompanyNameFromURL, getUserApplications, formatDate, getCommentsForCompany} from '../utils/helper';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
 import { Navigate } from "react-router-dom"
 
@@ -15,7 +15,7 @@ class AppliedCompany extends React.Component {
         super(props);
         this.state = {
            applications: [],
-           comments: [],
+           companyComments: [],
            companyName: "",
            companyID: null
         };
@@ -39,12 +39,15 @@ class AppliedCompany extends React.Component {
         try {
             const userApplications = await getUserApplications(companyName);
             let companyID = null;
+            let companyComments = [];
+        
+            // get companyID and comment if user has applications
             if (userApplications.length > 0) {
                 companyID = userApplications[0].companyID;
+                companyComments = await getCommentsForCompany(companyID);
             }
-            // get comments
-
-            this.setState({applications: userApplications, companyID});
+ 
+            this.setState({applications: userApplications, companyID, companyComments});
         }
         catch (error) {
             // console.log(error);
@@ -97,46 +100,39 @@ class AppliedCompany extends React.Component {
         );
     }
 
+    generateCommentTableBody() {
+        // get from state: companyComments
+        return this.state.companyComments.map((comment, idx) => {
+            return (
+                <tr key={comment.commentID}>
+                    <td>{idx + 1}</td>
+                    <td>{comment.title}</td>
+                    <td>{comment.text}</td>
+                </tr>
+            );
+        });
+    }
+
     showComments() {
-        // argument: array of maps
-        // props of comments for company from server
-        // need username, title, text
-        // create tbody dynamically from props
-        // enable routing to comment page
-        // hyperlink will be the text
+        // create tbody dynamically from state
         return (
             <Table bordered>
                 <thead>
                     <tr>
                     <th>#</th>
-                    <th>Username</th>
                     <th>Title</th>
-                    <th>Date</th>
                     <th>Text</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                    <td>1</td>
-                    <td>User1</td>
-                    <td>Great interview experience.</td>
-                    <td>1/1/22</td>
-                    <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod....</td>
-                    </tr>
-                    <tr>
-                    <td>2</td>
-                    <td>User2</td>
-                    <td>Horrible interview experience.</td>
-                    <td>3/1/22</td>
-                    <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod....</td>
-                    </tr>
+                    {this.generateCommentTableBody()}
                 </tbody>
             </Table>
         );
     }
 
     render() {
-        console.log(this.state.applications, this.state.companyID);
+        //console.log(this.state);
         const ApplicationFormBorder = "3px solid #0a2a66";
         return (
             <UserLoggedInContext.Consumer>
