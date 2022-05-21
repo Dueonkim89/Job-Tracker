@@ -1,7 +1,9 @@
 import express from "express";
 import userModel from "../models/userModel";
-import { validateAuthorization, validateAndParseStringID, ValidationError } from "../types/validators";
+import { ValidationError } from "../types/validators";
 import sendgrid from "@sendgrid/mail";
+import { randomUUID } from "crypto";
+import pwResetModel from "../models/pwResetModel";
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY as string);
 
 const router = express.Router();
@@ -20,19 +22,53 @@ router.post("/send-email", async function (req, res, next) {
     const { emailAddress } = req.body;
     try {
         // ensure email is found in the database
-        const user = userModel.getUserByEmailAddress(emailAddress);
+        const user = await userModel.getUserByEmailAddress(emailAddress);
         if (!user) throw new ValidationError("Email address not found.");
-        // using SendGrid Library: https://github.com/sendgrid/sendgrid-nodejs
-        const msg = {
-            to: "bairdjo@oregonstate.edu", // Change to your recipient
-            from: "jobtrackerapplication@gmail.com", // Change to your verified sender
-            subject: "Sending with SendGrid is Fun",
-            text: "and easy to do anywhere, even with Node.js",
-            html: "<strong>and easy to do anywhere, even with Node.js</strong>",
-        };
-        await sendgrid.send(msg);
+        const resetID = await saveResetRequest(emailAddress); // create and save a unique resetID for the request
+        await sendResetEmail(resetID, emailAddress); // send the email to the user
+        res.status(200).send({ success: true });
     } catch (err: any) {
-        err.sourceMessage = `Error in sending password reset email.`;
+        err.sourceMessage = `Error in sending password reset email`;
         next(err);
     }
 });
+
+async function saveResetRequest(emailAddress: string) {
+    while (true) {
+        try {
+            const resetID = randomUUID();
+            await pwResetModel.saveResetID(resetID, emailAddress, new Date());
+            return resetID;
+        } catch (err: any) {
+            if (err?.code === "ER_DUP_ENTRY") {
+                continue;
+            } else {
+                throw err;
+            }
+        }
+    }
+}
+
+async function sendResetEmail(resetID: string, emailAddress: string) {
+    // using SendGrid Library: https://github.com/sendgrid/sendgrid-nodejs
+    const resetURL = `https://jobtrackerapplication.azurewebsites.net/change-password/${resetID}`;
+    const emailText =
+        `Hello! We received a request to reset your password. ` +
+        `If this request was from you, please visit the below link. \n` +
+        `DO NOT share this URL with anyone else. \n\n` +
+        `${resetURL}`;
+    const emailHTML =
+        `<div>Hello! We received a request to reset your password. ` +
+        `If this request was from you, please visit the below link.</div>` +
+        `<div><strong>DO NOT</strong> share this URL with anyone else.</div>` +
+        `<br>` +
+        `<div><a href=${resetURL}>${resetURL}</a></div>`;
+    const msg: sendgrid.MailDataRequired = {
+        to: "bairdjo@oregonstate.edu", // TODO: change to emailAddress
+        from: "jobtrackerapplication@gmail.com",
+        subject: "Password Reset Request",
+        text: emailText,
+        html: emailHTML,
+    };
+    await sendgrid.send(msg);
+}

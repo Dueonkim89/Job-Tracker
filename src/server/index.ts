@@ -46,7 +46,7 @@ app.use(express.static(buildDir));
 app.use("/api", router);
 
 function printErr(err: Error, req: Request, res: Response) {
-    console.error(`[-[${err.name}]-]`, `${err.sourceMessage}:`, err.message);
+    console.error(`[--${err.name}--]`, `${err.sourceMessage}:`, err.message);
     console.error("Query params:\n", req.query, "\nRequest body:\n", req.body);
 }
 
