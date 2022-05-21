@@ -19,7 +19,7 @@ export function PasswordResetEmail() {
             const response = await axios.post("/api/pw-reset/send-email", { emailAddress });
             alert("Please check your email for the link to reset your password.");
         } catch (err: any) {
-            if (isAxiosErrGuard(err) && err.response?.data?.field === "email") {
+            if (isAxiosErrGuard(err) && err.response?.data?.field === "emailAddress") {
                 alert("An account tied to that email not was found.");
             } else {
                 console.log(err);
@@ -90,20 +90,33 @@ export function PasswordChangeForm() {
     const handleSubmit = async (event: any) => {
         event.preventDefault();
         try {
-            const response = await axios.post("/api/pw-reset/send-email", { resetID, emailAddress, newPassword });
-            alert("Password succesfully reset. You man now log in with the new password.");
+            const response = await axios.post("/api/pw-reset/change", { resetID, emailAddress, newPassword });
+            alert("Success! You man now log in with the new password.");
+            setEmailAddress("");
+            setNewPassword("");
             return navigate('/login');
         } catch (err: any) {
             // TODO - update these catch catching
-            if (isAxiosErrGuard(err) && err.response?.data?.field === "email") {
-                alert("An account tied to that email not was found.");
+            if (isAxiosErrGuard(err)) {
+                const errField = err.response?.data?.field
+                if(errField === "emailAddress") {
+                    alert("Invalid email address. Please check for any typos.");
+                } else if(errField === "datetime") {
+                    alert("This password reset link has expired. Please request a new password reset email.");
+                    return navigate('/forgot_password');
+                } else if(errField === "resetID" || errField === "userID") {
+                    alert("This password reset link is invalid. Please request a new password reset email.");
+                    return navigate('/forgot_password');
+                } else {
+                    console.log(err);
+                    alert("An error occurred, please try a new password reset email.");
+                    return navigate('/forgot_password');
+                }
             } else {
                 console.log(err);
-                alert("An error occurred, please try again later.");
+                alert("An error occurred, please try a new password reset email.");
+                return navigate('/forgot_password');
             }
-        } finally {
-            setEmailAddress("");
-            setNewPassword("");
         }
     };
 
