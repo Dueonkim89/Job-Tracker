@@ -94,7 +94,7 @@ async function saveResetRequest(userID: number, emailAddress: string) {
  */
 async function sendResetEmail(resetID: string, emailAddress: string) {
     // using SendGrid Library: https://github.com/sendgrid/sendgrid-nodejs
-    const resetURL = `https://jobtrackerapplication.azurewebsites.net/change-password/${resetID}`;
+    const resetURL = `https://jobtrackerapplication.azurewebsites.net/change_password?id=${resetID}`;
     const emailText =
         `Hello! We received a request to reset your password. ` +
         `If this request was from you, please visit the below link. \n` +
