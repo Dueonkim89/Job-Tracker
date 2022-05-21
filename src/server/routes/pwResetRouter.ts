@@ -23,7 +23,7 @@ router.post("/send-email", async function (req, res, next) {
     try {
         // ensure email is found in the database
         const user = await userModel.getUserByEmailAddress(emailAddress);
-        if (!user) throw new ValidationError("Email address not found.");
+        if (!user) return res.status(400).json({ success: false, field: "email", message: "Email not found." });
         // TODO - should I SALT the resetID before saving in the database?
         //    otherwise an attacker who gains DB access could intercept all incoming reset requests
         const resetID = await saveResetRequest(user.userID, emailAddress); // create and save a unique resetID for the request

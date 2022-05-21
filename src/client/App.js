@@ -56,7 +56,7 @@ function setRoutes() {
         <Routes>
             <Route path="" element={<Login />} />
             <Route path="login" element={<Login />} />
-            <Route path="pw_reset_email" element={<PasswordResetEmailForm />} />
+            <Route path="forgot_password" element={<PasswordResetEmailForm />} />
             <Route path="main" element={<Dashboard />} />
             <Route path="registration" element={<Registration />} />
             <Route path="application" element={<NewJobApplication />} />
