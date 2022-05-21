@@ -28,6 +28,6 @@ export class Skill extends BaseValidator<SkillFields & UserSkillFields & Applica
         applicationID: (v: any) => typeof v === "number",
         userID: (v: any) => typeof v === "number",
         name: (v: any) => typeof v === "string",
-        rating: (v: any) => typeof v === "number",
+        rating: (v: any) => typeof v === "number" && [0, 1, 2, 3, 4, 5].includes(v),
     };
 }
