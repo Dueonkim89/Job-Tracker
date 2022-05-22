@@ -20,6 +20,8 @@ export default async function scrape(url: URL) {
             return await greenhouse(url);
         } else if (host.includes("linkedin.com")) {
             return await linkedin(url);
+        } else if (host.includes("lever.co")) {
+            return await lever(url);
         } else {
             console.info(`No scraper available: ${url.toString()}`);
             return { success: false, message: "No scraper available for that URL." };
@@ -58,6 +60,13 @@ async function greenhouse(url: URL) {
 }
 
 async function linkedin(url: URL) {
+    const parseTagline = (tagline: string) => {
+        const [company, other1] = tagline.split(" hiring ");
+        const [title, other2] = other1.split(" in ");
+        const [location, _] = other2.split(" | ");
+        return { company, title, location };
+    };
+
     // modify the URL to the correct form
     if (url.searchParams.get("currentJobId")) {
         // example URL 1: https://www.linkedin.com/jobs/collections/recommended/?currentJobId=3063580347
@@ -81,9 +90,17 @@ async function linkedin(url: URL) {
     }
 }
 
-function parseTagline(tagline: string) {
-    const [company, other1] = tagline.split(" hiring ");
-    const [title, other2] = other1.split(" in ");
-    const [location, _] = other2.split(" | ");
-    return { company, title, location };
+async function lever(url: URL) {
+    // URL: https://jobs.lever.co/atlassian/620921f2-c09c-4d3e-8bd2-f8781fbcc276
+    // API URL: https://api.lever.co/v0/postings/atlassian/620921f2-c09c-4d3e-8bd2-f8781fbcc276
+    const apiURL = `https://api.lever.co/v0/postings${url.pathname}`;
+    const response = await axios.get(apiURL, { responseType: "json" });
+    if (response.status < 200 || response.status >= 300) {
+        throw Error(`Invalid response code: ${response.status} ${response.statusText}`);
+    }
+    const { data } = response;
+    const location = data?.categories?.location;
+    const title = data?.text;
+    const company = titleCase(url.pathname.split("/")[1]);
+    return makeAppInfo({ company, location, title });
 }

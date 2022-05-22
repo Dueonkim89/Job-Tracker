@@ -70,3 +70,16 @@ test("[Linkedin] Vanguard URL Type 2", async () => {
     expect(result.statusCode).toEqual(200);
     expect(result.body).toEqual(expected);
 });
+
+test("[Lever] Atlassian URL", async () => {
+    const url = "https://jobs.lever.co/atlassian/b581c923-c49d-41e0-be15-e6c7cfe011c1";
+    const expected = {
+        success: true,
+        company: "Atlassian",
+        location: "Mountain View, United States",
+        title: "Data Scientist, Product Analytics",
+    };
+    const result = await request(server).get(`/api/scrape?url=${url}`).set("Authorization", token).send();
+    expect(result.statusCode).toEqual(200);
+    expect(result.body).toEqual(expected);
+});
