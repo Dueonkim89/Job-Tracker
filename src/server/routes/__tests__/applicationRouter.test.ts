@@ -45,7 +45,7 @@ test("[Valid] Getting user applications", async () => {
             jobPostingURL: "https://www.amazon.jobs/en/jobs/996246/senior-software-dev-engineer",
             position: "Senior Software Dev Engineer",
             userID: 1,
-            status: "Phone Screen",
+            status: "Phone Interview",
             location: "Seattle, WA",
             notes: "here are my notes",
             datetime: "2022-01-01T00:00:00.000Z",
@@ -99,7 +99,7 @@ test("[Valid] Adding a user application", async () => {
         jobPostingURL: "https://www.test.com",
         position: "Test Position",
         userID: 2,
-        status: "pending",
+        status: "Phone Interview",
         location: "remote",
     };
     const result = await request(server).post("/api/applications").set("Authorization", token2).send(payload);
@@ -157,14 +157,14 @@ test("[Valid] Updating an app contact #1", async () => {
 test("[Valid] Updating an app status", async () => {
     const payload = {
         applicationID: 5,
-        status: "Interview Again",
+        status: "Rejected",
     };
     let result = await request(server).patch("/api/applications").set("Authorization", token3).send(payload);
     expect(result.statusCode).toEqual(201);
     expect(result.body.success).toEqual(true);
     result = await request(server).get("/api/applications?userID=3").set("Authorization", token3).send(payload);
     expect(result.statusCode).toEqual(200);
-    expect(result.body[1].status).toEqual("Interview Again");
+    expect(result.body[1].status).toEqual("Rejected");
     expect(result.body[1].location).toEqual("Remote");
 });
 
