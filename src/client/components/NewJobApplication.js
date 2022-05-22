@@ -316,7 +316,7 @@ class NewJobApplication extends React.Component {
             <Form.Select style={{ border: !this.state.statusValid ? invalidStyle: ''}} value={this.state.status} onChange={this.pickAppStatus} aria-label="Choose application status from dropdown menu" id="status">
                 <option value="">Pick application status</option>
                 {Object.entries(APP_STATUSES).map(([key, name]) => {
-                    return (<option value={key}>{name}</option>)
+                    return (<option key={name} value={key}>{name}</option>)
                 })}
             </Form.Select>
         );
