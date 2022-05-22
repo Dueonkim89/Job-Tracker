@@ -1,3 +1,4 @@
+import { isValidURL } from "../../global/inputValidators";
 import { BaseValidator, Validators } from "./validators";
 
 export interface CompanyFields {
@@ -17,6 +18,6 @@ export class Company extends BaseValidator<CompanyFields> {
         companyID: (v: any) => typeof v === "number",
         name: (v: any) => typeof v === "string",
         industry: (v: any) => typeof v === "string",
-        websiteURL: (v: any) => typeof v === "string",
+        websiteURL: (v: any) => typeof v === "string" && isValidURL(v),
     };
 }

@@ -1,4 +1,6 @@
 import { BaseValidator, Validators } from "./validators";
+import { APP_STATUSES } from "../../global/constants";
+import { isValidEmail, isValidPhone, isValidURL } from "../../global/inputValidators";
 
 export interface AppFields {
     applicationID?: number;
@@ -44,10 +46,10 @@ export class Application extends BaseValidator<AppFields> {
     validators: Validators<AppFields> = {
         applicationID: (v: any) => typeof v === "number",
         companyID: (v: any) => typeof v === "number",
-        jobPostingURL: (v: any) => typeof v === "string",
+        jobPostingURL: (v: any) => typeof v === "string" && isValidURL(v),
         position: (v: any) => typeof v === "string",
         userID: (v: any) => typeof v === "number",
-        status: (v: any) => typeof v === "string",
+        status: (v: any) => typeof v === "string" && Object.values(APP_STATUSES).includes(v),
         location: (v: any) => typeof v === "string",
         notes: (v: any) => typeof v === "string",
         datetime: (v: any) => v instanceof Date,
@@ -65,8 +67,8 @@ export class Contact extends BaseValidator<ContactFields> {
         applicationID: (v: any) => typeof v === "number",
         firstName: (v: any) => typeof v === "string",
         lastName: (v: any) => typeof v === "string",
-        phoneNumber: (v: any) => typeof v === "string",
-        emailAddress: (v: any) => typeof v === "string",
+        phoneNumber: (v: any) => typeof v === "string" && isValidPhone(v),
+        emailAddress: (v: any) => typeof v === "string" && isValidEmail(v),
         role: (v: any) => typeof v === "string",
     };
 }

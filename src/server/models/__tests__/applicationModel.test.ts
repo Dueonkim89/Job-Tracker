@@ -10,7 +10,7 @@ test("Get user 1 apps", async () => {
             jobPostingURL: "https://www.amazon.jobs/en/jobs/996246/senior-software-dev-engineer",
             position: "Senior Software Dev Engineer",
             userID: 1,
-            status: "Phone Screen",
+            status: "Phone Interview",
             location: "Seattle, WA",
             notes: "here are my notes",
             datetime: new Date("2022-01-01T00:00:00.000Z"),
