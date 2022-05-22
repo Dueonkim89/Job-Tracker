@@ -253,6 +253,50 @@ export function postSkillToApplication(skills) {
     }).catch(function (error) {
         return Promise.reject(error.response);
     });
+}
+
+export function getUserApplications(companyName) {
+    // input: company name (string)
+    // output: array of applications that have company name
+
+    const jwt = getUserToken();
+    const userID = getUserID();
+    companyName = companyName.toLowerCase();
+
+    const apiURL = '/api/applications?userID=' + userID;
+
+    return axios.get(apiURL, {
+        headers: {
+            'Authorization': jwt
+          }
+    }).then(function (response) {
+        // filter applications by company name
+        const results = response.data.filter(app => app.companyName.toLowerCase() === companyName);
+        return Promise.resolve(results);
+    }).catch(function (error) {
+        // send back error
+        return Promise.reject(error);
+    });
+}
+
+export function getCommentsForCompany(companyID) {
+    // INPUT: companyID (string)
+    // OUTPUT: Promise of array of companies if succesful
+    //         Else, Promise rejection
+    const jwt = getUserToken();
+    const apiURL = '/api/comments?companyID=' + companyID;
+
+    return axios.get(apiURL, {
+        headers: {
+            'Authorization': jwt
+          }
+    }).then(function (response) {
+        // send all comments
+        return Promise.resolve(response.data);
+    }).catch(function (error) {
+        // send back error
+        return Promise.reject(error);
+    });
 
 }
 
@@ -273,4 +317,31 @@ export function appSkillToMap(currentAppSkill, mapOfSkillID) {
         skill = skill.trim().toLowerCase();
         return {...accumulator, [skill]: mapOfSkillID[skill]};
     }, {});
+}
+
+export function getCompanyNameFromURL(url) {
+    // input: url of current page (STRING)
+    // output: company name in page (STRING)
+
+    // sanitize url link, replace encoding with white space
+    url = url.replace(/%20/g," ");
+
+    for (let i = url.length - 1; i >= 0; i--) {
+        if (url[i] === "/") {
+            return url.slice(i + 1, url.length);
+        }
+    }
+}
+
+export function formatDate(dt) {
+    // input: datetime in string
+    // output: formatted date as M/DD/YYYY
+    dt = new Date(dt);
+
+    // convert month, day and year to string
+    const month = '' + (dt.getMonth() + 1);
+    const day = '' + dt.getDate();
+    const year = '' + dt.getFullYear();
+
+    return month + "/" + day + "/" + year;
 }
