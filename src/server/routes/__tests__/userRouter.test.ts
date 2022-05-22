@@ -51,31 +51,33 @@ test("[Valid] user login", async () => {
 test("[Invalid] user login, wrong password", async () => {
     const expected = {
         success: false,
-        message: "Invalid Password or Username",
+        field: "password",
+        message: "Invalid password",
     };
     const body = {
         username: "ally1",
         password: "a",
     };
     const result = await request(server).post("/api/users/login").send(body);
-    const { success, message } = result.body;
+    const { success, field, message } = result.body;
     expect(result.statusCode).toEqual(400);
-    expect({ success, message }).toStrictEqual(expected);
+    expect({ success, field, message }).toStrictEqual(expected);
 });
 
 test("[Invalid] user login, no matching user", async () => {
     const expected = {
         success: false,
-        message: "Didn't find a user matching that username.",
+        field: "username",
+        message: "Invalid username",
     };
     const body = {
         username: "ZZZZ",
         password: "a",
     };
     const result = await request(server).post("/api/users/login").send(body);
-    const { success, message } = result.body;
+    const { success, field, message } = result.body;
     expect(result.statusCode).toEqual(400);
-    expect({ success, message }).toStrictEqual(expected);
+    expect({ success, field, message }).toStrictEqual(expected);
 });
 
 test("[Valid] user registration", async () => {

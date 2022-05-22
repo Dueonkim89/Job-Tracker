@@ -69,24 +69,24 @@ class Registration extends React.Component {
         const {firstName, lastName, email, userName, phoneNumber, password} = this.state;
         
         // See if all the form field has data and a valid strong password
-        this.setState({ 
+        const newState = { 
             firstNameValid: validStringData(firstName.trim()),
             lastNameValid: validStringData(lastName.trim()),
             emailValid: validStringData(email),
             userNameValid: validStringData(userName.trim()),
-            phoneNumberValid: validIntData(phoneNumber),
+            phoneNumberValid: (validIntData(phoneNumber) && `${phoneNumber}`.length === 10),
             passwordValid: validPassword(password)
-        });
+        }
+        this.setState(newState);
 
         // TEST:: SEE IF GLOBAL CAN BE TOGGLED
         // console.log(this.changeGlobalState);
         // this.changeGlobalState(!this.globalState)
 
         // only make POST request when all the form field is valid
-        if (validStringData(firstName) && validStringData(lastName) 
-            && validStringData(email) && validStringData(userName) 
-            && validIntData(phoneNumber) && validPassword(password)) {
+        const isValidForm = Object.values(newState).every(isValid => isValid === true);
 
+        if (isValidForm) {
             // const serverURL: string  = getServerURL(process.env.NODE_ENV);
 
             // make sure data has same property name as server
@@ -128,7 +128,7 @@ class Registration extends React.Component {
                     this.userNameNotAvailable()
                     return;
                 } // else, server error.
-                alert("Error while registering your account. Pleae try again!")
+                alert("Error while registering your account. Please try again!")
                 return;
             }
         } 
@@ -185,12 +185,15 @@ class Registration extends React.Component {
                 <Form.Group className="mb-3">
                     <Form.Label htmlFor="phoneNumber" style={{fontWeight: 'bold'}}>Phone Number</Form.Label>
                     <Form.Control style={{ border: !this.state.phoneNumberValid ? invalidStyle: ''}} id="phoneNumber" type="number" value={this.state.phoneNumber} onChange={this.enterPhoneNumber} placeholder="Enter phone number" />
+                    <Form.Text style={{color: '#212529'}} id="phoneHelpBlock">
+                        Enter as 10 digits without spaces, dashes, or parentheses
+                    </Form.Text>
                 </Form.Group>
                 <Form.Group className="mb-3">
                     <Form.Label htmlFor="password" style={{fontWeight: 'bold'}}>Password</Form.Label>
                     <Form.Control style={{ border: !this.state.passwordValid ? invalidStyle: ''}} id="password" type="password" value={this.state.password} onChange={this.enterPassword} placeholder="Enter password" />
                     <Form.Text style={{color: '#212529'}} id="passwordHelpBlock">
-                        Your password must be 8 - 32 characters long. Contain at least 1 uppercase letter, 1 lowercase letter and 1 number.
+                        8 - 32 characters with at least 1 uppercase, 1 lowercase, and 1 number
                     </Form.Text>
                 </Form.Group>
                 <Button type="submit">Sign Up</Button>

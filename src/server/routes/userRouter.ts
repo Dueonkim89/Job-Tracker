@@ -55,7 +55,7 @@ router.post("/login", async function (req, res, next) {
     try {
         const user = await userModel.getUserByUsername(username);
         if (!user) {
-            return res.status(400).json({ success: false, field: "username", message: "Invalid username." });
+            return res.status(400).json({ success: false, field: "username", message: "Invalid username" });
         }
         const isValidPassword = await bcrypt.compare(password, user.passwordHash);
         if (!isValidPassword) {

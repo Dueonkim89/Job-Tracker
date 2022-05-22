@@ -7,6 +7,7 @@ import {validStringData} from '../utils/formValidation';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
 import { Navigate, useNavigate, Link,  useLocation } from "react-router-dom"
 import {APP_STATUSES} from "../../global/constants"
+import {isValidURL} from "../../global/inputValidators"
 
 const formPadding = ".75rem";
 const labelFontSize = "1.2rem";
@@ -170,7 +171,7 @@ class NewJobApplication extends React.Component {
         let {url} = this.state;
         url = url.trim();
 
-        if (validStringData(url)) {
+        if (isValidURL(url)) {
             // disable button to prevent server congestion
             this.setState({disableScrapeButton: true, urlValid: true});
 

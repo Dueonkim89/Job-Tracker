@@ -19,5 +19,12 @@ module.exports = {
             globalSetup: "<rootDir>/src/server/config/jestGlobalSetup.js",
             globalTeardown: "<rootDir>/src/server/config/jestGlobalTeardown.js",
         },
+        {
+            displayName: "scraping",
+            testMatch: ["<rootDir>/src/server/routes/__tests__/scraperRouter.test.ts"],
+            preset: "ts-jest/presets/default-esm",
+            globalSetup: "<rootDir>/src/server/config/jestGlobalSetup.js",
+            globalTeardown: "<rootDir>/src/server/config/jestGlobalTeardown.js",
+        },
     ],
 };
