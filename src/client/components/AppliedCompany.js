@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Container, Row, Table, Button } from 'react-bootstrap';
-import {getCompanyNameFromURL, getUserApplications, formatDate, getCommentsForCompany} from '../utils/helper';
+import {getCompanyNameFromURL, getUserApplications, formatDate, getCommentsForCompany, getSkillsForApplication} from '../utils/helper';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
 import { Navigate } from "react-router-dom"
 
@@ -17,7 +17,8 @@ class AppliedCompany extends React.Component {
            applications: [],
            companyComments: [],
            companyName: "",
-           companyID: null
+           companyID: null,
+           jobSkills: {}
         };
     }
 
@@ -40,14 +41,22 @@ class AppliedCompany extends React.Component {
             const userApplications = await getUserApplications(companyName);
             let companyID = null;
             let companyComments = [];
+            let jobSkills = {};
         
-            // get companyID and comment if user has applications
+            // get companyID, comment, and job skills if user has applications
             if (userApplications.length > 0) {
+
+                // for each app, get the skills required for it
+                for (const app of userApplications) {
+                    const appSkills = await getSkillsForApplication(app.applicationID);
+                    jobSkills[app.applicationID] = appSkills;
+                }
+
                 companyID = userApplications[0].companyID;
                 companyComments = await getCommentsForCompany(companyID);
             }
  
-            this.setState({applications: userApplications, companyID, companyComments});
+            this.setState({applications: userApplications, companyID, companyComments, jobSkills});
         }
         catch (error) {
             // console.log(error);
@@ -70,6 +79,7 @@ class AppliedCompany extends React.Component {
                     <td>{app.status}</td>
                     <td>{app.position}</td>
                     <td>{app.location}</td>
+                    <td>{this.state.jobSkills[app.applicationID].join(', ')}</td>
                     <td>{formatDate(app.datetime)}</td>
                     <td>{app.notes}</td>
                 </tr>
@@ -89,6 +99,7 @@ class AppliedCompany extends React.Component {
                     <th>Status</th>
                     <th>Title</th>
                     <th>Location</th>
+                    <th>Required Skills</th>
                     <th>Date</th>
                     <th>Notes</th>
                     </tr>
