@@ -22,6 +22,8 @@ export default async function scrape(url: URL) {
             return await linkedin(url);
         } else if (host.includes("lever.co")) {
             return await lever(url);
+        } else if (host.includes("myworkdayjobs.com")) {
+            return await workday(url);
         } else {
             console.info(`No scraper available: ${url.toString()}`);
             return { success: false, message: "No scraper available for that URL." };
@@ -102,5 +104,22 @@ async function lever(url: URL) {
     const location = data?.categories?.location;
     const title = data?.text;
     const company = titleCase(url.pathname.split("/")[1]);
+    return makeAppInfo({ company, location, title });
+}
+
+async function workday(url: URL) {
+    // URL: https://autodesk.wd1.myworkdayjobs.com/en-US/Ext/job/Oregon-USA---Remote/Software-Engineer_22WD58982-2
+    // API: https://autodesk.wd1.myworkdayjobs.com/wday/cxs/autodesk/Ext/job/Oregon-USA---Remote/Software-Engineer_22WD58982-2
+    const subdomain = url.host.split(".")[0];
+    const tail = url.pathname.slice(url.pathname.indexOf("/job/"));
+    const apiURL = `https://${subdomain}.wd1.myworkdayjobs.com/wday/cxs/${subdomain}/Ext${tail}`;
+    const response = await axios.get(apiURL, { responseType: "json", headers: { accept: "application/json" } });
+    if (response.status < 200 || response.status >= 300) {
+        throw Error(`Invalid response code: ${response.status} ${response.statusText}`);
+    }
+    const { data } = response;
+    const title = data?.jobPostingInfo?.title;
+    const location = data?.jobPostingInfo?.location;
+    const company = data?.hiringOrganization?.name;
     return makeAppInfo({ company, location, title });
 }
