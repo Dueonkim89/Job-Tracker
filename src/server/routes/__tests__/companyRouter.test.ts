@@ -34,7 +34,7 @@ test("[Valid] Adding a new company", async () => {
     const payload = {
         name: "Test Company 2",
         industry: "Pharma",
-        websiteURL: "www.test.com",
+        websiteURL: "https://www.test.com",
     };
     const result = await request(server).post("/api/companies").send(payload);
     expect(result.statusCode).toEqual(201);
