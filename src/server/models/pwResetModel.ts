@@ -26,4 +26,11 @@ export default {
             return result[0] as PWReset;
         }
     },
+
+    async deleteResetRequest(resetID: string) {
+        const sql = "DELETE FROM PasswordResets WHERE resetID = ?;";
+        const vals = [resetID];
+        const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.promise().query(sql, [resetID]);
+        return result.affectedRows === 1;
+    },
 };

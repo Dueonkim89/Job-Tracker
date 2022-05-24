@@ -5,7 +5,7 @@ import companyRouter from "./routes/companyRouter";
 import skillRouter from "./routes/skillRouter";
 import commentRouter from "./routes/commentRouter";
 import scrapeRouter from "./routes/scrapeRouter";
-import pwResetRouter from "./routes/pwresetRouter";
+import pwResetRouter from "./routes/pwResetRouter";
 
 const router = express.Router();
 export default router;

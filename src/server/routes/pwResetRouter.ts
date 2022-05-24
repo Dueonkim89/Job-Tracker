@@ -46,7 +46,6 @@ router.post("/change", async function (req, res, next) {
     try {
         // TODO - validate the inputs
         // TODO - return failure if more than [5] attempts are made within the last 15 minutes for the given emailAddress
-        // TODO - delete the database row after successful reset
         const pwReset = await pwResetModel.getResetRequest(resetID);
         if (pwReset === null) {
             return res.status(400).json({ success: false, field: "resetID", message: "Invalid resetID" });
@@ -63,6 +62,7 @@ router.post("/change", async function (req, res, next) {
         if (!didUpdate) {
             return res.status(400).json({ success: false, field: "userID", message: "User ID didn't match" });
         }
+        await pwResetModel.deleteResetRequest(resetID);
         return res.status(200).json({ success: true });
     } catch (err: any) {
         err.sourceMessage = `Error in resetting password`;
