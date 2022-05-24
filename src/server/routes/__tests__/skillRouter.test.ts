@@ -38,8 +38,6 @@ afterAll((done) => {
 
 // Tests start here
 
-// TODO - test that a user cannot update skills other than their own?
-
 test("[Valid] Getting all skills", async () => {
     const expected = [
         { name: "Java", skillID: 1 },

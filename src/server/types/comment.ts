@@ -20,7 +20,6 @@ export class CompanyComment extends BaseValidator<CommentFields> {
         super({ commentID, userID, companyID, title, text, datetime });
     }
 
-    // TODO - regex validation for phone and email
     validators: Validators<CommentFields> = {
         commentID: (v: any) => typeof v === "number",
         userID: (v: any) => typeof v === "number",
