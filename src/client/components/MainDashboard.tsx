@@ -6,6 +6,7 @@ import axios from 'axios';
 import { UserLoggedInContext } from "../context/UserLoggedInStatus";
 import { User } from './User';
 import { Application } from './Application';
+import { Contact } from './Contact';
 import { Skill } from './Skill';
 import { setConstantValue } from 'typescript';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -63,6 +64,22 @@ export default function Dashboard() {
                 // Go through all applications and create a new map
                 for (let i=0; i<data.data.length; i++) {
                     let current = data.data[i];
+                    let tempContacts : Array<Contact> = [];
+
+                    if (current.contacts) {
+                        for (let j=0; j<current.contacts.length; j++) {
+                            let contact : Contact = {"contactID" : current.contacts[j].contactID,
+                                                    "firstName" : current.contacts[j].firstName,
+                                                    "lastName" : current.contacts[j].lastName,
+                                                    "role" : current.contacts[j].role,
+                                                    "emailAddress" : current.contacts[j].emailAddress,
+                                                    "phoneNumber" : current.contacts[j].phoneNumber};
+                            tempContacts.push(contact);
+                    }
+                    }
+                    // create contacts and add to array
+                    
+
                     // create application object
                     let application : Application = {"applicationID" : current.applicationID,
                                                      "companyName" : current.companyName,
@@ -71,10 +88,12 @@ export default function Dashboard() {
                                                      "location" : current.location,
                                                      "position" : current.position,
                                                      "status" : current.status,
-                                                     "notes" : current.notes}
+                                                     "notes" : current.notes,
+                                                     "contacts" : tempContacts}
                     temp.push(application);
                 }
                 setApplications(temp);
+                console.log(applications)
             })
         } else {
             //navigate('/login');
