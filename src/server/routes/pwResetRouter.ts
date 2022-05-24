@@ -1,6 +1,5 @@
 import express from "express";
 import userModel from "../models/userModel";
-import { ValidationError } from "../types/validators";
 import sendgrid from "@sendgrid/mail";
 import { randomUUID } from "crypto";
 import * as bcrypt from "bcrypt";
@@ -24,8 +23,6 @@ router.post("/send-email", async function (req, res, next) {
         // ensure email is found in the database
         const user = await userModel.getUserByEmailAddress(emailAddress);
         if (!user) return res.status(400).json({ success: false, field: "emailAddress", message: "Email not found." });
-        // TODO - should I SALT the resetID before saving in the database?
-        //    otherwise an attacker who gains DB access could intercept all incoming reset requests
         const resetID = await saveResetRequest(user.userID, emailAddress); // create and save a unique resetID for the request
         await sendResetEmail(resetID, emailAddress); // send the email to the user
         res.status(200).send({ success: true });
@@ -46,12 +43,13 @@ router.post("/change", async function (req, res, next) {
     try {
         // TODO - validate the inputs
         // TODO - return failure if more than [5] attempts are made within the last 15 minutes for the given emailAddress
-        const pwReset = await pwResetModel.getResetRequest(resetID);
+        const pwReset = await pwResetModel.getResetRequest(emailAddress);
         if (pwReset === null) {
-            return res.status(400).json({ success: false, field: "resetID", message: "Invalid resetID" });
-        }
-        if (pwReset.emailAddress !== emailAddress) {
             return res.status(400).json({ success: false, field: "emailAddress", message: "Invalid emailAddress" });
+        }
+        const isValidResetID = await bcrypt.compare(resetID, pwReset.hashedResetID);
+        if (!isValidResetID) {
+            return res.status(400).json({ success: false, field: "resetID", message: "Invalid resetID" });
         }
         const expirationTime = new Date(pwReset.datetime.getTime() + 900000); // add 15 minutes
         if (new Date() > expirationTime) {
@@ -62,7 +60,7 @@ router.post("/change", async function (req, res, next) {
         if (!didUpdate) {
             return res.status(400).json({ success: false, field: "userID", message: "User ID didn't match" });
         }
-        await pwResetModel.deleteResetRequest(resetID);
+        await pwResetModel.deleteResetRequest(emailAddress);
         return res.status(200).json({ success: true });
     } catch (err: any) {
         err.sourceMessage = `Error in resetting password`;
@@ -71,22 +69,13 @@ router.post("/change", async function (req, res, next) {
 });
 
 /**
- * Saves the necessary info to the database and
+ * Saves the necessary info to the database and returns randomly generated resetID (one-time password secret)
  */
 async function saveResetRequest(userID: number, emailAddress: string) {
-    while (true) {
-        try {
-            const resetID = randomUUID();
-            await pwResetModel.saveResetRequest(resetID, userID, emailAddress, new Date());
-            return resetID;
-        } catch (err: any) {
-            if (err?.code === "ER_DUP_ENTRY") {
-                continue; // in the event of a hash collision, try a new hash value
-            } else {
-                throw err; // if a different err occurs, percolate the err up
-            }
-        }
-    }
+    const resetID = randomUUID();
+    const hashedResetID = await bcrypt.hash(resetID, PW_SALT_ROUNDS);
+    await pwResetModel.saveResetRequest(emailAddress, userID, hashedResetID, new Date());
+    return resetID;
 }
 
 /**
@@ -107,7 +96,7 @@ async function sendResetEmail(resetID: string, emailAddress: string) {
         `<br>` +
         `<div><a href=${resetURL}>${resetURL}</a></div>`;
     const msg: sendgrid.MailDataRequired = {
-        to: "bairdjo@oregonstate.edu", // TODO: change to emailAddress
+        to: emailAddress,
         from: "jobtrackerapplication@gmail.com",
         subject: "Password Reset Request",
         text: emailText,

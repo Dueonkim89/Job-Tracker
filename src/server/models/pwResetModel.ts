@@ -3,20 +3,22 @@ import db from "../config/db";
 import { PWReset } from "../types/pwReset";
 
 export default {
-    async saveResetRequest(resetID: string, userID: number, emailAddress: string, datetime: Date) {
+    async saveResetRequest(emailAddress: string, userID: number, hashedResetID: string, datetime: Date) {
         const sql = `
         INSERT INTO PasswordResets
-        (resetID, userID, emailAddress, datetime)
-        VALUES (?, ?, ?, ?);
+        (emailAddress, userID, hashedResetID, datetime)
+        VALUES (?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+        hashedResetID = ?, datetime = ?;
         `;
-        const vals = [resetID, userID, emailAddress, datetime];
+        const vals = [emailAddress, userID, hashedResetID, datetime, hashedResetID, datetime];
         const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.promise().query(sql, vals);
         return result.insertId;
     },
 
-    async getResetRequest(resetID: string) {
-        const sql = `SELECT * FROM PasswordResets WHERE resetID = ?`;
-        const vals = [resetID];
+    async getResetRequest(emailAddress: string) {
+        const sql = `SELECT * FROM PasswordResets WHERE emailAddress = ?`;
+        const vals = [emailAddress];
         const [result, fields] = <[RowDataPacket[], FieldPacket[]]>await db.promise().query(sql, vals);
         if (result.length === 0) {
             return null;
@@ -27,10 +29,9 @@ export default {
         }
     },
 
-    async deleteResetRequest(resetID: string) {
-        const sql = "DELETE FROM PasswordResets WHERE resetID = ?;";
-        const vals = [resetID];
-        const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.promise().query(sql, [resetID]);
+    async deleteResetRequest(emailAddress: string) {
+        const sql = "DELETE FROM PasswordResets WHERE emailAddress = ?;";
+        const [result, fields] = <[ResultSetHeader, FieldPacket[]]>await db.promise().query(sql, [emailAddress]);
         return result.affectedRows === 1;
     },
 };
