@@ -21,7 +21,6 @@ export class User extends BaseValidator<UserFields> {
         super({ userID, firstName, lastName, username, phoneNumber, emailAddress, passwordHash });
     }
 
-    // TODO - regex validation for phone and email, username as well
     validators: Validators<UserFields> = {
         userID: (v: any) => typeof v === "number",
         firstName: (v: any) => typeof v === "string",

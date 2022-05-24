@@ -1,6 +1,6 @@
 export interface PWReset {
-    resetID: number;
-    userID: number;
     emailAddress: string;
+    userID: number;
+    hashedResetID: string;
     datetime: Date;
 }
