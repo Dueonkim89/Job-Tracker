@@ -10,7 +10,7 @@ CREATE TABLE `Users`(
     `lastName` VARCHAR(255) NOT NULL,
     `username` VARCHAR(255) NOT NULL UNIQUE,
     `phoneNumber` VARCHAR(15) NULL,
-    `emailAddress` VARCHAR(50) NOT NULL,
+    `emailAddress` VARCHAR(50) NOT NULL UNIQUE,
     `passwordHash` VARCHAR(60) NOT NULL
 );
 -- Creating Company Table
@@ -88,9 +88,9 @@ CREATE TABLE `ApplicationSkills`(
 -- Creating PasswordResets Table
 DROP TABLE IF EXISTS PasswordResets;
 CREATE TABLE `PasswordResets`(
-    `resetID` VARCHAR(255) PRIMARY KEY UNIQUE NOT NULL,
-    `userID` INT,
-    `emailAddress` VARCHAR(255) NOT NULL,
+    `emailAddress` VARCHAR(255) NOT NULL PRIMARY KEY,
+    `userID` INT NOT NULL UNIQUE,
+    `hashedResetID` VARCHAR(255) NOT NULL UNIQUE,
     `datetime` DATETIME NOT NULL,
     FOREIGN KEY(`userID`) REFERENCES `Users`(`userID`)
 );

@@ -67,3 +67,11 @@ code {
 .create-account{
   text-align: center;
 }
+
+table{
+  table-layout: fixed;
+}
+
+td{
+  word-wrap:break-word
+}

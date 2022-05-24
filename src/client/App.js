@@ -63,6 +63,7 @@ function setRoutes() {
             <Route path="application" element={<NewJobApplication />} />
             <Route path="add_company" element={<AddCompany />} />
             <Route path="applied_company/:company_name" element={<AppliedCompany />} />
+            <Route path="*" element={<Dashboard />} />
         </Routes>
     );
 }

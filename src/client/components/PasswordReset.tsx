@@ -105,7 +105,6 @@ export function PasswordChangeForm() {
             setNewPassword("");
             return navigate('/login');
         } catch (err: any) {
-            // TODO - update these catch catching
             if (isAxiosErrGuard(err)) {
                 const errField = err.response?.data?.field
                 if(errField === "emailAddress") {

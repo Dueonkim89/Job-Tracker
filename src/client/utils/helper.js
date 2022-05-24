@@ -280,7 +280,7 @@ export function getUserApplications(companyName) {
 }
 
 export function getCommentsForCompany(companyID) {
-    // INPUT: companyID (string)
+    // INPUT: companyID (INT)
     // OUTPUT: Promise of array of companies if succesful
     //         Else, Promise rejection
     const jwt = getUserToken();
@@ -293,6 +293,28 @@ export function getCommentsForCompany(companyID) {
     }).then(function (response) {
         // send all comments
         return Promise.resolve(response.data);
+    }).catch(function (error) {
+        // send back error
+        return Promise.reject(error);
+    });
+
+}
+
+export function getSkillsForApplication(appID) {
+    // INPUT: appID (INT)
+    // OUTPUT: Promise of array of skills if succesful
+    //         Else, Promise rejection
+    const jwt = getUserToken();
+    const apiURL = '/api/skills/application?applicationID=' + appID;
+
+    return axios.get(apiURL, {
+        headers: {
+            'Authorization': jwt
+          }
+    }).then(function (response) {
+        // send name of skills in array
+        let appSkills = response.data.map(skill => skill.name);
+        return Promise.resolve(appSkills);
     }).catch(function (error) {
         // send back error
         return Promise.reject(error);
