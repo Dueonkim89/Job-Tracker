@@ -10,6 +10,7 @@ import { Contact } from './Contact';
 import { Skill } from './Skill';
 import { setConstantValue } from 'typescript';
 import RaisedButton from 'material-ui/RaisedButton';
+import ContactsIcon from '@mui/icons-material/Contacts';
 import { application } from 'express';
 import { EventEmitter } from 'stream';
 import { constants } from 'buffer';
@@ -41,6 +42,16 @@ export default function Dashboard() {
     // Note state to update
     const [currentApp, setCurrentApp] = useState({notes: '', applicationID: ''});
     let currentNote : string = '';
+
+    // Showing contacts modal
+    const [showContacts, setShowContacts] = useState(false);
+    const handleCloseContacts = () => {
+        setShowContacts(false);
+    }
+    const handleShowContacts = () => setShowContacts(true);
+
+    // Contact state to update
+    const [currentContacts, setCurrentContacts] = useState<Contact[]>([]);
 
     useEffect(() => {
         if (user) {
@@ -93,7 +104,6 @@ export default function Dashboard() {
                     temp.push(application);
                 }
                 setApplications(temp);
-                console.log(applications)
             })
         } else {
             //navigate('/login');
@@ -157,12 +167,13 @@ export default function Dashboard() {
                 <th>Location</th>
                 <th>Company</th>
                 <th>Notes</th>
+                <th>Contacts</th>
                 </tr>
             </thead>
         )
     }
 
-    const ShowModal = () : JSX.Element => {
+    const NotesModal = () : JSX.Element => {
         return (
             <Modal
                 show={show}
@@ -188,6 +199,47 @@ export default function Dashboard() {
                     updateNotes(Number(currentApp.applicationID), currentNote)
                     .then(handleClose);
                 }}>Update</Button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+
+    // Contacts Modal
+    const ContactsModal = () : JSX.Element => {
+        return (
+            <Modal
+                show={showContacts}
+                onHide={handleCloseContacts}
+                backdrop="static"
+                keyboard={false}
+                size="xl"
+            >
+                <Modal.Header closeButton>
+                <Modal.Title>Contacts</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Container className="main-table">
+                        <Table striped bordered hover size="sm">
+                            <thead>
+                                <tr>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Role</th>
+                                    <th>Email Address</th>
+                                    <th>Phone Number</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {tableContactRow}
+                            </tbody>
+                        </Table>
+                    </Container>
+                    
+                </Modal.Body>
+                <Modal.Footer>
+                <Button variant="secondary" onClick={handleCloseContacts}>
+                    Close
+                </Button>
                 </Modal.Footer>
             </Modal>
         );
@@ -248,8 +300,43 @@ export default function Dashboard() {
                             }}>
                             {app.notes || <div style={{color: "grey"}}>[Click to Add Notes]</div>}
                         </Button>
-                        <ShowModal />
+                        <NotesModal />
                     </div>
+                </td> 
+                <td>
+                    <div className="d-grid">
+                        <Button variant="" onClick={() => {
+                            handleShowContacts();
+                            setCurrentContacts(app.contacts);
+                            console.log(currentContacts);
+                            }}>
+                            <ContactsIcon />
+                        </Button>
+                        <ContactsModal />
+                    </div>
+                </td>
+            </tr>
+        )
+    })
+
+    // Table rows for Contacts
+    const tableContactRow = currentContacts.map((contact) => {
+        return (
+            <tr>
+                <td>
+                    {contact.firstName}                    
+                </td>
+                <td>
+                    {contact.lastName}                    
+                </td>
+                <td>
+                    {contact.role}                    
+                </td>
+                <td>
+                    {contact.emailAddress}                    
+                </td>
+                <td>
+                    {contact.phoneNumber}                    
                 </td>
             </tr>
         )
