@@ -92,7 +92,6 @@ class NewJobApplication extends React.Component {
 
     async submitApplication(event) {
         event.preventDefault();
-        this.setState({disableSubmitButton: true});
         let {applicationSkillList, companyName, title, location, url, status, companyList, notes, skillListFromServer} = this.state;
 
         url = url.trim();
@@ -114,6 +113,7 @@ class NewJobApplication extends React.Component {
         if (validStringData(companyName) && validStringData(url) && validStringData(title) 
             && validStringData(location) && applicationSkillList.length > 0 && validStringData(status)) {
 
+            this.setState({disableSubmitButton: true});
             const userID = getUserID();
             const companyID = getCompanyID(companyList, companyName);
             const userNotes = notes;
