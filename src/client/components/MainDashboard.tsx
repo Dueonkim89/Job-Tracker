@@ -6,9 +6,11 @@ import axios from 'axios';
 import { UserLoggedInContext } from "../context/UserLoggedInStatus";
 import { User } from './User';
 import { Application } from './Application';
+import { Contact } from './Contact';
 import { Skill } from './Skill';
 import { setConstantValue } from 'typescript';
 import RaisedButton from 'material-ui/RaisedButton';
+import ContactsIcon from '@mui/icons-material/Contacts';
 import { application } from 'express';
 import { EventEmitter } from 'stream';
 import { constants } from 'buffer';
@@ -41,6 +43,16 @@ export default function Dashboard() {
     const [currentApp, setCurrentApp] = useState({notes: '', applicationID: ''});
     let currentNote : string = '';
 
+    // Showing contacts modal
+    const [showContacts, setShowContacts] = useState(false);
+    const handleCloseContacts = () => {
+        setShowContacts(false);
+    }
+    const handleShowContacts = () => setShowContacts(true);
+
+    // Contact state to update
+    const [currentContacts, setCurrentContacts] = useState<Contact[]>([]);
+
     useEffect(() => {
         if (user) {
             getApps();
@@ -63,6 +75,22 @@ export default function Dashboard() {
                 // Go through all applications and create a new map
                 for (let i=0; i<data.data.length; i++) {
                     let current = data.data[i];
+                    let tempContacts : Array<Contact> = [];
+
+                    if (current.contacts) {
+                        for (let j=0; j<current.contacts.length; j++) {
+                            let contact : Contact = {"contactID" : current.contacts[j].contactID,
+                                                    "firstName" : current.contacts[j].firstName,
+                                                    "lastName" : current.contacts[j].lastName,
+                                                    "role" : current.contacts[j].role,
+                                                    "emailAddress" : current.contacts[j].emailAddress,
+                                                    "phoneNumber" : current.contacts[j].phoneNumber};
+                            tempContacts.push(contact);
+                    }
+                    }
+                    // create contacts and add to array
+                    
+
                     // create application object
                     let application : Application = {"applicationID" : current.applicationID,
                                                      "companyName" : current.companyName,
@@ -71,7 +99,8 @@ export default function Dashboard() {
                                                      "location" : current.location,
                                                      "position" : current.position,
                                                      "status" : current.status,
-                                                     "notes" : current.notes}
+                                                     "notes" : current.notes,
+                                                     "contacts" : tempContacts}
                     temp.push(application);
                 }
                 setApplications(temp);
@@ -138,12 +167,13 @@ export default function Dashboard() {
                 <th>Location</th>
                 <th>Company</th>
                 <th>Notes</th>
+                <th>Contacts</th>
                 </tr>
             </thead>
         )
     }
 
-    const ShowModal = () : JSX.Element => {
+    const NotesModal = () : JSX.Element => {
         return (
             <Modal
                 show={show}
@@ -169,6 +199,47 @@ export default function Dashboard() {
                     updateNotes(Number(currentApp.applicationID), currentNote)
                     .then(handleClose);
                 }}>Update</Button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+
+    // Contacts Modal
+    const ContactsModal = () : JSX.Element => {
+        return (
+            <Modal
+                show={showContacts}
+                onHide={handleCloseContacts}
+                backdrop="static"
+                keyboard={false}
+                size="xl"
+            >
+                <Modal.Header closeButton>
+                <Modal.Title>Contacts</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Container className="main-table">
+                        <Table striped bordered hover size="sm">
+                            <thead>
+                                <tr>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Role</th>
+                                    <th>Email Address</th>
+                                    <th>Phone Number</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {tableContactRow}
+                            </tbody>
+                        </Table>
+                    </Container>
+                    
+                </Modal.Body>
+                <Modal.Footer>
+                <Button variant="secondary" onClick={handleCloseContacts}>
+                    Close
+                </Button>
                 </Modal.Footer>
             </Modal>
         );
@@ -229,8 +300,43 @@ export default function Dashboard() {
                             }}>
                             {app.notes || <div style={{color: "grey"}}>[Click to Add Notes]</div>}
                         </Button>
-                        <ShowModal />
+                        <NotesModal />
                     </div>
+                </td> 
+                <td>
+                    <div className="d-grid">
+                        <Button variant="" onClick={() => {
+                            handleShowContacts();
+                            setCurrentContacts(app.contacts);
+                            console.log(currentContacts);
+                            }}>
+                            <ContactsIcon />
+                        </Button>
+                        <ContactsModal />
+                    </div>
+                </td>
+            </tr>
+        )
+    })
+
+    // Table rows for Contacts
+    const tableContactRow = currentContacts.map((contact) => {
+        return (
+            <tr>
+                <td>
+                    {contact.firstName}                    
+                </td>
+                <td>
+                    {contact.lastName}                    
+                </td>
+                <td>
+                    {contact.role}                    
+                </td>
+                <td>
+                    {contact.emailAddress}                    
+                </td>
+                <td>
+                    {contact.phoneNumber}                    
                 </td>
             </tr>
         )

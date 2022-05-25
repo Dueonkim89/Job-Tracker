@@ -1,3 +1,5 @@
+import { Contact } from "./Contact";
+
 export interface Application {
     applicationID : string;
     companyName : string;
@@ -7,5 +9,6 @@ export interface Application {
     position: string;
     status: string;
     notes: string;
+    contacts : Contact[];
 }
 
