@@ -1,4 +1,4 @@
-import { Container, Row, Col, Modal, Button, InputGroup, FormControl, Table, DropdownButton, Dropdown } from 'react-bootstrap';
+import { Container, Row, Col, Modal, Button, InputGroup, FormControl, Table, DropdownButton, Dropdown, Form } from 'react-bootstrap';
 import Rating from '@mui/material/Rating';
 import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -52,6 +52,13 @@ export default function Dashboard() {
 
     // Contact state to update
     const [currentContacts, setCurrentContacts] = useState<Contact[]>([]);
+
+    // current Contact info to add contact
+    let currentFirstName : string = "";
+    let currentLastName : string = "";
+    let currentRole : string = "";
+    let currentEmailAddress : string = "";
+    let currentPhoneNumber : string = "";
 
     useEffect(() => {
         if (user) {
@@ -204,6 +211,89 @@ export default function Dashboard() {
         );
     }
 
+    // add Contact
+    const addContact = () => {
+        if (user) {
+            axios.post("/api/applications/contact", {
+                applicationID: Number(currentApp.applicationID),
+                firstName: currentFirstName,
+                lastName: currentLastName,
+                emailAddress: currentEmailAddress,
+                phoneNumber: currentPhoneNumber,
+                role: currentRole,
+            }, {
+                headers: {
+                    Authorization: user.token
+                }
+            })
+            .then((res) => {
+                setApplications((apps: Application[]) => {
+                    // remove update given application's notes; return the new array
+                    const newApps = apps.slice();
+                    const appToUpdate = newApps.find((app) => Number(app.applicationID) === Number(currentApp.applicationID));
+                    // Create new Contact
+                    let contact : Contact = {"contactID" : res.data.contactID,
+                                            "firstName" : currentFirstName,
+                                            "lastName" : currentLastName,
+                                            "role" : currentRole,
+                                            "emailAddress" : currentEmailAddress,
+                                            "phoneNumber" : currentPhoneNumber};
+                    if(appToUpdate) appToUpdate.contacts.push(contact);
+                    currentFirstName = "";
+                    currentLastName = "";
+                    currentRole = "";
+                    currentEmailAddress = "";
+                    currentPhoneNumber = "";
+                    return newApps;
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+        }
+    }
+
+    const removeContact = () => {
+        if (user) {
+            axios.post("/api/applications/contact", {
+                applicationID: Number(currentApp.applicationID),
+                firstName: currentFirstName,
+                lastName: currentLastName,
+                emailAddress: currentEmailAddress,
+                phoneNumber: currentPhoneNumber,
+                role: currentRole,
+            }, {
+                headers: {
+                    Authorization: user.token
+                }
+            })
+            .then((res) => {
+                setApplications((apps: Application[]) => {
+                    // remove update given application's notes; return the new array
+                    const newApps = apps.slice();
+                    const appToUpdate = newApps.find((app) => Number(app.applicationID) === Number(currentApp.applicationID));
+                    // Create new Contact
+                    let contact : Contact = {"contactID" : res.data.contactID,
+                                            "firstName" : currentFirstName,
+                                            "lastName" : currentLastName,
+                                            "role" : currentRole,
+                                            "emailAddress" : currentEmailAddress,
+                                            "phoneNumber" : currentPhoneNumber};
+                    if(appToUpdate) appToUpdate.contacts.push(contact);
+                    currentFirstName = "";
+                    currentLastName = "";
+                    currentRole = "";
+                    currentEmailAddress = "";
+                    currentPhoneNumber = "";
+                    return newApps;
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+        }
+    }
+
     // Contacts Modal
     const ContactsModal = () : JSX.Element => {
         return (
@@ -218,6 +308,67 @@ export default function Dashboard() {
                 <Modal.Title>Contacts</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    <div style={{float : "right"}}>
+                        <Form>
+                            <Row>
+                                <Form.Group as={Col}>
+                                    <Form.Control 
+                                        id="firstName"
+                                        type="text"
+                                        defaultValue={currentFirstName}
+                                        onChange={(event) => currentFirstName = event.target.value}
+                                        placeholder="First Name"
+                                    />
+                                </Form.Group>
+                                <Form.Group as={Col}>
+                                    <Form.Control 
+                                        id="lastName"
+                                        type="text"
+                                        defaultValue={currentLastName}
+                                        onChange={(event) => currentLastName = event.target.value}
+                                        placeholder="Last Name"
+                                    />
+                                </Form.Group>
+                                <Form.Group as={Col}>
+                                    <Form.Control 
+                                        id="role"
+                                        type="text"
+                                        defaultValue={currentRole}
+                                        onChange={(event) => currentRole = event.target.value}
+                                        placeholder="Role"
+                                    />
+                                </Form.Group>
+                                <Form.Group as={Col}>
+                                    <Form.Control 
+                                        id="emailAddress"
+                                        type="text"
+                                        defaultValue={currentEmailAddress}
+                                        onChange={(event) => currentEmailAddress = event.target.value}
+                                        placeholder="Email Address"
+                                    />
+                                </Form.Group>
+                                <Form.Group as={Col}>
+                                    <Form.Control 
+                                        id="phoneNumber"
+                                        type="text"
+                                        defaultValue={currentPhoneNumber}
+                                        onChange={(event) => currentPhoneNumber = event.target.value}
+                                        placeholder="Phone Number"
+                                    />
+                                </Form.Group>
+                                <Col>
+                                    <Button type="submit" variant="primary" onClick={(e) => {
+                                        e.preventDefault();
+                                        addContact();
+                                    }}>Add Contact</Button>
+                                </Col>
+                            </Row>
+                        </Form>
+                        
+                    </div>
+                </Modal.Body>
+                <Modal.Body>
+                    
                     <Container className="main-table">
                         <Table striped bordered hover size="sm">
                             <thead>
@@ -308,7 +459,7 @@ export default function Dashboard() {
                         <Button variant="" onClick={() => {
                             handleShowContacts();
                             setCurrentContacts(app.contacts);
-                            console.log(currentContacts);
+                            setCurrentApp({notes:"", applicationID: app.applicationID})
                             }}>
                             <ContactsIcon />
                         </Button>
