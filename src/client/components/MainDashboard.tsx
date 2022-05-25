@@ -11,6 +11,7 @@ import { Skill } from './Skill';
 import { setConstantValue } from 'typescript';
 import RaisedButton from 'material-ui/RaisedButton';
 import ContactsIcon from '@mui/icons-material/Contacts';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { application } from 'express';
 import { EventEmitter } from 'stream';
 import { constants } from 'buffer';
@@ -229,8 +230,8 @@ export default function Dashboard() {
             .then((res) => {
                 setApplications((apps: Application[]) => {
                     // remove update given application's notes; return the new array
-                    const newApps = apps.slice();
-                    const appToUpdate = newApps.find((app) => Number(app.applicationID) === Number(currentApp.applicationID));
+                    let newApps = apps.slice();
+                    let appToUpdate = newApps.find((app) => Number(app.applicationID) === Number(currentApp.applicationID));
                     // Create new Contact
                     let contact : Contact = {"contactID" : res.data.contactID,
                                             "firstName" : currentFirstName,
@@ -238,7 +239,10 @@ export default function Dashboard() {
                                             "role" : currentRole,
                                             "emailAddress" : currentEmailAddress,
                                             "phoneNumber" : currentPhoneNumber};
-                    if(appToUpdate) appToUpdate.contacts.push(contact);
+                    if(appToUpdate) {
+                        appToUpdate.contacts.push(contact);
+                        setCurrentContacts(appToUpdate.contacts);
+                    }
                     currentFirstName = "";
                     currentLastName = "";
                     currentRole = "";
@@ -253,16 +257,10 @@ export default function Dashboard() {
         }
     }
 
-    const removeContact = () => {
+    const removeContact = (contactID : Number) => {
         if (user) {
-            axios.post("/api/applications/contact", {
-                applicationID: Number(currentApp.applicationID),
-                firstName: currentFirstName,
-                lastName: currentLastName,
-                emailAddress: currentEmailAddress,
-                phoneNumber: currentPhoneNumber,
-                role: currentRole,
-            }, {
+            axios.delete("/api/applications/contact?contactID=" + contactID, 
+                {
                 headers: {
                     Authorization: user.token
                 }
@@ -270,16 +268,17 @@ export default function Dashboard() {
             .then((res) => {
                 setApplications((apps: Application[]) => {
                     // remove update given application's notes; return the new array
-                    const newApps = apps.slice();
-                    const appToUpdate = newApps.find((app) => Number(app.applicationID) === Number(currentApp.applicationID));
-                    // Create new Contact
-                    let contact : Contact = {"contactID" : res.data.contactID,
-                                            "firstName" : currentFirstName,
-                                            "lastName" : currentLastName,
-                                            "role" : currentRole,
-                                            "emailAddress" : currentEmailAddress,
-                                            "phoneNumber" : currentPhoneNumber};
-                    if(appToUpdate) appToUpdate.contacts.push(contact);
+                    let newApps = apps.slice();
+                    let appToUpdate = newApps.find((app) => Number(app.applicationID) === Number(currentApp.applicationID));
+                    if(appToUpdate) {
+                        appToUpdate.contacts.forEach((contact, index) => {
+                            if (Number(contact.contactID) === contactID) {
+                                appToUpdate?.contacts.splice(index, 1);
+                            }
+                        });
+                        setCurrentContacts(appToUpdate.contacts);
+
+                    }
                     currentFirstName = "";
                     currentLastName = "";
                     currentRole = "";
@@ -488,6 +487,13 @@ export default function Dashboard() {
                 </td>
                 <td>
                     {contact.phoneNumber}                    
+                </td>
+                <td>
+                    <Button variant="" size="sm" onClick={() => {
+                        removeContact(Number(contact.contactID))
+                        }}>
+                        <DeleteIcon />
+                    </Button>
                 </td>
             </tr>
         )
