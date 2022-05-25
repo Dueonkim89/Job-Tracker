@@ -177,11 +177,34 @@ export function titleCase(str) {
 
 export function getAllSkills() {
     //  INPUT: none
-    // OUTPUT: get request of user skills in promise
+    // OUTPUT: get request of all skills in promise
     return axios.get('/api/skills').then(function (response) {
         return Promise.resolve(response.data);
     }).catch(function (error) {
         return Promise.reject(error.response);
+    });
+}
+
+export function getUserSkills() {
+    //  INPUT: none
+    // OUTPUT: SUCCESS: map of user skills in promise (KEY = skillID, value = name)
+    //         FAILURE: error message
+    const jwt = getUserToken();
+    const apiURL = '/api/skills/user?userID=' + getUserID();
+    return axios.get(apiURL, {
+        headers: {
+            'Authorization': jwt
+          }
+    }).then(function (response) {
+        // payload contains: array of user skill id and skillName
+        const mapOfUserSkills = response.data.reduce((accumulator, data) => {
+            const {skillID, name} = data;
+            return {...accumulator, [skillID]: name};
+        }, {});
+        return Promise.resolve(mapOfUserSkills);
+    }).catch(function (error) {
+        // send back error
+        return Promise.reject(error.response.data);
     });
 }
 
@@ -245,6 +268,25 @@ export function postSkillToApplication(skills) {
 
     const jwt = getUserToken();
     return axios.post("/api/skills/application", skills, {
+        headers: {
+            'Authorization': jwt
+        }
+    }).then(function (response) {
+        return Promise.resolve(response.data);
+    }).catch(function (error) {
+        return Promise.reject(error.response);
+    });
+}
+
+export function postSkillToUser(skillID, rating) {
+    // inputs: skillID (int) and rating(int)
+    //  OUTPUT: Success: Promise {success: true}
+    //          Fail:   Promise rejection: Error
+
+    const jwt = getUserToken();
+    const userID = getUserID();
+
+    return axios.post("/api/skills/user", {skillID, userID, rating}, {
         headers: {
             'Authorization': jwt
         }
