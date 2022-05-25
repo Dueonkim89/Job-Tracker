@@ -2,7 +2,8 @@ import * as React from 'react';
 import { Container, Row, Form, Button, Col } from 'react-bootstrap';
 import {getListOfAllCompanies, getUserToken, getAllSkills, scrapeJobURL, 
         dataAlreadyRecorded, postSkill, arrayOfSkillsToMap, getUserID, 
-        getCompanyID, postApplication, appSkillToMap, postSkillToApplication} from '../utils/helper';
+        getCompanyID, postApplication, appSkillToMap, postSkillToApplication, 
+        postSkillToUser, getUserSkills} from '../utils/helper';
 import {validStringData} from '../utils/formValidation';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
 import { Navigate, useNavigate, Link,  useLocation } from "react-router-dom"
@@ -35,7 +36,9 @@ class NewJobApplication extends React.Component {
            locationValid: true,
            statusValid: true,
            appSkillsValid: true,
-           redirect: {shouldRedirect: false, location: ""}
+           userSkillAlreadyRecorded: {},
+           redirect: {shouldRedirect: false, location: ""},
+           disableSubmitButton: false,
         };
 
         // this.enterFirstName = this.enterFirstName.bind(this);enterLocationaa
@@ -89,6 +92,7 @@ class NewJobApplication extends React.Component {
 
     async submitApplication(event) {
         event.preventDefault();
+        this.setState({disableSubmitButton: true});
         let {applicationSkillList, companyName, title, location, url, status, companyList, notes, skillListFromServer} = this.state;
 
         url = url.trim();
@@ -125,6 +129,15 @@ class NewJobApplication extends React.Component {
                 const uniqueMapOfAppSkills = appSkillToMap(applicationSkillList, mapOfSkillsFromServer);
 
                 await postSkillToApplication({applicationID, 'skillIDs': Object.values(uniqueMapOfAppSkills)});
+
+                // post job skills to user, give default rating of 3
+                for (const skill in uniqueMapOfAppSkills) {
+                    // only post if not already in user skill
+                    const skillID = uniqueMapOfAppSkills[skill];
+                    if (!this.state.userSkillAlreadyRecorded.hasOwnProperty(skillID)) {
+                        await postSkillToUser(skillID, 3);
+                    }
+                }
   
                 // send message that app was succesfully submitted and reset form fields
                 alert("Application has been successfully submitted.");
@@ -135,6 +148,7 @@ class NewJobApplication extends React.Component {
             catch (error) {
                 if (error.sourceMessage === "Error in creating new application") {
                     alert("Unable to submit application. Please try again!");
+                    this.resetFormFields();
                     return;
                 }
                 // application was posted, but skill was not.
@@ -164,6 +178,7 @@ class NewJobApplication extends React.Component {
             locationValid: true,
             statusValid: true,
             appSkillsValid: true,
+            disableSubmitButton: false,
         });
     }
 
@@ -248,9 +263,20 @@ class NewJobApplication extends React.Component {
                 }
             );
 
+            // all skills recorded in database
             getAllSkills().then(
                 (result) => {
                     this.setState({skillListFromServer: result});
+                }
+            ).catch((error) => {
+                return;
+                }
+            );
+            
+            //user skill already recorded
+            getUserSkills().then(
+                (result) => {
+                    this.setState({userSkillAlreadyRecorded: result});
                 }
             ).catch((error) => {
                 return;
@@ -296,7 +322,7 @@ class NewJobApplication extends React.Component {
                     <Form.Control id="notes" as="textarea" rows={3} value={this.state.notes} onChange={this.enterNotes} placeholder="Leave optional notes here..."/>
                 </Form.Group>
                 <div style={{padding: formPadding}}>
-                    <Button type="submit">Submit</Button>
+                    <Button disabled={this.state.disableSubmitButton} type="submit">Submit</Button>
                 </div>
             </Form>    
         );
