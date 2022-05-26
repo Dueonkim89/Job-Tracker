@@ -439,9 +439,9 @@ export default function Dashboard() {
                     {app.position}
                 </a></td>
                 <td>{app.location}</td>
-                <td><a href={window.origin + "/applied_company/" + app.companyName} target="_blank" rel="noopener">
-                    {app.companyName}
-                </a></td>
+                <td>
+                    <Link to={`/applied_company/${app.companyName}`}>{app.companyName}</Link>
+                </td>
                 <td>
                     <div className="d-grid">
                         <Button variant="" onClick={() => {

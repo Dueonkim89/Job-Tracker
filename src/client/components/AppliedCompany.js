@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Container, Row, Table, Button } from 'react-bootstrap';
 import {getCompanyNameFromURL, getUserApplications, formatDate, getCommentsForCompany, getSkillsForApplication} from '../utils/helper';
 import {UserLoggedInContext} from "../context/UserLoggedInStatus";
-import { Navigate } from "react-router-dom"
+import { Navigate, Link } from "react-router-dom"
 
 const formPadding = ".75rem";
 const labelFontSize = "1.2rem";
@@ -165,7 +165,9 @@ class AppliedCompany extends React.Component {
                         </Row>
                         <Row style={{backgroundColor: "#c0c6cc", textAlign: "left"}}>
                             <div style={{fontSize: "1.2rem", marginTop: "1.25rem", marginBottom: "1.25rem" }}>
+                            <Link to="/add_comment" state={{ companyName: this.state.companyName, companyID: this.state.companyID }}>
                                 <Button variant="primary">Add comment</Button>
+                            </Link>
                             </div>                    
                         </Row>
                     </Container>

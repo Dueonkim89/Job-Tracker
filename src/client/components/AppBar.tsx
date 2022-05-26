@@ -26,13 +26,13 @@ export default function ProjectAppBar() {
     return (
       <Navbar bg="primary" className="proj-appbar" variant="dark">
         <Container className="me-auto">
-          <LinkContainer to="login">
+          <LinkContainer to="main">
             <Navbar.Brand>Job Tracker</Navbar.Brand>
           </LinkContainer>
         </Container>
         <Nav className="me-auto">
-          <LinkContainer to="login">
-            <Nav.Link>My contacts</Nav.Link>
+          <LinkContainer to="main">
+            <Nav.Link>My Applications</Nav.Link>
           </LinkContainer>
           <LinkContainer to="login">
             <Nav.Link onClick={logout}>Log out</Nav.Link>
