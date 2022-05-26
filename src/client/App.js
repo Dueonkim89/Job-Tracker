@@ -8,7 +8,8 @@ import NewJobApplication from "./components/NewJobApplication";
 import AddCompany from "./components/AddCompany";
 import AppliedCompany from "./components/AppliedCompany";
 import {PasswordResetEmail, PasswordChangeForm} from "./components/PasswordReset"
-import { Routes, Route } from "react-router-dom"; 
+import AddComment from "./components/AddComment";
+import { BrowserRouter, Routes, Route } from "react-router-dom"; 
 import {UserLoggedInContext} from "./context/UserLoggedInStatus";
 import {checkIfTokenExists, checkIfTokenExpired} from "./utils/helper.js"
 
@@ -63,6 +64,7 @@ function setRoutes() {
             <Route path="application" element={<NewJobApplication />} />
             <Route path="add_company" element={<AddCompany />} />
             <Route path="applied_company/:company_name" element={<AppliedCompany />} />
+            <Route path="add_comment" element={<AddComment />} />
             <Route path="*" element={<Dashboard />} />
         </Routes>
     );
