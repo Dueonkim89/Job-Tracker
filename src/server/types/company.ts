@@ -18,6 +18,6 @@ export class Company extends BaseValidator<CompanyFields> {
         companyID: (v: any) => typeof v === "number",
         name: (v: any) => typeof v === "string",
         industry: (v: any) => typeof v === "string",
-        websiteURL: (v: any) => typeof v === "string" && isValidURL(v),
+        websiteURL: (v: any) => typeof v === "string",
     };
 }
