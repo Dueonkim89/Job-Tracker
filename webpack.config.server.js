@@ -2,6 +2,8 @@
 
 const path = require("path");
 const nodeExternals = require("webpack-node-externals");
+const Dotenv = require('dotenv-webpack');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const entry = { server: "./src/server/index.ts" };
 
@@ -11,6 +13,14 @@ module.exports = {
     devtool: "inline-source-map",
     entry: entry,
     cache: false,
+    plugins: [
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: 'certs', to: 'certs/'}
+            ]
+        }),
+        new Dotenv()
+    ],
     output: {
         path: path.resolve(__dirname, "build"),
         filename: "[name].js",

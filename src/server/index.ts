@@ -10,7 +10,7 @@ import { AuthError, ValidationError } from "./types/validators";
 const cors = require("cors");
 const MySqlStore = require("express-mysql-session")(session);
 
-const buildDir = path.join(process.cwd(), "/build");
+const buildDir = path.join(process.cwd(), "");
 
 // Middleware
 export const app: Express = express();
